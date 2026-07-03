@@ -61,25 +61,34 @@ same-model agents within a cell produce DIFFERING raw completions; abort and rep
 if identical** (guards against provider caching / sampling determinism, the artifact
 that inflated the broken pilot from Δκ = 0.113 to 0.485).
 
-## Grid
+## Grid (v3 — powered)
 
-- **50 tickers**, stratified 4–5 per GICS sector across all 11 sectors
-  (`config.yaml: sectors`; enumerated with sectors in `appendix/grid.csv`).
-- **8 analysis dates**, each (a) strictly AFTER the latest knowledge cutoff in
+Mini-pilot v1 (news context, 8×2) gave a clean, independent-draw Δκ(HOM−HET)=0.124
+(protocol verified: identical-raw 0%), but implied ~1,097 cells for 80% power — the
+50×8 design was underpowered, and per-cell real-news snippets do not scale. The
+design is therefore updated (re-registered here, before any confirmatory data) to:
+
+- **100 tickers**, stratified 8–10 per GICS sector across all 11 sectors
+  (`config.yaml: sectors`; enumerated in `appendix/grid.csv`). More tickers = more
+  bootstrap clusters, which is what tightens the ticker-clustered CI.
+- **12 analysis dates**, each (a) strictly AFTER the latest knowledge cutoff in
   `model_manifest.md` and (b) ON/BEFORE 2026-06-01 so every 20-trading-day
-  forward-return window has closed. Dates are spread across distinct 2026 market
-  regimes (AI-capex expansion vs energy supply-shock), one-line justification per
-  date in `config.yaml: date_regimes` and `appendix/grid.csv`.
-- 400 cells × 3 configs × 3 runs × 5 agents = **18,000 calls**.
-- Context snippets come solely from `/inputs`, containing only pre-date
-  information (as-of date strictly before the analysis date); provenance is logged
-  per call.
+  forward-return window has closed; spread across 2026 regimes (see `date_regimes`).
+- 1,200 cells × 3 configs × 3 runs × 5 agents = **54,000 calls**.
+- **Context is price-derived** (not news): each snippet is computed deterministically
+  from the ticker's own price history up to the as-of date (prior trading day) —
+  trailing 1w/1m/3m returns, 21-day realized volatility, position within the 63-day
+  range. No lookahead (only data ≤ as-of), fully reproducible from public prices via
+  `fetch_prices.py` (yfinance) → `build_data.py`; provenance `price_derived` logged
+  per call. This replaces the connector-news context of pilot v1 and is stated
+  explicitly wherever pilot and study are compared.
 
 ## Task
 
 Each agent receives the same context snippet and returns STRICT JSON
 `{"direction":"BUY|HOLD|SELL","conviction":1-5,"rationale":"<=30 words"}`. The exact
-prompt text is frozen in `prompt_template.txt`.
+prompt text is frozen in `prompt_template.txt` (unchanged from v1; only the snippet
+content differs).
 
 ## Replicability clause
 

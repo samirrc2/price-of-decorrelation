@@ -12,49 +12,56 @@ seeds: [101, 202, 303]       # base seed per run; per-agent seed derived from th
 
 forward_return_days: 20
 
-# --- Grid: 50 tickers stratified across 11 GICS sectors (see sectors map) -----
+# --- Grid: 100 tickers stratified across 11 GICS sectors (see sectors map) -----
+#     Enlarged from 50 -> 100 so the ticker-clustered bootstrap has enough clusters
+#     to power the pre-registered Δκ endpoint (mini-pilot v1 implied ~1,097 cells).
 tickers: [
-  AAPL, MSFT, NVDA, AVGO, CRM,          # Information Technology (5)
-  JPM, BAC, WFC, GS, MS,                # Financials (5)
-  XOM, CVX, COP, SLB, EOG,              # Energy (5)
-  LIN, SHW, FCX, NEM,                   # Materials (4)
-  CAT, BA, HON, UNP, GE,                # Industrials (5)
-  NEE, DUK, SO, D,                      # Utilities (4)
-  UNH, JNJ, LLY, PFE, ABBV,             # Health Care (5)
-  AMZN, TSLA, HD, MCD, NKE,             # Consumer Discretionary (5)
-  PG, KO, PEP, COST,                    # Consumer Staples (4)
-  GOOGL, META, NFLX, DIS,               # Communication Services (4)
-  PLD, AMT, EQIX, SPG,                  # Real Estate (4)
+  AAPL, MSFT, NVDA, AVGO, CRM, ORCL, ADBE, AMD, CSCO, ACN,      # Info Tech (10)
+  JPM, BAC, WFC, GS, MS, C, AXP, SCHW, BLK, SPGI,               # Financials (10)
+  XOM, CVX, COP, SLB, EOG, MPC, PSX, WMB, OXY,                  # Energy (9)
+  LIN, SHW, FCX, NEM, APD, ECL, DOW, NUE,                       # Materials (8)
+  CAT, BA, HON, UNP, GE, RTX, DE, LMT, UPS, ETN,                # Industrials (10)
+  NEE, DUK, SO, D, AEP, EXC, SRE, XEL,                          # Utilities (8)
+  UNH, JNJ, LLY, PFE, ABBV, MRK, TMO, ABT, DHR, BMY,            # Health Care (10)
+  AMZN, TSLA, HD, MCD, NKE, LOW, SBUX, BKNG, TJX, GM,           # Cons Disc (10)
+  PG, KO, PEP, COST, WMT, MDLZ, CL, MO, TGT,                    # Cons Staples (9)
+  GOOGL, META, NFLX, DIS, CMCSA, VZ, T, TMUS,                   # Comm Svcs (8)
+  PLD, AMT, EQIX, SPG, O, CCI, PSA, DLR,                        # Real Estate (8)
 ]
 
 sectors:
-  Information Technology: [AAPL, MSFT, NVDA, AVGO, CRM]
-  Financials: [JPM, BAC, WFC, GS, MS]
-  Energy: [XOM, CVX, COP, SLB, EOG]
-  Materials: [LIN, SHW, FCX, NEM]
-  Industrials: [CAT, BA, HON, UNP, GE]
-  Utilities: [NEE, DUK, SO, D]
-  Health Care: [UNH, JNJ, LLY, PFE, ABBV]
-  Consumer Discretionary: [AMZN, TSLA, HD, MCD, NKE]
-  Consumer Staples: [PG, KO, PEP, COST]
-  Communication Services: [GOOGL, META, NFLX, DIS]
-  Real Estate: [PLD, AMT, EQIX, SPG]
+  Information Technology: [AAPL, MSFT, NVDA, AVGO, CRM, ORCL, ADBE, AMD, CSCO, ACN]
+  Financials: [JPM, BAC, WFC, GS, MS, C, AXP, SCHW, BLK, SPGI]
+  Energy: [XOM, CVX, COP, SLB, EOG, MPC, PSX, WMB, OXY]
+  Materials: [LIN, SHW, FCX, NEM, APD, ECL, DOW, NUE]
+  Industrials: [CAT, BA, HON, UNP, GE, RTX, DE, LMT, UPS, ETN]
+  Utilities: [NEE, DUK, SO, D, AEP, EXC, SRE, XEL]
+  Health Care: [UNH, JNJ, LLY, PFE, ABBV, MRK, TMO, ABT, DHR, BMY]
+  Consumer Discretionary: [AMZN, TSLA, HD, MCD, NKE, LOW, SBUX, BKNG, TJX, GM]
+  Consumer Staples: [PG, KO, PEP, COST, WMT, MDLZ, CL, MO, TGT]
+  Communication Services: [GOOGL, META, NFLX, DIS, CMCSA, VZ, T, TMUS]
+  Real Estate: [PLD, AMT, EQIX, SPG, O, CCI, PSA, DLR]
 
 # --- 8 analysis dates: all strictly AFTER latest model cutoff (2025-08, VERIFY via
 #     probe) and ON/BEFORE 2026-06-01 so every 20-td forward window has closed.
 #     Regime justification per date (see appendix/grid.csv / preregistration.md). ---
-dates: ["2026-01-15", "2026-02-12", "2026-03-04", "2026-03-25",
-        "2026-04-15", "2026-05-01", "2026-05-15", "2026-05-28"]
+dates: ["2026-01-09", "2026-01-23", "2026-02-06", "2026-02-20",
+        "2026-03-06", "2026-03-20", "2026-04-03", "2026-04-17",
+        "2026-05-01", "2026-05-15", "2026-05-22", "2026-05-29"]
 
 date_regimes:
-  "2026-01-15": "Early-year risk-on positioning; pre-Q4-earnings."
-  "2026-02-12": "Q4 2025 earnings season; rate-path repricing."
-  "2026-03-04": "AI-capex expansion phase; semis leadership."
-  "2026-03-25": "Late-Q1 rotation; breadth broadening."
-  "2026-04-15": "Q1 2026 earnings / AI-capex peak (pilot date)."
+  "2026-01-09": "Early-year risk-on positioning."
+  "2026-01-23": "Pre-Q4-earnings drift."
+  "2026-02-06": "Q4 2025 earnings season; rate-path repricing."
+  "2026-02-20": "Post-earnings rotation."
+  "2026-03-06": "AI-capex expansion phase; semis leadership."
+  "2026-03-20": "Late-Q1 breadth broadening."
+  "2026-04-03": "Q2 positioning."
+  "2026-04-17": "Q1 2026 earnings / AI-capex peak."
   "2026-05-01": "Onset of energy supply-shock regime (Iran / Strait of Hormuz)."
-  "2026-05-15": "Energy supply-shock phase; defensive rotation (pilot date)."
-  "2026-05-28": "Late-May consolidation; supply-shock persistence."
+  "2026-05-15": "Energy supply-shock phase; defensive rotation."
+  "2026-05-22": "Supply-shock persistence."
+  "2026-05-29": "Late-May consolidation."
 
 # --- Ensemble configs (5 agents each). Heterogeneity = # non-OpenAI agents. ---
 configs:
@@ -117,11 +124,11 @@ models:
 # --- Phase 1.5 mini-pilot (reuses the cached pilot cells) ---------------------
 minipilot:
   tickers: [AAPL, MSFT, JPM, XOM, UNH, CAT, GOOGL, PG]
-  dates: ["2026-04-15", "2026-05-15"]
+  dates: ["2026-04-17", "2026-05-15"]
   runs: 3
   spend_cap_usd: 8.0
   gate:
-    max_cells: 400
+    max_cells: 1200          # power must be reachable within the planned 1,200-cell grid
     max_cost_usd: 75.0
   paths:
     runs_csv: "minipilot/runs.csv"
@@ -132,6 +139,7 @@ spend_cap_usd: 90.0           # hard cap for the single confirmatory execution
 stop_margin_usd: 1.0
 midrun_report_at: 0.50
 max_retries: 3
+concurrency: 24               # parallel worker threads (override with --concurrency)
 
 # --- Paths -------------------------------------------------------------------
 paths:
@@ -144,5 +152,5 @@ bootstrap_draws: 2000
 power_alpha: 0.05
 power_target: 0.80
 gate:
-  max_cells: 400
+  max_cells: 1200         # planned confirmatory grid = 100 tickers x 12 dates
   max_cost_usd: 300.0

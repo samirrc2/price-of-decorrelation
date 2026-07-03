@@ -112,11 +112,12 @@ def parse_strict(raw: str) -> Decision:
     txt = raw.strip()
     if txt.startswith("```"):
         txt = re.sub(r"^```[a-zA-Z]*\n?|\n?```$", "", txt.strip())
-    # grab the first {...} block
-    m = re.search(r"\{.*\}", txt, re.DOTALL)
-    if not m:
+    # Decode the FIRST JSON object and ignore any trailing data (some models,
+    # e.g. Gemini in JSON mode, emit a second object or trailing text).
+    start = txt.find("{")
+    if start == -1:
         raise ValueError(f"No JSON object in response: {raw[:200]!r}")
-    obj = json.loads(m.group(0))
+    obj, _end = json.JSONDecoder().raw_decode(txt[start:])
     direction = str(obj["direction"]).strip().upper()
     if direction not in VALID_DIRECTIONS:
         raise ValueError(f"direction {direction!r} not in {VALID_DIRECTIONS}")

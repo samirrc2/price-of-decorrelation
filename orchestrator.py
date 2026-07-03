@@ -23,6 +23,8 @@ import csv
 import json
 import hashlib
 import sys
+import threading
+from concurrent.futures import ThreadPoolExecutor
 from datetime import date, datetime, timezone
 from pathlib import Path
 
@@ -167,6 +169,9 @@ def main() -> int:
     ap.add_argument("--today", default=None, help="override today (YYYY-MM-DD) for gates")
     ap.add_argument("--phase", choices=["minipilot", "full"], default="full",
                     help="minipilot (Phase 1.5 gate) or full (Phase 2 single execution)")
+    ap.add_argument("--concurrency", type=int, default=None,
+                    help="parallel worker threads (default: config.concurrency or 1). "
+                         "Order-independent: does NOT affect analysis determinism.")
     args = ap.parse_args()
 
     cfg = load_config()
@@ -246,30 +251,33 @@ def main() -> int:
 
     seed_mode = str(cfg.get("seed_mode", "per_agent"))
     master = int(cfg["seed_master"])
+    workers = args.concurrency or int(cfg.get("concurrency", 1))
+    workers = max(1, workers)
     print(f"Seed mode: {seed_mode} "
-          f"({'INDEPENDENT per-agent draws' if seed_mode=='per_agent' else seed_mode}).")
+          f"({'INDEPENDENT per-agent draws' if seed_mode=='per_agent' else seed_mode}). "
+          f"Concurrency: {workers} worker(s).")
 
-    cum = 0.0
-    n_done = 0
-    n_fail = 0
-    for (config_name, ticker, d, run_idx, run_seed, agent_idx, model) in calls:
-        key = (config_name, ticker, d, run_idx, agent_idx)
-        if key in done:
-            continue
+    todo = [c for c in calls if (c[0], c[1], c[2], c[3], c[5]) not in done]
+    remaining = len(todo)
+
+    # shared state (thread-safe). Execution order does NOT affect analysis (analyze.py
+    # is order-independent); concurrency is purely a wall-clock optimization.
+    st = {"cum": 0.0, "n_done": 0, "n_fail": 0, "stop": False}
+    lock_spend = threading.Lock()
+    lock_io = threading.Lock()
+    temp = float(cfg["temperature"])
+
+    def process(slot):
+        (config_name, ticker, d, run_idx, run_seed, agent_idx, model) = slot
         mcfg = cfg["models"][model]
-        # Corrected seeding: a distinct seed per agent per call (or none).
         seed = derive_agent_seed(seed_mode, master, run_seed, config_name, ticker, d, agent_idx)
-
         snip = agentmod.load_or_build_snippet(ticker, d, inputs_dir)
-        temp = float(cfg["temperature"])
         user = agentmod.build_prompt(ticker, snip)
         ph = agentmod.prompt_hash(agentmod.SYSTEM_PROMPT, user)
         use_cache = seed is not None
         ckey = _response_cache_key(mcfg, ph, seed, temp) if use_cache else None
         cached_hit = _cache_get(ckey) if use_cache else None
 
-        # (res, is_cached, attempt) tuples to log — one row PER attempt (retries
-        # are logged, never silently replacing a logged response).
         attempts = []
         if cached_hit is not None:
             try:
@@ -283,14 +291,14 @@ def main() -> int:
             attempts.append((res, True, 1))
         else:
             wc = worst_case_cost(mcfg, est_in)
-            if cum + wc > (cap - margin):
-                print(f"\nSTOP: next call worst-case ${wc:.4f} would risk breaching "
-                      f"cap ${cap:.2f} (cumulative ${cum:.4f}, margin ${margin:.2f}).")
-                print("Halting cleanly; runs.csv holds all completed calls.")
-                break
+            with lock_spend:
+                if st["stop"] or st["cum"] + wc > (cap - margin):
+                    st["stop"] = True
+                    return
             for attempt in range(1, max_retries + 2):
                 res = agentmod.run_agent(mcfg, ticker, snip, temp, seed)
-                cum += price_of(mcfg, res.input_tokens, res.output_tokens)
+                with lock_spend:
+                    st["cum"] += price_of(mcfg, res.input_tokens, res.output_tokens)
                 if use_cache and res.ok and (res.raw_response or res.output_tokens):
                     _cache_put(ckey, {"raw": res.raw_response,
                                       "in_tok": res.input_tokens, "out_tok": res.output_tokens})
@@ -298,49 +306,60 @@ def main() -> int:
                 if res.ok:
                     break
 
-        for (res, is_cached, attempt) in attempts:
-            cost = price_of(mcfg, res.input_tokens, res.output_tokens)
-            row = {
-                "phase": phase, "config": config_name, "ticker": ticker, "date": d,
-                "run_idx": run_idx, "run_seed": run_seed, "seed": seed,
-                "seed_mode": seed_mode, "agent_idx": agent_idx, "attempt": attempt,
-                "model": model, "api_model": mcfg["api_model"], "provider": mcfg["provider"],
-                "timestamp_utc": datetime.now(timezone.utc).isoformat(),
-                "prompt_hash": res.prompt_hash,
-                "snippet_source": snip.source, "snippet_asof": snip.asof,
-                "direction": res.decision.direction if res.decision else "",
-                "conviction": res.decision.conviction if res.decision else "",
-                "rationale": res.decision.rationale if res.decision else "",
-                "input_tokens": res.input_tokens, "output_tokens": res.output_tokens,
-                "cost_usd": round(cost, 6), "cached": is_cached,
-                "ok": res.ok, "error": res.error or "",
-                "raw_response": (res.raw_response or "").replace("\n", " ")[:2000],
-            }
-            append_row(runs_csv, row)
-            _store_result(mcfg, row)
-            if not res.ok:
-                n_fail += 1
-                tag = "retry" if attempt > 1 else "call"
-                print(f"  ! {config_name} {ticker} {d} run{run_idx} agent{agent_idx} "
-                      f"({model}) {tag} {attempt} FAILED: {res.error}")
-        n_done += 1  # one grid slot resolved (its attempts are all logged)
+        with lock_io:
+            for (res, is_cached, attempt) in attempts:
+                cost = price_of(mcfg, res.input_tokens, res.output_tokens)
+                row = {
+                    "phase": phase, "config": config_name, "ticker": ticker, "date": d,
+                    "run_idx": run_idx, "run_seed": run_seed, "seed": seed,
+                    "seed_mode": seed_mode, "agent_idx": agent_idx, "attempt": attempt,
+                    "model": model, "api_model": mcfg["api_model"], "provider": mcfg["provider"],
+                    "timestamp_utc": datetime.now(timezone.utc).isoformat(),
+                    "prompt_hash": res.prompt_hash,
+                    "snippet_source": snip.source, "snippet_asof": snip.asof,
+                    "direction": res.decision.direction if res.decision else "",
+                    "conviction": res.decision.conviction if res.decision else "",
+                    "rationale": res.decision.rationale if res.decision else "",
+                    "input_tokens": res.input_tokens, "output_tokens": res.output_tokens,
+                    "cost_usd": round(cost, 6), "cached": is_cached,
+                    "ok": res.ok, "error": res.error or "",
+                    "raw_response": (res.raw_response or "").replace("\n", " ")[:2000],
+                }
+                append_row(runs_csv, row)
+                _store_result(mcfg, row)
+                if not res.ok:
+                    st["n_fail"] += 1
+                    tag = "retry" if attempt > 1 else "call"
+                    print(f"  ! {config_name} {ticker} {d} run{run_idx} agent{agent_idx} "
+                          f"({model}) {tag} {attempt} FAILED: {res.error}")
+            st["n_done"] += 1
+            nd = st["n_done"]
+            ledger_path.write_text(json.dumps({
+                "phase": phase, "cumulative_usd": round(st["cum"], 6),
+                "slots_completed_this_session": nd,
+                "attempt_failures_this_session": st["n_fail"],
+                "cap_usd": cap, "updated": datetime.now(timezone.utc).isoformat(),
+            }, indent=2))
+            if remaining and nd == int(midrun_at * remaining):
+                print(f"  === MID-RUN ({midrun_at:.0%}): {nd}/{remaining} slots, "
+                      f"cumulative ${st['cum']:.4f} / cap ${cap:.2f} ===")
+            if nd % 100 == 0:
+                print(f"  ...{nd}/{remaining} slots, cumulative ${st['cum']:.4f}")
 
-        ledger_path.write_text(json.dumps({
-            "phase": phase, "cumulative_usd": round(cum, 6),
-            "slots_completed_this_session": n_done,
-            "attempt_failures_this_session": n_fail,
-            "cap_usd": cap, "updated": datetime.now(timezone.utc).isoformat(),
-        }, indent=2))
+    if workers == 1:
+        for slot in todo:
+            if st["stop"]:
+                break
+            process(slot)
+    else:
+        with ThreadPoolExecutor(max_workers=workers) as ex:
+            list(ex.map(process, todo))
 
-        remaining = total - len(done)
-        if remaining and n_done == int(midrun_at * remaining):
-            print(f"  === MID-RUN ({midrun_at:.0%}): {n_done}/{remaining} slots, "
-                  f"cumulative ${cum:.4f} / cap ${cap:.2f} ===")
-        if n_done % 50 == 0:
-            print(f"  ...{n_done} slots this session, cumulative ${cum:.4f}")
-
-    print(f"\nDone this session: {n_done} calls, {n_fail} failed, "
-          f"spend ${cum:.4f} / cap ${cap:.2f}.")
+    if st["stop"]:
+        print(f"\nSTOP: spend cap ${cap:.2f} guard tripped; halted cleanly. "
+              f"runs.csv holds all completed calls (resume by re-running).")
+    print(f"\nDone this session: {st['n_done']}/{remaining} slots, {st['n_fail']} attempt-failures, "
+          f"spend ${st['cum']:.4f} / cap ${cap:.2f}.")
     print(f"Raw log: {runs_csv}")
     print("Next: python analyze.py")
     return 0
