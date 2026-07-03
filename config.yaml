@@ -101,7 +101,7 @@ models:
     knowledge_cutoff: "2025-08-01"    # VERIFY
     price_in: 0.20
     price_out: 1.25
-    max_tokens: 2000
+    max_tokens: 256                   # ~40-token JSON output; 256 is ample headroom
   # (gemini flagship/pro was inventory-only and not available on this account;
   #  no config uses it, so it is intentionally omitted. Add back a verified pro
   #  string here if you want it recorded in the manifest.)
@@ -111,7 +111,7 @@ models:
     knowledge_cutoff: "2025-01-01"    # VERIFY
     price_in: 1.5
     price_out: 9.0
-    max_tokens: 512
+    max_tokens: 256                   # thinking disabled; ~40-token JSON output
   grok-4.3:
     provider: xai
     api_model: "grok-4.3"
