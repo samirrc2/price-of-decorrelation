@@ -1,0 +1,100 @@
+# =============================================================================
+# PILOT: Cost of de-correlating multi-agent LLM financial analysis
+# Fully deterministic. Editing this file is the ONLY way to change the grid.
+# =============================================================================
+
+seed_master: 20260703          # governs any pipeline-level RNG (bootstrap, etc.)
+
+# --- Task grid ---------------------------------------------------------------
+tickers: [AAPL, MSFT, JPM, XOM, UNH, CAT, GOOGL, PG]
+
+# Analysis dates. HARD CONSTRAINTS (enforced by orchestrator, will refuse to run
+# if violated):
+#   (a) date  >  every model's knowledge cutoff below   (avoids memorised answers)
+#   (b) date  <= today - forward_return_days trading days (so the 20d forward
+#       return used by the accuracy proxy has actually realised)
+#   (c) the context snippet fed to agents must PREDATE the date (no lookahead) —
+#       enforced in agent.py via snippet_asof metadata.
+# Defaults below are chosen for a "today" on/after ~2026-06-20. VERIFY cutoffs
+# (see models.*.knowledge_cutoff) before trusting (a).
+dates: ["2026-04-15", "2026-05-15"]
+
+runs: 3                          # independent runs / seeds per cell
+seeds: [101, 202, 303]           # base seed per run (see seed_mode)
+temperature: 0.7
+
+# Seeding of agent draws. The estimand is INDEPENDENT agent draws, so the 5 agents
+# in a cell must NOT share a seed (that yields one draw copied 5x -> spurious κ=1).
+#   per_agent : unique reproducible seed per (run, cell, agent)  [CORRECT DEFAULT]
+#   per_run   : legacy bug — all 5 agents share the run seed (correlated draws)
+#   none      : send no seed; provider samples freely (max independence, not reproducible)
+seed_mode: per_agent
+
+forward_return_days: 20          # trading days, for the NOISY accuracy proxy
+
+# --- Ensemble configurations -------------------------------------------------
+# Each entry is one agent slot. 5 agents per config. Order is fixed & logged.
+configs:
+  HOM:                          # homogeneous: 5x the same model (xAI)
+    - {model: grok-4.3}
+    - {model: grok-4.3}
+    - {model: grok-4.3}
+    - {model: grok-4.3}
+    - {model: grok-4.3}
+  HET:                          # heterogeneous: cross-vendor 1 big / 2 mid / 2 small
+    - {model: gpt-5.5}          # big  (OpenAI flagship)
+    - {model: grok-4.3}         # mid  (xAI)
+    - {model: grok-4.3}         # mid  (xAI)
+    - {model: gpt-5.4-nano}     # small (OpenAI)
+    - {model: gpt-5.4-nano}     # small (OpenAI)
+
+# --- Model registry ----------------------------------------------------------
+# provider: which SDK path in agent.py handles the call.
+# knowledge_cutoff: VERIFY each against the provider's model card before running.
+#   The orchestrator refuses to run if any analysis date <= a model's cutoff.
+# price_in / price_out: USD per 1,000,000 tokens. VERIFY against CURRENT published
+#   pricing at run time — these are placeholders based on historical tiers.
+models:
+  # --- xAI (grok-3 / grok-4 were RETIRED 2026-05-15; grok-4.3 is the live model) ---
+  grok-4.3:
+    provider: xai
+    api_model: "grok-4.3"
+    knowledge_cutoff: "2025-06-01"    # VERIFY (grok-3/4 were Nov-2024; 4.3 is newer)
+    price_in: 1.25                    # per xAI docs, June 2026
+    price_out: 2.50
+    max_tokens: 256
+    reasoning_effort: "low"           # keep short/cheap; grok-4.3 supports this
+
+  # --- OpenAI (gpt-5 family, July 2026) ---
+  gpt-5.5:
+    provider: openai
+    api_model: "gpt-5.5"              # VERIFY exact id in your account
+    knowledge_cutoff: "2025-06-01"    # VERIFY
+    price_in: 5.0
+    price_out: 30.0
+    max_tokens: 3000                  # reasoning tokens count against this; 256 left empty replies
+  gpt-5.4-nano:
+    provider: openai
+    api_model: "gpt-5.4-nano"         # VERIFY exact id in your account
+    knowledge_cutoff: "2025-06-01"    # VERIFY
+    price_in: 0.20
+    price_out: 1.25
+    max_tokens: 256
+
+# --- Guardrails --------------------------------------------------------------
+spend_cap_usd: 20.0            # hard stop; orchestrator halts if a call would exceed
+stop_margin_usd: 0.50         # stop this much BEFORE the cap to avoid overshoot
+
+# --- Paths -------------------------------------------------------------------
+paths:
+  inputs_dir: "inputs"        # optional pre-made context snippets: <TICKER>_<DATE>.json
+  runs_csv: "runs.csv"
+  spend_ledger: "spend_ledger.json"
+
+# --- Analysis knobs ----------------------------------------------------------
+bootstrap_draws: 2000
+power_alpha: 0.05
+power_target: 0.80
+gate:
+  max_cells: 400
+  max_cost_usd: 300.0

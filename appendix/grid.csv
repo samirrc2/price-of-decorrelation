@@ -1,0 +1,401 @@
+cell_id,ticker,sector,date,regime
+AAPL|2026-01-15,AAPL,Information Technology,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+AAPL|2026-02-12,AAPL,Information Technology,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+AAPL|2026-03-04,AAPL,Information Technology,2026-03-04,AI-capex expansion phase; semis leadership.
+AAPL|2026-03-25,AAPL,Information Technology,2026-03-25,Late-Q1 rotation; breadth broadening.
+AAPL|2026-04-15,AAPL,Information Technology,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+AAPL|2026-05-01,AAPL,Information Technology,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+AAPL|2026-05-15,AAPL,Information Technology,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+AAPL|2026-05-28,AAPL,Information Technology,2026-05-28,Late-May consolidation; supply-shock persistence.
+MSFT|2026-01-15,MSFT,Information Technology,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+MSFT|2026-02-12,MSFT,Information Technology,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+MSFT|2026-03-04,MSFT,Information Technology,2026-03-04,AI-capex expansion phase; semis leadership.
+MSFT|2026-03-25,MSFT,Information Technology,2026-03-25,Late-Q1 rotation; breadth broadening.
+MSFT|2026-04-15,MSFT,Information Technology,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+MSFT|2026-05-01,MSFT,Information Technology,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+MSFT|2026-05-15,MSFT,Information Technology,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+MSFT|2026-05-28,MSFT,Information Technology,2026-05-28,Late-May consolidation; supply-shock persistence.
+NVDA|2026-01-15,NVDA,Information Technology,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+NVDA|2026-02-12,NVDA,Information Technology,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+NVDA|2026-03-04,NVDA,Information Technology,2026-03-04,AI-capex expansion phase; semis leadership.
+NVDA|2026-03-25,NVDA,Information Technology,2026-03-25,Late-Q1 rotation; breadth broadening.
+NVDA|2026-04-15,NVDA,Information Technology,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+NVDA|2026-05-01,NVDA,Information Technology,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+NVDA|2026-05-15,NVDA,Information Technology,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+NVDA|2026-05-28,NVDA,Information Technology,2026-05-28,Late-May consolidation; supply-shock persistence.
+AVGO|2026-01-15,AVGO,Information Technology,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+AVGO|2026-02-12,AVGO,Information Technology,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+AVGO|2026-03-04,AVGO,Information Technology,2026-03-04,AI-capex expansion phase; semis leadership.
+AVGO|2026-03-25,AVGO,Information Technology,2026-03-25,Late-Q1 rotation; breadth broadening.
+AVGO|2026-04-15,AVGO,Information Technology,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+AVGO|2026-05-01,AVGO,Information Technology,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+AVGO|2026-05-15,AVGO,Information Technology,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+AVGO|2026-05-28,AVGO,Information Technology,2026-05-28,Late-May consolidation; supply-shock persistence.
+CRM|2026-01-15,CRM,Information Technology,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+CRM|2026-02-12,CRM,Information Technology,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+CRM|2026-03-04,CRM,Information Technology,2026-03-04,AI-capex expansion phase; semis leadership.
+CRM|2026-03-25,CRM,Information Technology,2026-03-25,Late-Q1 rotation; breadth broadening.
+CRM|2026-04-15,CRM,Information Technology,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+CRM|2026-05-01,CRM,Information Technology,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+CRM|2026-05-15,CRM,Information Technology,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+CRM|2026-05-28,CRM,Information Technology,2026-05-28,Late-May consolidation; supply-shock persistence.
+JPM|2026-01-15,JPM,Financials,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+JPM|2026-02-12,JPM,Financials,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+JPM|2026-03-04,JPM,Financials,2026-03-04,AI-capex expansion phase; semis leadership.
+JPM|2026-03-25,JPM,Financials,2026-03-25,Late-Q1 rotation; breadth broadening.
+JPM|2026-04-15,JPM,Financials,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+JPM|2026-05-01,JPM,Financials,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+JPM|2026-05-15,JPM,Financials,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+JPM|2026-05-28,JPM,Financials,2026-05-28,Late-May consolidation; supply-shock persistence.
+BAC|2026-01-15,BAC,Financials,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+BAC|2026-02-12,BAC,Financials,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+BAC|2026-03-04,BAC,Financials,2026-03-04,AI-capex expansion phase; semis leadership.
+BAC|2026-03-25,BAC,Financials,2026-03-25,Late-Q1 rotation; breadth broadening.
+BAC|2026-04-15,BAC,Financials,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+BAC|2026-05-01,BAC,Financials,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+BAC|2026-05-15,BAC,Financials,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+BAC|2026-05-28,BAC,Financials,2026-05-28,Late-May consolidation; supply-shock persistence.
+WFC|2026-01-15,WFC,Financials,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+WFC|2026-02-12,WFC,Financials,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+WFC|2026-03-04,WFC,Financials,2026-03-04,AI-capex expansion phase; semis leadership.
+WFC|2026-03-25,WFC,Financials,2026-03-25,Late-Q1 rotation; breadth broadening.
+WFC|2026-04-15,WFC,Financials,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+WFC|2026-05-01,WFC,Financials,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+WFC|2026-05-15,WFC,Financials,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+WFC|2026-05-28,WFC,Financials,2026-05-28,Late-May consolidation; supply-shock persistence.
+GS|2026-01-15,GS,Financials,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+GS|2026-02-12,GS,Financials,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+GS|2026-03-04,GS,Financials,2026-03-04,AI-capex expansion phase; semis leadership.
+GS|2026-03-25,GS,Financials,2026-03-25,Late-Q1 rotation; breadth broadening.
+GS|2026-04-15,GS,Financials,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+GS|2026-05-01,GS,Financials,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+GS|2026-05-15,GS,Financials,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+GS|2026-05-28,GS,Financials,2026-05-28,Late-May consolidation; supply-shock persistence.
+MS|2026-01-15,MS,Financials,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+MS|2026-02-12,MS,Financials,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+MS|2026-03-04,MS,Financials,2026-03-04,AI-capex expansion phase; semis leadership.
+MS|2026-03-25,MS,Financials,2026-03-25,Late-Q1 rotation; breadth broadening.
+MS|2026-04-15,MS,Financials,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+MS|2026-05-01,MS,Financials,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+MS|2026-05-15,MS,Financials,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+MS|2026-05-28,MS,Financials,2026-05-28,Late-May consolidation; supply-shock persistence.
+XOM|2026-01-15,XOM,Energy,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+XOM|2026-02-12,XOM,Energy,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+XOM|2026-03-04,XOM,Energy,2026-03-04,AI-capex expansion phase; semis leadership.
+XOM|2026-03-25,XOM,Energy,2026-03-25,Late-Q1 rotation; breadth broadening.
+XOM|2026-04-15,XOM,Energy,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+XOM|2026-05-01,XOM,Energy,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+XOM|2026-05-15,XOM,Energy,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+XOM|2026-05-28,XOM,Energy,2026-05-28,Late-May consolidation; supply-shock persistence.
+CVX|2026-01-15,CVX,Energy,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+CVX|2026-02-12,CVX,Energy,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+CVX|2026-03-04,CVX,Energy,2026-03-04,AI-capex expansion phase; semis leadership.
+CVX|2026-03-25,CVX,Energy,2026-03-25,Late-Q1 rotation; breadth broadening.
+CVX|2026-04-15,CVX,Energy,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+CVX|2026-05-01,CVX,Energy,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+CVX|2026-05-15,CVX,Energy,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+CVX|2026-05-28,CVX,Energy,2026-05-28,Late-May consolidation; supply-shock persistence.
+COP|2026-01-15,COP,Energy,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+COP|2026-02-12,COP,Energy,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+COP|2026-03-04,COP,Energy,2026-03-04,AI-capex expansion phase; semis leadership.
+COP|2026-03-25,COP,Energy,2026-03-25,Late-Q1 rotation; breadth broadening.
+COP|2026-04-15,COP,Energy,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+COP|2026-05-01,COP,Energy,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+COP|2026-05-15,COP,Energy,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+COP|2026-05-28,COP,Energy,2026-05-28,Late-May consolidation; supply-shock persistence.
+SLB|2026-01-15,SLB,Energy,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+SLB|2026-02-12,SLB,Energy,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+SLB|2026-03-04,SLB,Energy,2026-03-04,AI-capex expansion phase; semis leadership.
+SLB|2026-03-25,SLB,Energy,2026-03-25,Late-Q1 rotation; breadth broadening.
+SLB|2026-04-15,SLB,Energy,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+SLB|2026-05-01,SLB,Energy,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+SLB|2026-05-15,SLB,Energy,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+SLB|2026-05-28,SLB,Energy,2026-05-28,Late-May consolidation; supply-shock persistence.
+EOG|2026-01-15,EOG,Energy,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+EOG|2026-02-12,EOG,Energy,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+EOG|2026-03-04,EOG,Energy,2026-03-04,AI-capex expansion phase; semis leadership.
+EOG|2026-03-25,EOG,Energy,2026-03-25,Late-Q1 rotation; breadth broadening.
+EOG|2026-04-15,EOG,Energy,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+EOG|2026-05-01,EOG,Energy,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+EOG|2026-05-15,EOG,Energy,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+EOG|2026-05-28,EOG,Energy,2026-05-28,Late-May consolidation; supply-shock persistence.
+LIN|2026-01-15,LIN,Materials,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+LIN|2026-02-12,LIN,Materials,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+LIN|2026-03-04,LIN,Materials,2026-03-04,AI-capex expansion phase; semis leadership.
+LIN|2026-03-25,LIN,Materials,2026-03-25,Late-Q1 rotation; breadth broadening.
+LIN|2026-04-15,LIN,Materials,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+LIN|2026-05-01,LIN,Materials,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+LIN|2026-05-15,LIN,Materials,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+LIN|2026-05-28,LIN,Materials,2026-05-28,Late-May consolidation; supply-shock persistence.
+SHW|2026-01-15,SHW,Materials,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+SHW|2026-02-12,SHW,Materials,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+SHW|2026-03-04,SHW,Materials,2026-03-04,AI-capex expansion phase; semis leadership.
+SHW|2026-03-25,SHW,Materials,2026-03-25,Late-Q1 rotation; breadth broadening.
+SHW|2026-04-15,SHW,Materials,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+SHW|2026-05-01,SHW,Materials,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+SHW|2026-05-15,SHW,Materials,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+SHW|2026-05-28,SHW,Materials,2026-05-28,Late-May consolidation; supply-shock persistence.
+FCX|2026-01-15,FCX,Materials,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+FCX|2026-02-12,FCX,Materials,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+FCX|2026-03-04,FCX,Materials,2026-03-04,AI-capex expansion phase; semis leadership.
+FCX|2026-03-25,FCX,Materials,2026-03-25,Late-Q1 rotation; breadth broadening.
+FCX|2026-04-15,FCX,Materials,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+FCX|2026-05-01,FCX,Materials,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+FCX|2026-05-15,FCX,Materials,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+FCX|2026-05-28,FCX,Materials,2026-05-28,Late-May consolidation; supply-shock persistence.
+NEM|2026-01-15,NEM,Materials,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+NEM|2026-02-12,NEM,Materials,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+NEM|2026-03-04,NEM,Materials,2026-03-04,AI-capex expansion phase; semis leadership.
+NEM|2026-03-25,NEM,Materials,2026-03-25,Late-Q1 rotation; breadth broadening.
+NEM|2026-04-15,NEM,Materials,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+NEM|2026-05-01,NEM,Materials,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+NEM|2026-05-15,NEM,Materials,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+NEM|2026-05-28,NEM,Materials,2026-05-28,Late-May consolidation; supply-shock persistence.
+CAT|2026-01-15,CAT,Industrials,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+CAT|2026-02-12,CAT,Industrials,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+CAT|2026-03-04,CAT,Industrials,2026-03-04,AI-capex expansion phase; semis leadership.
+CAT|2026-03-25,CAT,Industrials,2026-03-25,Late-Q1 rotation; breadth broadening.
+CAT|2026-04-15,CAT,Industrials,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+CAT|2026-05-01,CAT,Industrials,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+CAT|2026-05-15,CAT,Industrials,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+CAT|2026-05-28,CAT,Industrials,2026-05-28,Late-May consolidation; supply-shock persistence.
+BA|2026-01-15,BA,Industrials,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+BA|2026-02-12,BA,Industrials,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+BA|2026-03-04,BA,Industrials,2026-03-04,AI-capex expansion phase; semis leadership.
+BA|2026-03-25,BA,Industrials,2026-03-25,Late-Q1 rotation; breadth broadening.
+BA|2026-04-15,BA,Industrials,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+BA|2026-05-01,BA,Industrials,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+BA|2026-05-15,BA,Industrials,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+BA|2026-05-28,BA,Industrials,2026-05-28,Late-May consolidation; supply-shock persistence.
+HON|2026-01-15,HON,Industrials,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+HON|2026-02-12,HON,Industrials,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+HON|2026-03-04,HON,Industrials,2026-03-04,AI-capex expansion phase; semis leadership.
+HON|2026-03-25,HON,Industrials,2026-03-25,Late-Q1 rotation; breadth broadening.
+HON|2026-04-15,HON,Industrials,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+HON|2026-05-01,HON,Industrials,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+HON|2026-05-15,HON,Industrials,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+HON|2026-05-28,HON,Industrials,2026-05-28,Late-May consolidation; supply-shock persistence.
+UNP|2026-01-15,UNP,Industrials,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+UNP|2026-02-12,UNP,Industrials,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+UNP|2026-03-04,UNP,Industrials,2026-03-04,AI-capex expansion phase; semis leadership.
+UNP|2026-03-25,UNP,Industrials,2026-03-25,Late-Q1 rotation; breadth broadening.
+UNP|2026-04-15,UNP,Industrials,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+UNP|2026-05-01,UNP,Industrials,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+UNP|2026-05-15,UNP,Industrials,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+UNP|2026-05-28,UNP,Industrials,2026-05-28,Late-May consolidation; supply-shock persistence.
+GE|2026-01-15,GE,Industrials,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+GE|2026-02-12,GE,Industrials,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+GE|2026-03-04,GE,Industrials,2026-03-04,AI-capex expansion phase; semis leadership.
+GE|2026-03-25,GE,Industrials,2026-03-25,Late-Q1 rotation; breadth broadening.
+GE|2026-04-15,GE,Industrials,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+GE|2026-05-01,GE,Industrials,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+GE|2026-05-15,GE,Industrials,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+GE|2026-05-28,GE,Industrials,2026-05-28,Late-May consolidation; supply-shock persistence.
+NEE|2026-01-15,NEE,Utilities,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+NEE|2026-02-12,NEE,Utilities,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+NEE|2026-03-04,NEE,Utilities,2026-03-04,AI-capex expansion phase; semis leadership.
+NEE|2026-03-25,NEE,Utilities,2026-03-25,Late-Q1 rotation; breadth broadening.
+NEE|2026-04-15,NEE,Utilities,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+NEE|2026-05-01,NEE,Utilities,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+NEE|2026-05-15,NEE,Utilities,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+NEE|2026-05-28,NEE,Utilities,2026-05-28,Late-May consolidation; supply-shock persistence.
+DUK|2026-01-15,DUK,Utilities,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+DUK|2026-02-12,DUK,Utilities,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+DUK|2026-03-04,DUK,Utilities,2026-03-04,AI-capex expansion phase; semis leadership.
+DUK|2026-03-25,DUK,Utilities,2026-03-25,Late-Q1 rotation; breadth broadening.
+DUK|2026-04-15,DUK,Utilities,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+DUK|2026-05-01,DUK,Utilities,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+DUK|2026-05-15,DUK,Utilities,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+DUK|2026-05-28,DUK,Utilities,2026-05-28,Late-May consolidation; supply-shock persistence.
+SO|2026-01-15,SO,Utilities,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+SO|2026-02-12,SO,Utilities,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+SO|2026-03-04,SO,Utilities,2026-03-04,AI-capex expansion phase; semis leadership.
+SO|2026-03-25,SO,Utilities,2026-03-25,Late-Q1 rotation; breadth broadening.
+SO|2026-04-15,SO,Utilities,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+SO|2026-05-01,SO,Utilities,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+SO|2026-05-15,SO,Utilities,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+SO|2026-05-28,SO,Utilities,2026-05-28,Late-May consolidation; supply-shock persistence.
+D|2026-01-15,D,Utilities,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+D|2026-02-12,D,Utilities,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+D|2026-03-04,D,Utilities,2026-03-04,AI-capex expansion phase; semis leadership.
+D|2026-03-25,D,Utilities,2026-03-25,Late-Q1 rotation; breadth broadening.
+D|2026-04-15,D,Utilities,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+D|2026-05-01,D,Utilities,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+D|2026-05-15,D,Utilities,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+D|2026-05-28,D,Utilities,2026-05-28,Late-May consolidation; supply-shock persistence.
+UNH|2026-01-15,UNH,Health Care,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+UNH|2026-02-12,UNH,Health Care,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+UNH|2026-03-04,UNH,Health Care,2026-03-04,AI-capex expansion phase; semis leadership.
+UNH|2026-03-25,UNH,Health Care,2026-03-25,Late-Q1 rotation; breadth broadening.
+UNH|2026-04-15,UNH,Health Care,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+UNH|2026-05-01,UNH,Health Care,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+UNH|2026-05-15,UNH,Health Care,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+UNH|2026-05-28,UNH,Health Care,2026-05-28,Late-May consolidation; supply-shock persistence.
+JNJ|2026-01-15,JNJ,Health Care,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+JNJ|2026-02-12,JNJ,Health Care,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+JNJ|2026-03-04,JNJ,Health Care,2026-03-04,AI-capex expansion phase; semis leadership.
+JNJ|2026-03-25,JNJ,Health Care,2026-03-25,Late-Q1 rotation; breadth broadening.
+JNJ|2026-04-15,JNJ,Health Care,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+JNJ|2026-05-01,JNJ,Health Care,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+JNJ|2026-05-15,JNJ,Health Care,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+JNJ|2026-05-28,JNJ,Health Care,2026-05-28,Late-May consolidation; supply-shock persistence.
+LLY|2026-01-15,LLY,Health Care,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+LLY|2026-02-12,LLY,Health Care,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+LLY|2026-03-04,LLY,Health Care,2026-03-04,AI-capex expansion phase; semis leadership.
+LLY|2026-03-25,LLY,Health Care,2026-03-25,Late-Q1 rotation; breadth broadening.
+LLY|2026-04-15,LLY,Health Care,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+LLY|2026-05-01,LLY,Health Care,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+LLY|2026-05-15,LLY,Health Care,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+LLY|2026-05-28,LLY,Health Care,2026-05-28,Late-May consolidation; supply-shock persistence.
+PFE|2026-01-15,PFE,Health Care,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+PFE|2026-02-12,PFE,Health Care,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+PFE|2026-03-04,PFE,Health Care,2026-03-04,AI-capex expansion phase; semis leadership.
+PFE|2026-03-25,PFE,Health Care,2026-03-25,Late-Q1 rotation; breadth broadening.
+PFE|2026-04-15,PFE,Health Care,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+PFE|2026-05-01,PFE,Health Care,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+PFE|2026-05-15,PFE,Health Care,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+PFE|2026-05-28,PFE,Health Care,2026-05-28,Late-May consolidation; supply-shock persistence.
+ABBV|2026-01-15,ABBV,Health Care,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+ABBV|2026-02-12,ABBV,Health Care,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+ABBV|2026-03-04,ABBV,Health Care,2026-03-04,AI-capex expansion phase; semis leadership.
+ABBV|2026-03-25,ABBV,Health Care,2026-03-25,Late-Q1 rotation; breadth broadening.
+ABBV|2026-04-15,ABBV,Health Care,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+ABBV|2026-05-01,ABBV,Health Care,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+ABBV|2026-05-15,ABBV,Health Care,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+ABBV|2026-05-28,ABBV,Health Care,2026-05-28,Late-May consolidation; supply-shock persistence.
+AMZN|2026-01-15,AMZN,Consumer Discretionary,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+AMZN|2026-02-12,AMZN,Consumer Discretionary,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+AMZN|2026-03-04,AMZN,Consumer Discretionary,2026-03-04,AI-capex expansion phase; semis leadership.
+AMZN|2026-03-25,AMZN,Consumer Discretionary,2026-03-25,Late-Q1 rotation; breadth broadening.
+AMZN|2026-04-15,AMZN,Consumer Discretionary,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+AMZN|2026-05-01,AMZN,Consumer Discretionary,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+AMZN|2026-05-15,AMZN,Consumer Discretionary,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+AMZN|2026-05-28,AMZN,Consumer Discretionary,2026-05-28,Late-May consolidation; supply-shock persistence.
+TSLA|2026-01-15,TSLA,Consumer Discretionary,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+TSLA|2026-02-12,TSLA,Consumer Discretionary,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+TSLA|2026-03-04,TSLA,Consumer Discretionary,2026-03-04,AI-capex expansion phase; semis leadership.
+TSLA|2026-03-25,TSLA,Consumer Discretionary,2026-03-25,Late-Q1 rotation; breadth broadening.
+TSLA|2026-04-15,TSLA,Consumer Discretionary,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+TSLA|2026-05-01,TSLA,Consumer Discretionary,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+TSLA|2026-05-15,TSLA,Consumer Discretionary,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+TSLA|2026-05-28,TSLA,Consumer Discretionary,2026-05-28,Late-May consolidation; supply-shock persistence.
+HD|2026-01-15,HD,Consumer Discretionary,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+HD|2026-02-12,HD,Consumer Discretionary,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+HD|2026-03-04,HD,Consumer Discretionary,2026-03-04,AI-capex expansion phase; semis leadership.
+HD|2026-03-25,HD,Consumer Discretionary,2026-03-25,Late-Q1 rotation; breadth broadening.
+HD|2026-04-15,HD,Consumer Discretionary,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+HD|2026-05-01,HD,Consumer Discretionary,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+HD|2026-05-15,HD,Consumer Discretionary,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+HD|2026-05-28,HD,Consumer Discretionary,2026-05-28,Late-May consolidation; supply-shock persistence.
+MCD|2026-01-15,MCD,Consumer Discretionary,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+MCD|2026-02-12,MCD,Consumer Discretionary,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+MCD|2026-03-04,MCD,Consumer Discretionary,2026-03-04,AI-capex expansion phase; semis leadership.
+MCD|2026-03-25,MCD,Consumer Discretionary,2026-03-25,Late-Q1 rotation; breadth broadening.
+MCD|2026-04-15,MCD,Consumer Discretionary,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+MCD|2026-05-01,MCD,Consumer Discretionary,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+MCD|2026-05-15,MCD,Consumer Discretionary,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+MCD|2026-05-28,MCD,Consumer Discretionary,2026-05-28,Late-May consolidation; supply-shock persistence.
+NKE|2026-01-15,NKE,Consumer Discretionary,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+NKE|2026-02-12,NKE,Consumer Discretionary,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+NKE|2026-03-04,NKE,Consumer Discretionary,2026-03-04,AI-capex expansion phase; semis leadership.
+NKE|2026-03-25,NKE,Consumer Discretionary,2026-03-25,Late-Q1 rotation; breadth broadening.
+NKE|2026-04-15,NKE,Consumer Discretionary,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+NKE|2026-05-01,NKE,Consumer Discretionary,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+NKE|2026-05-15,NKE,Consumer Discretionary,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+NKE|2026-05-28,NKE,Consumer Discretionary,2026-05-28,Late-May consolidation; supply-shock persistence.
+PG|2026-01-15,PG,Consumer Staples,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+PG|2026-02-12,PG,Consumer Staples,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+PG|2026-03-04,PG,Consumer Staples,2026-03-04,AI-capex expansion phase; semis leadership.
+PG|2026-03-25,PG,Consumer Staples,2026-03-25,Late-Q1 rotation; breadth broadening.
+PG|2026-04-15,PG,Consumer Staples,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+PG|2026-05-01,PG,Consumer Staples,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+PG|2026-05-15,PG,Consumer Staples,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+PG|2026-05-28,PG,Consumer Staples,2026-05-28,Late-May consolidation; supply-shock persistence.
+KO|2026-01-15,KO,Consumer Staples,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+KO|2026-02-12,KO,Consumer Staples,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+KO|2026-03-04,KO,Consumer Staples,2026-03-04,AI-capex expansion phase; semis leadership.
+KO|2026-03-25,KO,Consumer Staples,2026-03-25,Late-Q1 rotation; breadth broadening.
+KO|2026-04-15,KO,Consumer Staples,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+KO|2026-05-01,KO,Consumer Staples,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+KO|2026-05-15,KO,Consumer Staples,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+KO|2026-05-28,KO,Consumer Staples,2026-05-28,Late-May consolidation; supply-shock persistence.
+PEP|2026-01-15,PEP,Consumer Staples,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+PEP|2026-02-12,PEP,Consumer Staples,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+PEP|2026-03-04,PEP,Consumer Staples,2026-03-04,AI-capex expansion phase; semis leadership.
+PEP|2026-03-25,PEP,Consumer Staples,2026-03-25,Late-Q1 rotation; breadth broadening.
+PEP|2026-04-15,PEP,Consumer Staples,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+PEP|2026-05-01,PEP,Consumer Staples,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+PEP|2026-05-15,PEP,Consumer Staples,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+PEP|2026-05-28,PEP,Consumer Staples,2026-05-28,Late-May consolidation; supply-shock persistence.
+COST|2026-01-15,COST,Consumer Staples,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+COST|2026-02-12,COST,Consumer Staples,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+COST|2026-03-04,COST,Consumer Staples,2026-03-04,AI-capex expansion phase; semis leadership.
+COST|2026-03-25,COST,Consumer Staples,2026-03-25,Late-Q1 rotation; breadth broadening.
+COST|2026-04-15,COST,Consumer Staples,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+COST|2026-05-01,COST,Consumer Staples,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+COST|2026-05-15,COST,Consumer Staples,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+COST|2026-05-28,COST,Consumer Staples,2026-05-28,Late-May consolidation; supply-shock persistence.
+GOOGL|2026-01-15,GOOGL,Communication Services,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+GOOGL|2026-02-12,GOOGL,Communication Services,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+GOOGL|2026-03-04,GOOGL,Communication Services,2026-03-04,AI-capex expansion phase; semis leadership.
+GOOGL|2026-03-25,GOOGL,Communication Services,2026-03-25,Late-Q1 rotation; breadth broadening.
+GOOGL|2026-04-15,GOOGL,Communication Services,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+GOOGL|2026-05-01,GOOGL,Communication Services,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+GOOGL|2026-05-15,GOOGL,Communication Services,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+GOOGL|2026-05-28,GOOGL,Communication Services,2026-05-28,Late-May consolidation; supply-shock persistence.
+META|2026-01-15,META,Communication Services,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+META|2026-02-12,META,Communication Services,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+META|2026-03-04,META,Communication Services,2026-03-04,AI-capex expansion phase; semis leadership.
+META|2026-03-25,META,Communication Services,2026-03-25,Late-Q1 rotation; breadth broadening.
+META|2026-04-15,META,Communication Services,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+META|2026-05-01,META,Communication Services,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+META|2026-05-15,META,Communication Services,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+META|2026-05-28,META,Communication Services,2026-05-28,Late-May consolidation; supply-shock persistence.
+NFLX|2026-01-15,NFLX,Communication Services,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+NFLX|2026-02-12,NFLX,Communication Services,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+NFLX|2026-03-04,NFLX,Communication Services,2026-03-04,AI-capex expansion phase; semis leadership.
+NFLX|2026-03-25,NFLX,Communication Services,2026-03-25,Late-Q1 rotation; breadth broadening.
+NFLX|2026-04-15,NFLX,Communication Services,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+NFLX|2026-05-01,NFLX,Communication Services,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+NFLX|2026-05-15,NFLX,Communication Services,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+NFLX|2026-05-28,NFLX,Communication Services,2026-05-28,Late-May consolidation; supply-shock persistence.
+DIS|2026-01-15,DIS,Communication Services,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+DIS|2026-02-12,DIS,Communication Services,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+DIS|2026-03-04,DIS,Communication Services,2026-03-04,AI-capex expansion phase; semis leadership.
+DIS|2026-03-25,DIS,Communication Services,2026-03-25,Late-Q1 rotation; breadth broadening.
+DIS|2026-04-15,DIS,Communication Services,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+DIS|2026-05-01,DIS,Communication Services,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+DIS|2026-05-15,DIS,Communication Services,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+DIS|2026-05-28,DIS,Communication Services,2026-05-28,Late-May consolidation; supply-shock persistence.
+PLD|2026-01-15,PLD,Real Estate,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+PLD|2026-02-12,PLD,Real Estate,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+PLD|2026-03-04,PLD,Real Estate,2026-03-04,AI-capex expansion phase; semis leadership.
+PLD|2026-03-25,PLD,Real Estate,2026-03-25,Late-Q1 rotation; breadth broadening.
+PLD|2026-04-15,PLD,Real Estate,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+PLD|2026-05-01,PLD,Real Estate,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+PLD|2026-05-15,PLD,Real Estate,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+PLD|2026-05-28,PLD,Real Estate,2026-05-28,Late-May consolidation; supply-shock persistence.
+AMT|2026-01-15,AMT,Real Estate,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+AMT|2026-02-12,AMT,Real Estate,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+AMT|2026-03-04,AMT,Real Estate,2026-03-04,AI-capex expansion phase; semis leadership.
+AMT|2026-03-25,AMT,Real Estate,2026-03-25,Late-Q1 rotation; breadth broadening.
+AMT|2026-04-15,AMT,Real Estate,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+AMT|2026-05-01,AMT,Real Estate,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+AMT|2026-05-15,AMT,Real Estate,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+AMT|2026-05-28,AMT,Real Estate,2026-05-28,Late-May consolidation; supply-shock persistence.
+EQIX|2026-01-15,EQIX,Real Estate,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+EQIX|2026-02-12,EQIX,Real Estate,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+EQIX|2026-03-04,EQIX,Real Estate,2026-03-04,AI-capex expansion phase; semis leadership.
+EQIX|2026-03-25,EQIX,Real Estate,2026-03-25,Late-Q1 rotation; breadth broadening.
+EQIX|2026-04-15,EQIX,Real Estate,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+EQIX|2026-05-01,EQIX,Real Estate,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+EQIX|2026-05-15,EQIX,Real Estate,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+EQIX|2026-05-28,EQIX,Real Estate,2026-05-28,Late-May consolidation; supply-shock persistence.
+SPG|2026-01-15,SPG,Real Estate,2026-01-15,Early-year risk-on positioning; pre-Q4-earnings.
+SPG|2026-02-12,SPG,Real Estate,2026-02-12,Q4 2025 earnings season; rate-path repricing.
+SPG|2026-03-04,SPG,Real Estate,2026-03-04,AI-capex expansion phase; semis leadership.
+SPG|2026-03-25,SPG,Real Estate,2026-03-25,Late-Q1 rotation; breadth broadening.
+SPG|2026-04-15,SPG,Real Estate,2026-04-15,Q1 2026 earnings / AI-capex peak (pilot date).
+SPG|2026-05-01,SPG,Real Estate,2026-05-01,Onset of energy supply-shock regime (Iran / Strait of Hormuz).
+SPG|2026-05-15,SPG,Real Estate,2026-05-15,Energy supply-shock phase; defensive rotation (pilot date).
+SPG|2026-05-28,SPG,Real Estate,2026-05-28,Late-May consolidation; supply-shock persistence.

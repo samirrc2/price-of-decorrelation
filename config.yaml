@@ -1,0 +1,148 @@
+# =============================================================================
+# CONFIRMATORY STUDY — The Price of Diversity (cross-provider, 3 configs)
+# Frozen at Phase-1 prereg. analyze.py is a pure function of (runs.csv, config.yaml).
+# =============================================================================
+
+seed_master: 20260703
+bootstrap_seed: 42            # fixed RNG for the cluster bootstrap (pre-registered)
+seed_mode: per_agent         # unique derived seed per agent per call (independent draws)
+temperature: 0.7
+runs: 3
+seeds: [101, 202, 303]       # base seed per run; per-agent seed derived from these
+
+forward_return_days: 20
+
+# --- Grid: 50 tickers stratified across 11 GICS sectors (see sectors map) -----
+tickers: [
+  AAPL, MSFT, NVDA, AVGO, CRM,          # Information Technology (5)
+  JPM, BAC, WFC, GS, MS,                # Financials (5)
+  XOM, CVX, COP, SLB, EOG,              # Energy (5)
+  LIN, SHW, FCX, NEM,                   # Materials (4)
+  CAT, BA, HON, UNP, GE,                # Industrials (5)
+  NEE, DUK, SO, D,                      # Utilities (4)
+  UNH, JNJ, LLY, PFE, ABBV,             # Health Care (5)
+  AMZN, TSLA, HD, MCD, NKE,             # Consumer Discretionary (5)
+  PG, KO, PEP, COST,                    # Consumer Staples (4)
+  GOOGL, META, NFLX, DIS,               # Communication Services (4)
+  PLD, AMT, EQIX, SPG,                  # Real Estate (4)
+]
+
+sectors:
+  Information Technology: [AAPL, MSFT, NVDA, AVGO, CRM]
+  Financials: [JPM, BAC, WFC, GS, MS]
+  Energy: [XOM, CVX, COP, SLB, EOG]
+  Materials: [LIN, SHW, FCX, NEM]
+  Industrials: [CAT, BA, HON, UNP, GE]
+  Utilities: [NEE, DUK, SO, D]
+  Health Care: [UNH, JNJ, LLY, PFE, ABBV]
+  Consumer Discretionary: [AMZN, TSLA, HD, MCD, NKE]
+  Consumer Staples: [PG, KO, PEP, COST]
+  Communication Services: [GOOGL, META, NFLX, DIS]
+  Real Estate: [PLD, AMT, EQIX, SPG]
+
+# --- 8 analysis dates: all strictly AFTER latest model cutoff (2025-08, VERIFY via
+#     probe) and ON/BEFORE 2026-06-01 so every 20-td forward window has closed.
+#     Regime justification per date (see appendix/grid.csv / preregistration.md). ---
+dates: ["2026-01-15", "2026-02-12", "2026-03-04", "2026-03-25",
+        "2026-04-15", "2026-05-01", "2026-05-15", "2026-05-28"]
+
+date_regimes:
+  "2026-01-15": "Early-year risk-on positioning; pre-Q4-earnings."
+  "2026-02-12": "Q4 2025 earnings season; rate-path repricing."
+  "2026-03-04": "AI-capex expansion phase; semis leadership."
+  "2026-03-25": "Late-Q1 rotation; breadth broadening."
+  "2026-04-15": "Q1 2026 earnings / AI-capex peak (pilot date)."
+  "2026-05-01": "Onset of energy supply-shock regime (Iran / Strait of Hormuz)."
+  "2026-05-15": "Energy supply-shock phase; defensive rotation (pilot date)."
+  "2026-05-28": "Late-May consolidation; supply-shock persistence."
+
+# --- Ensemble configs (5 agents each). Heterogeneity = # non-OpenAI agents. ---
+configs:
+  HOM:                                   # heterogeneity level 0
+    - {model: gpt-5.4-nano}
+    - {model: gpt-5.4-nano}
+    - {model: gpt-5.4-nano}
+    - {model: gpt-5.4-nano}
+    - {model: gpt-5.4-nano}
+  HET-LITE:                              # heterogeneity level 1
+    - {model: gpt-5.4-nano}
+    - {model: gpt-5.4-nano}
+    - {model: gpt-5.4-nano}
+    - {model: gpt-5.4-nano}
+    - {model: gemini-3.5-flash}
+  HET:                                   # heterogeneity level 3
+    - {model: gpt-5.4-nano}
+    - {model: gpt-5.4-nano}
+    - {model: gemini-3.5-flash}
+    - {model: gemini-3.5-flash}
+    - {model: grok-4.3}
+
+heterogeneity_level: {HOM: 0, HET-LITE: 1, HET: 3}
+
+# --- Model registry (VERIFY strings/pricing/cutoffs via probe_models.py) -------
+models:
+  gpt-5.5:
+    provider: openai
+    api_model: "gpt-5.5"
+    knowledge_cutoff: "2025-08-01"    # VERIFY
+    price_in: 5.0
+    price_out: 30.0
+    max_tokens: 3000
+  gpt-5.4-nano:
+    provider: openai
+    api_model: "gpt-5.4-nano"
+    knowledge_cutoff: "2025-08-01"    # VERIFY
+    price_in: 0.20
+    price_out: 1.25
+    max_tokens: 2000
+  # (gemini flagship/pro was inventory-only and not available on this account;
+  #  no config uses it, so it is intentionally omitted. Add back a verified pro
+  #  string here if you want it recorded in the manifest.)
+  gemini-3.5-flash:
+    provider: google
+    api_model: "gemini-3.5-flash"
+    knowledge_cutoff: "2025-01-01"    # VERIFY
+    price_in: 1.5
+    price_out: 9.0
+    max_tokens: 512
+  grok-4.3:
+    provider: xai
+    api_model: "grok-4.3"
+    knowledge_cutoff: "2025-06-01"    # VERIFY
+    price_in: 1.25
+    price_out: 2.50
+    max_tokens: 256
+    reasoning_effort: "low"
+
+# --- Phase 1.5 mini-pilot (reuses the cached pilot cells) ---------------------
+minipilot:
+  tickers: [AAPL, MSFT, JPM, XOM, UNH, CAT, GOOGL, PG]
+  dates: ["2026-04-15", "2026-05-15"]
+  runs: 3
+  spend_cap_usd: 8.0
+  gate:
+    max_cells: 400
+    max_cost_usd: 75.0
+  paths:
+    runs_csv: "minipilot/runs.csv"
+    spend_ledger: "minipilot/spend_ledger.json"
+
+# --- Phase 2 full study -------------------------------------------------------
+spend_cap_usd: 90.0           # hard cap for the single confirmatory execution
+stop_margin_usd: 1.0
+midrun_report_at: 0.50
+max_retries: 3
+
+# --- Paths -------------------------------------------------------------------
+paths:
+  inputs_dir: "inputs"
+  runs_csv: "runs.csv"
+  spend_ledger: "spend_ledger.json"
+
+# --- Analysis / gate knobs ---------------------------------------------------
+bootstrap_draws: 2000
+power_alpha: 0.05
+power_target: 0.80
+gate:
+  max_cells: 400
+  max_cost_usd: 300.0

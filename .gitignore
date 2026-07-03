@@ -1,0 +1,26 @@
+# secrets — never commit
+keys.env
+keys.env.txt
+*.key
+
+# generated run artifacts (regenerate by running the pipeline)
+runs.csv
+spend_ledger.json
+metrics_summary.md
+minipilot_verdict.md
+archive_manifest.md
+replication_check.md
+model_probe_raw.json
+cache/
+results/
+minipilot/
+figures/
+tables/
+datacache/forward_returns.json
+inputs/*.json
+__pycache__/
+*.pyc
+.venv/
+
+# committed: datacache/prices.json, datacache/news_cache.json, appendix/grid.csv,
+#            preregistration.md, prompt_template.txt, model_manifest.md, freeze_receipt.md

@@ -1,0 +1,35 @@
+{
+  "_meta": "Real headlines pulled from the financial-data MCP (FMP), each dated on/before the as-of date. Source of truth for inputs/ snippets. Regenerate snippets via build_data.py.",
+  "AAPL": {
+    "2026-04-15": {"headlines": ["Apple price target raised ahead of earnings on expectation of strong iPhone sales and Services growth; Bank of America lifts objective to $325 from $320 (2026-04-14).", "Apple and Amazon partner on Globalstar satellite deal, extending iPhone/Apple Watch satellite features (2026-04-14)."], "fundamentals": "Large-cap tech; iPhone + Services momentum into fiscal Q2 print; analysts constructive; FX a tailwind."},
+    "2026-05-15": {"headlines": ["OpenAI considers legal action against Apple as their two-year AI partnership sours (2026-05-14, NYT/Bloomberg).", "OpenAI weighs breach-of-contract notice over ChatGPT integration results (2026-05-14)."], "fundamentals": "Overhang from strained OpenAI relationship; core hardware/Services franchise intact."}
+  },
+  "MSFT": {
+    "2026-04-15": {"headlines": ["Microsoft outperforms broader market, closing at $393.01, +2.25% on the session (2026-04-14).", "Analysts flag bearish narrative on Microsoft AI spending but argue the bigger AI picture is favorable into Q2 (2026-04-14)."], "fundamentals": "Mega-cap software; AI capex debate; cloud/Copilot growth focus."},
+    "2026-05-15": {"headlines": ["Microsoft eyes AI acquisitions to launch its own model, preparing for a future separate from OpenAI (2026-05-14, Reuters).", "Microsoft down ~25% from its high while the Nasdaq rallies; Burry and Ives frame it as an opportunity (2026-05-14)."], "fundamentals": "Stock lagging index; strategic pivot toward in-house AI; valuation reset debate."}
+  },
+  "JPM": {
+    "2026-04-15": {"headlines": ["JPMorgan trading desk posts record $11.6B; Q1 2026 net income $16.5B on $50.5B revenue, loans $1.5T (2026-04-14).", "CEO Jamie Dimon flags macro risks (wars, trade tensions, AI disruption) despite record profits (2026-04-14)."], "fundamentals": "Largest U.S. bank; record markets revenue; management cautious on outlook."},
+    "2026-05-15": {"headlines": ["JPMorgan down ~1.9% since last earnings report as investors reassess (2026-05-14, Zacks).", "Q1 standout Asset & Wealth Management revenue +11%, AUM climbs to $4.8T on net inflows (2026-05-13)."], "fundamentals": "Post-earnings drift; AWM strength; scale and dividend firepower."}
+  },
+  "XOM": {
+    "2026-04-15": {"headlines": ["Exxon Mobil stock declines -2.23% to $149.24 (2026-04-14, Zacks).", "Analysts list ExxonMobil among dividend energy giants to buy amid Middle East conflict flux (2026-04-14)."], "fundamentals": "Integrated oil major; geopolitics-driven crude volatility; dividend anchor."},
+    "2026-05-15": {"headlines": ["Texas jury finds Exxon Mobil not liable to investors over Canadian oil sands / Rocky Mountain gas disclosures (2026-05-14, Reuters).", "Analysts pitch oil majors including ExxonMobil to buy before prices head higher as Strait of Hormuz stays closed amid Iran war (2026-05-12)."], "fundamentals": "Litigation overhang cleared; oil-price upside skew from supply disruption."}
+  },
+  "UNH": {
+    "2026-04-15": {"headlines": ["UnitedHealth expected to beat earnings estimates in upcoming report (2026-04-14, Zacks).", "Analysts rate UnitedHealth a Buy on ~12% projected annual EPS growth and ~18% total-return potential through 2030 (2026-04-14)."], "fundamentals": "Managed-care leader; earnings rebound thesis after difficult 2025."},
+    "2026-05-15": {"headlines": ["UnitedHealth Q1 revenue $111.72B, EPS $7.23; FY EPS guide raised to >$18.25 with a $2B+ buyback authorized (2026-05-14).", "Goldman Sachs adds UnitedHealth to its Conviction List (2026-05-14)."], "fundamentals": "Strong Q1 beat and guide raise; sell-side upgrade; DOJ/PBM regulatory risk noted."}
+  },
+  "CAT": {
+    "2026-04-15": {"headlines": ["Caterpillar among most-searched stocks as investors weigh the setup into earnings (2026-04-14, Zacks).", "Analysts note Caterpillar's impressive earnings-surprise history heading into its next report (2026-04-13)."], "fundamentals": "Industrial bellwether; cyclical + emerging AI-power generation angle."},
+    "2026-05-15": {"headlines": ["Caterpillar positioned to solve AI's time-to-power bottleneck; Power Generation +41% YoY but only 16.2% of Q1 sales (2026-05-13, Seeking Alpha).", "CAT trading like a tech stock on a ~50% YTD rally tied to AI power demand (2026-05-13)."], "fundamentals": "Re-rating on AI/data-center power; core cyclical exposure remains."}
+  },
+  "GOOGL": {
+    "2026-04-15": {"headlines": ["Commentators argue Google's AI dominance may be unstoppable as compute is used instantly (2026-04-14).", "Google sued by rival app store Aptoide over alleged app-distribution monopoly (2026-04-14, Reuters)."], "fundamentals": "Search/ads + AI infrastructure strength; fresh antitrust litigation risk."},
+    "2026-05-15": {"headlines": ["Microsoft and Alphabet both reported; commentators compare the two AI hands (2026-05-14).", "Alphabet presents at MoffettNathanson Media, Internet & Communications conference (2026-05-14)."], "fundamentals": "Post-earnings; AI monetization narrative; ad business diversification."}
+  },
+  "PG": {
+    "2026-04-15": {"headlines": ["P&G declares an increased quarterly dividend of $1.0885/share, payable May 2026 (2026-04-14).", "P&G Beauty unit grows ~4% on premium innovation while Baby Care lags on inventory headwinds (2026-04-14)."], "fundamentals": "Defensive consumer staple; dividend aristocrat; mixed segment growth."},
+    "2026-05-15": {"headlines": ["Analysts debate whether P&G's U.S. Baby Care slump is dragging overall growth; viewed as fixable (2026-05-12, Zacks).", "P&G featured in dividend-quality/low-risk large-cap screens (2026-05-13)."], "fundamentals": "Stable staple; segment-level softness vs. strong global franchise and yield."}
+  }
+}
