@@ -511,6 +511,21 @@ findings to be evaluated against the design specified before data collection.
 The frozen dataset, pre-registration materials, orchestration configuration, and
 analysis code are included in the accompanying reproducibility package.
 
+\subsection{Collection provenance and retry accounting}
+\label{subsec:provenance}
+The confirmatory grid contains 54{,}000 planned responses, all of which
+ultimately returned valid outputs. Completing the grid required 94{,}566 API
+requests. Of the 40{,}566 unsuccessful requests, 40{,}544 were provider
+rate-limit or quota responses and 22 were transport or schema failures. Because
+rate-limit and quota responses returned no model completion, retrying them did
+not select observations based on generated content.
+
+Every request attempt is retained in the released log. Request settings were
+fixed across configurations, including temperature 0.7, per-agent seed
+construction, a 256-token completion limit, and strict JSON output. The released
+reproducibility materials contain the prompts, prompt hashes, model identifiers,
+prices, experimental configuration, and preregistration records.
+
 \section{Results}
 The analysis includes the complete planned set of 54{,}000 model calls across
 100 equities, 12 analysis dates, three ensemble configurations, three
@@ -618,52 +633,43 @@ Two-way & 1200 & 0.3363 & $[0.2786,\,0.3877]$ \\
 \end{tabular}
 \end{table}
 
-\subsection{Agreement, error correlation, and what ``de-correlation'' denotes}
+\subsection{Agreement, error correlation, and what ``decorrelation'' denotes}
 \label{subsec:errcorr}
-Fleiss' $\kappa$ measures agreement between labels irrespective of whether those
-labels are correct. It is therefore not, by itself, a measure of correlation
-between errors. Because this article's central quantity is described as
-de-correlation, we distinguish five notions that are easily conflated and report
-the one the term denotes.
+Fleiss' $\kappa$ measures agreement among categorical outputs without regard to
+whether those outputs are correct. It therefore does not directly measure
+dependence between model errors. Because this article uses the term
+decorrelation, we distinguish five related concepts:
 
 \begin{enumerate}
-\item \emph{Output agreement}: how often agents emit the same label. Measured by
-$\kappa$; it is what the primary endpoint contrasts.
-\item \emph{Error correlation}: dependence between agents' \emph{mistakes},
-measured below by $\phi$.
-\item \emph{Sampling independence}: whether two draws share a random seed or a
-decoding path. Addressed by the independent-draw protocol of
-Section~\ref{subsec:estimand}; it is a property of the measurement apparatus, not
-of the models.
-\item \emph{Model diversity}: differences in weights, architecture, or training
-data between the agents.
+\item \emph{Output agreement}: the extent to which agents return the same
+categorical label. This is measured by $\kappa$ and constitutes the primary
+endpoint.
+\item \emph{Error correlation}: dependence between agents' mistakes. This is
+measured using $\phi$.
+\item \emph{Sampling independence}: whether repeated responses share elements of
+the sampling process, such as a random seed or decoding trajectory. This is a
+property of the measurement procedure rather than of the models.
+\item \emph{Model diversity}: differences in model weights, architecture,
+training data, or related characteristics.
 \item \emph{Provider diversity}: whether agents are supplied by different
-organisations. This is the factor the design varies.
+organizations. The experimental configurations vary provider composition,
+although provider remains bundled with other model-specific characteristics.
 \end{enumerate}
 
-To establish that heterogeneity reduces error dependence and not merely label
-agreement, we compute, for every pair of agents within an ensemble cell, the
-Pearson correlation $\phi$ between their binary error indicators against the
-forward-return sign. Confidence intervals use the same equity-clustered bootstrap
-as the primary endpoint.
+To determine whether heterogeneity reduces error dependence rather than only
+output agreement, we compute $\phi$ between binary error indicators for every
+pair of agents within an ensemble cell. Error correlation decreases from
+$\phi = 0.984$ for HOM to $0.742$ for HET-LITE and $0.530$ for HET, giving
+$\Delta\phi_{\mathrm{HOM-HET}} = 0.454$ (95\% CI $[0.376,\,0.534]$).
 
-Error correlation falls monotonically with heterogeneity: $\phi = 0.984$ for
-HOM, $0.742$ for HET-LITE, and $0.530$ for HET, giving
-$\Delta\phi_{\mathrm{HOM-HET}} = 0.454$ (95\% CI $[0.376,\,0.534]$). Because
-abstentions are excluded, the scored subset differs across configurations. We
-therefore repeat the calculation counting HOLD as an error, which fixes an
-identical subset for every configuration and removes that selection: $\phi$ is
-$0.586$, $0.359$, and $0.277$, with
-$\Delta\phi_{\mathrm{HOM-HET}} = 0.309$ (95\% CI $[0.262,\,0.354]$). Both
-treatments give a monotone decline whose interval excludes zero, so the estimate
-is bracketed rather than dependent on the treatment of abstentions.
-
-Two qualifications follow. Mean per-agent error rates are close across
-configurations, so the decline is a change in dependence rather than a
-consequence of differing accuracy. And de-correlation is partial, not complete:
-heterogeneous agents still err together more often than independence would imply.
-The term is used in this article in sense (2) above, and the evidence for it is
-the $\phi$ contrast reported here rather than the $\kappa$ contrast.
+Because treating HOLD as an abstention changes the scoreable subset, we repeat
+the analysis with HOLD counted as an error. The corresponding values are $0.586$,
+$0.359$, and $0.277$, with $\Delta\phi_{\mathrm{HOM-HET}} = 0.309$
+(95\% CI $[0.262,\,0.354]$). The ordering is therefore preserved under both
+treatments of HOLD. Mean error rates remain similar across configurations, so the
+decline reflects lower error dependence rather than differences in average
+correctness. Throughout this article, decorrelation refers specifically to the
+reduction in error dependence measured by $\phi$.
 
 \subsection{The agreement--cost frontier}
 \label{subsec:frontier}
@@ -780,27 +786,25 @@ seeds. Both estimates use the same pilot grid and model set.}
 \end{figure}
 
 \paragraph{Sensitivity: agreement by pair type}
-The diagnostic above is strongest for HOM, where all five agents share a model,
-and the heterogeneous cross-run comparison is confounded because pooling across
-runs adds further draws from the same models. We therefore decompose pairwise
-agreement by whether the two agents share a model. Same-model pairs agree at
-0.800 in HOM, 0.794 in HET-LITE, and 0.862 in HET, whereas different-model
-pairs agree at 0.455 and 0.490 respectively. Same-model agreement is stable
-across configurations, so the fall in $\kappa$ with heterogeneity is driven by
-the introduction of different-model pairs rather than by any change in how
-same-model pairs behave. This is a sensitivity analysis on the frozen data, not
-an additional verification of seed support, which the provider APIs do not
-expose.
+We additionally separate pairwise agreement according to whether two agents use
+the same model. Same-model agreement is $0.800$ in HOM, $0.794$ in HET-LITE, and
+$0.862$ in HET, while different-model agreement is $0.455$ in HET-LITE and
+$0.490$ in HET.
+
+The reduction in ensemble agreement is therefore associated with the introduction
+of different-model pairs rather than a systematic decline in agreement among
+repeated instances of the same model. This analysis is a sensitivity check on the
+frozen dataset and does not independently verify provider seed behavior.
 
 \paragraph{What unique seeds do and do not establish}
-A distinct seed per agent removes one specific artifact: identical sampling
-trajectories arising from a shared seed. It does not establish statistical
-independence of the responses. Commercial inference stacks do not guarantee
-bitwise-reproducible outputs for a fixed seed, because floating-point reduction
-order varies with kernel selection and batch composition, and providers may
-change serving configurations without notice. Seed support is therefore
-best-effort and is treated in this article as a control against one known
-dependence mechanism, not as a proof of independence.
+Assigning a distinct seed to each agent removes the specific shared-seed artifact
+observed in the pilot. It does not establish statistical independence of the
+resulting responses.
+
+Seed support in commercial inference systems is best-effort rather than a
+guarantee of deterministic execution. Distinct per-agent seeds are therefore
+treated as a control against one demonstrated dependence mechanism, not as proof
+of independence.
 
 \subsection{Provider-pair agreement}
 The pairwise directional-agreement matrix in Fig.~\ref{fig:provider} provides
@@ -965,75 +969,49 @@ secondary directional-accuracy analysis.}
 \label{fig:cal}
 \end{figure}
 
-\subsection{Cross-domain replication: clinical decisions}
+\subsection{Cross-domain replication: clinical knowledge}
 \label{subsec:crossdomain}
-The confirmatory study measures one financial task. To test whether the effect is
-a property of that task, the entire protocol was repeated on a domain chosen to
-be as unlike it as possible: expert clinical decision-making. Items are the
-MMLU professional-medicine and clinical-knowledge subsets (MIT licence, no
-personal data), 537 four-option questions with a single correct answer.
-Choice order is shuffled deterministically per item, because the published answer
-key is skewed toward one position and a model could otherwise beat chance on
-position alone. The five agents, three configurations, per-agent independent-draw
-seeding, temperature, number of runs, and estimators are unchanged; only the
-domain differs, so any change in the endpoint is attributable to domain rather
-than to a redesign. The design, the predicted direction, and the decision rule
-were registered before collection.
+To test whether the observed ordering is specific to the financial task, we
+repeated the protocol using 537 questions from the MMLU professional-medicine and
+clinical-knowledge subsets~\cite{hendrycks2021mmlu}. Each item has four response
+options and one correct answer. Choice order is shuffled deterministically to
+remove positional imbalance in the published answer key. The five-agent
+structure, three configurations, seeding procedure, temperature, number of runs,
+and estimators remain unchanged. The replication design, predicted direction, and
+decision rule were registered before collection.
 
-The prediction was that the effect would replicate in direction but be
-\emph{smaller} than in finance, because agents answer these items far more
-accurately and agents that are more often correct necessarily agree more. Both
-parts hold. Agreement falls from $\kappa = 0.881$ for HOM to $0.809$ for HET,
-giving $\Delta\kappa_{\mathrm{HOM-HET}} = 0.072$ (95\% CI $[0.040,\,0.104]$),
-roughly a fifth of the financial estimate of $0.336$. Error correlation, by
-contrast, barely attenuates: $\Delta\phi_{\mathrm{HOM-HET}} = 0.393$
-(95\% CI $[0.325,\,0.459]$), against $0.454$ in finance. Agreement is thus the
-accuracy-sensitive quantity and error correlation the portable one, which is why
-the de-correlation claim of Section~\ref{subsec:errcorr} is stated in terms of
-$\phi$.
+Agreement decreases from $\kappa = 0.881$ for HOM to $0.809$ for HET, giving
+$\Delta\kappa_{\mathrm{HOM-HET}} = 0.072$ (95\% CI $[0.040,\,0.104]$), compared
+with $0.336$ in the financial experiment. Error correlation decreases by
+$\Delta\phi_{\mathrm{HOM-HET}} = 0.393$ (95\% CI $[0.325,\,0.459]$), compared
+with $0.454$ in finance. The agreement contrast therefore changes substantially
+more across the two tasks than the error correlation contrast.
 
-Because the three providers are not capability-matched on this domain --- the two
-non-OpenAI models answer these items more accurately --- the pooled contrast
-confounds provider with capability. The design admits a direct test. Within the
-fully heterogeneous configuration, agent pairs drawn from the same provider can
-be compared with pairs drawn from different providers while holding the item set
-and the ensemble composition fixed; and among those, one same-provider and one
-cross-provider pairing have near-identical member accuracy
-($0.951$ and $0.955$). For that capability-matched contrast, error correlation
-is $0.954$ within a provider and $0.607$ across providers, a difference of
-$0.347$ (95\% CI $[0.207,\,0.507]$). Every same-provider pairing shows
-higher error correlation than every cross-provider pairing, at both accuracy
-levels present in the ensemble. The provider-associated ordering therefore
-persists after approximate capability matching, although provider cannot be
-isolated causally from other model-specific characteristics.
+The pooled clinical comparison still combines provider and capability
+differences. However, one same-provider pair and one cross-provider pair have
+nearly identical member accuracy, $0.951$ and $0.955$ respectively. Their error
+correlations are $0.954$ and $0.607$, a difference of $0.347$
+(95\% CI $[0.207,\,0.507]$). The provider-associated ordering therefore persists
+after approximate capability matching, although provider remains confounded with
+other model-specific characteristics.
 
-This arm is a replication of the mechanism on a second domain; it is not a claim
-that heterogeneity improves accuracy. Per-agent accuracy is unchanged by
-configuration in these data, and the rise in ensemble accuracy across
-configurations is attributable to the inclusion of individually stronger models.
+This replication supports the observed ordering across two substantially
+different domains. It does not establish that heterogeneity improves predictive
+accuracy.
 
 \paragraph{Selective prediction}
-Reduced agreement is only valuable if it buys something downstream. Because
-directional accuracy is measured on differing subsets once HOLD is treated as an
-abstention, marginal hit-rates with overlapping intervals are not an adequate
-basis for comparison. We therefore report a selective-prediction analysis:
-ensemble decisions are ranked by mean agent conviction, coverage is swept from
-the most confident decision to the full set, and selective risk is the error rate
-among decisions retained at each coverage level. Summarising the curve by the
-area under it (AURC, lower is better), the three configurations are
-0.553 for HOM, 0.568 for HET-LITE, and 0.554 for HET. The HOM$-$HET difference
-in AURC, from the same paired equity-clustered bootstrap, is $-0.001$ (95\% CI
-$[-0.059,\,0.060]$): the interval contains zero, so these data do not establish
-a difference in selective-prediction quality between the two configurations. The
-two-way interval, $[-0.113,\,0.115]$, is wider and likewise contains zero.
-These values stand against
-full-coverage risks of 0.562, 0.537, and 0.512. Restricting to the most
-confident half of decisions does not materially reduce selective risk in any
-configuration. Conviction, as elicited here, does not rank errors usefully, and
-we therefore do not claim a calibration or abstention benefit from
-heterogeneity. The agreement--cost frontier of
-Section~\ref{subsec:frontier} is reported as a description of what diversity
-costs, not as evidence that it improves decision quality.
+We evaluate whether reduced agreement improves selective prediction by ranking
+ensemble decisions according to mean agent conviction. AURC is $0.553$ for HOM,
+$0.568$ for HET-LITE, and $0.554$ for HET. The HOM$-$HET difference is $-0.001$
+(95\% CI $[-0.059,\,0.060]$). The corresponding two-way interval is
+$[-0.113,\,0.115]$. Both intervals contain zero.
+
+Restricting evaluation to the most confident half of decisions does not
+materially reduce selective risk in any configuration. These results therefore do
+not establish an improvement in calibration or abstention quality. The agreement
+and cost frontier of Section~\ref{subsec:frontier} describes the cost associated
+with greater behavioral diversity, not a demonstrated improvement in decision
+quality.
 
 \subsection{Robustness: capability-matched control}
 \label{sec:control}
@@ -1113,28 +1091,20 @@ $\kappa_{\mathrm{HET}}$ & $\Delta\kappa$ [95\% CI] \\
 \end{tabular}
 \end{table}
 
-\subsection{Relation to state-of-the-art ensemble methods}
-This article does not propose an ensemble method and therefore does not report a
-head-to-head benchmark against one. Methods such as mixture-of-agents, multi-agent
-debate, and diversity-maximising ensemble selection are evaluated on task
-performance: the comparison that matters for them is accuracy or win-rate against
-a baseline on a shared benchmark~\cite{wang2024moa,du2023debate,tekin2024topla}. The
-object of study here is different. We measure how much genuine behavioral
-de-correlation a given ensemble composition buys and what it costs, holding the
-task, prompt, and information set fixed. Accuracy is a secondary axis, and the
-study is not powered for it.
+\subsection{Relation to existing ensemble methods}
+This article does not propose a new ensemble algorithm, so a direct performance
+benchmark against existing ensemble methods is not the primary comparison.
+Methods such as mixture-of-agents, multi-agent debate, and diversity-based
+ensemble selection are generally evaluated using downstream accuracy or win
+rate~\cite{wang2024moa}. The present study instead measures how ensemble
+composition changes output agreement, error dependence, and inference cost under
+fixed task conditions.
 
-A fair comparison is therefore one of measurement rather than of performance.
-Prior work that reports ensemble diversity typically does so with a single
-agreement or diversity index computed on pooled outputs, without separating
-agreement from error correlation, without an independent-draw protocol, and
-without interval estimates. Section~\ref{subsec:errcorr} shows that the first of
-these distinctions changes the interpretation, Section~\ref{subsec:estimand}
-shows that the second changes the estimate by roughly fourfold in our pilot, and
-the intervals reported throughout show that the third determines whether a
-reported difference is resolvable at all. The contribution is that measurement
-protocol and the frontier it makes it possible to state, not a competitor to the
-methods above.
+The contribution is therefore a measurement framework that separates output
+agreement from error correlation, controls the shared-seed artifact observed in
+repeated model sampling, quantifies uncertainty, and incorporates inference cost.
+These measurements complement performance-based evaluations rather than
+constitute a competing aggregation method.
 
 \section{Discussion}
 The results provide a quantitative characterization of the relationship between
@@ -1187,30 +1157,6 @@ contrasts to be materially distorted. Agreement studies should therefore
 document the sampling context, assign separate reproducible seeds to individual
 agents when supported, and include a diagnostic for residual within-run
 dependence.
-
-\subsection{Collection provenance and retry accounting}
-\label{subsec:provenance}
-The confirmatory grid comprises 54{,}000 planned calls, all of which returned a
-valid response. Reaching them required 94{,}566 API requests: 40{,}566 requests
-did not return a usable completion and were retried, up to six attempts per slot.
-Of those unsuccessful requests, 40{,}544 were provider rate-limit or quota
-responses and 22 were transport or schema failures. A rate-limited request is
-rejected before the model is invoked and returns no content, so retrying it
-cannot select on the response; the completed grid is therefore the full
-pre-registered design rather than a subset surviving a content filter. Every
-attempt, successful or not, is recorded in the released log with its error
-string, so the accounting can be reconstructed independently.
-
-Request parameters are fixed across configurations and recorded in the released
-configuration: temperature $0.7$, a per-agent seed derived from the run seed, a
-completion cap of 256 tokens, and a strict-JSON response contract. The exact
-system and user prompt text is released verbatim, and each row of the log carries
-the SHA-256 hash of the prompt actually sent, so any row can be checked against
-the frozen template. Model snapshot identifiers, prices, and knowledge cutoffs
-were probe-verified before collection and are listed in Table~\ref{tab:models}.
-Pre-registration, prompt, configuration, and analysis code were hashed and
-committed before collection began; the hashes and the commit timestamp are in the
-released freeze receipt.
 
 \section{Threats to Validity}
 \textbf{Heterogeneity vs.\ capability confound.}
