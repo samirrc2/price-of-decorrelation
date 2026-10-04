@@ -70,6 +70,46 @@ def check_portable() -> list[str]:
     return bad
 
 
+# Documents that assert a hash or a path must agree with the filesystem. archive_manifest.md
+# named a path that had not existed since the layout reorganisation and a config SHA-256 that
+# matched neither the current file nor its pre-reorganisation version -- stale for months,
+# with nothing to catch it, in the one document whose entire purpose is to pin the dataset.
+def check_documents() -> list[str]:
+    bad = []
+    am = ROOT / "archive_manifest.md"
+    if am.exists():
+        t = am.read_text()
+        # Only the LIVE assertions are gated. The changelog deliberately quotes the stale
+        # path and hash it is recording the correction of, and a gate that cannot tell a
+        # historical citation from a current claim would force the record to omit what went
+        # wrong -- which is the opposite of an audit trail.
+        _cl = t.find("## Changelog")
+        if _cl > 0:
+            t = t[:_cl]
+        # every `path` in backticks that looks like a repo file must exist
+        for m in re.finditer(r"`((?:data|code|results|paper)/[^`\s]+)`", t):
+            rel = m.group(1)
+            if "*" in rel or rel.endswith("/"):
+                continue
+            if not (ROOT / rel).exists():
+                bad.append(f"archive_manifest.md names a path that does not exist: {rel}")
+        # every 64-hex SHA-256 asserted next to a named file must match that file
+        import hashlib
+        for m in re.finditer(r"`((?:data|code)/[^`\s]+)`[^`]{0,80}?`([0-9a-f]{64})`", t, re.S):
+            rel, want = m.group(1), m.group(2)
+            f = ROOT / rel
+            if not f.exists():
+                continue
+            h = hashlib.sha256()
+            with f.open("rb") as fh:
+                for b in iter(lambda: fh.read(1 << 20), b""):
+                    h.update(b)
+            if h.hexdigest() != want:
+                bad.append(f"archive_manifest.md asserts {rel} = {want[:16]}... "
+                           f"but it hashes to {h.hexdigest()[:16]}...")
+    return bad
+
+
 def main() -> int:
     if not CLAIMS.exists():
         print(f"[check-claims] {CLAIMS.relative_to(ROOT)} absent -- run make_claims.py")
@@ -140,6 +180,11 @@ def main() -> int:
     for b in check_portable():
         fails.append(b)
     checked += len(PORTABLE)
+
+    # documents that pin hashes or paths
+    for b in check_documents():
+        fails.append(b)
+    checked += 1
 
     print(f"[check-claims] {checked} gated claims checked against "
           f"{TEX.relative_to(ROOT)} ({len(present)} numeric literals found)")
