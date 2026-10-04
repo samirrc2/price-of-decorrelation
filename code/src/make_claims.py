@@ -77,7 +77,9 @@ def from_tables(d: Path) -> dict:
                 continue
             slug = re.sub(r"[^a-z0-9]+", "_", key.lower()).strip("_")
             for col, suf in (("estimate", ""), ("delta_kappa", ""), ("dk", ""),
-                             ("ci_low", "_ci_low"), ("ci_high", "_ci_high")):
+                             ("ci_low", "_ci_low"), ("ci_high", "_ci_high"),
+                             ("two_way_ci_low", "_two_way_ci_low"),
+                             ("two_way_ci_high", "_two_way_ci_high")):
                 if col in r and _num(r[col]) is not None:
                     c[f"contrast_{slug}{suf}"] = _num(r[col])
         if rows and not any(k.startswith("contrast_") for k in c):
@@ -218,13 +220,17 @@ def from_supporting(res: Path) -> dict:
     if f.exists():
         t = f.read_text()
         m = re.search(r"kappa_HOM\s*=\s*([0-9.]+);\s*kappa_HET-SAMETIER\s*=\s*([0-9.]+);\s*"
-                      r"Delta-kappa\s*=\s*([0-9.]+)\s*\(95% CI \[([0-9.]+),\s*([0-9.]+)\]", t)
+                      r"Delta-kappa\s*=\s*([0-9.]+)\s*\(95% CI \[([0-9.]+),\s*([0-9.]+)\]"
+                      r"(?:;\s*two-way \[([0-9.]+),\s*([0-9.]+)\])?", t)
         if m:
             c["control_kappa_hom"] = float(m.group(1))
             c["control_kappa_het_sametier"] = float(m.group(2))
             c["control_delta_kappa"] = float(m.group(3))
             c["control_ci_low"] = float(m.group(4))
             c["control_ci_high"] = float(m.group(5))
+            if m.group(6) and m.group(7):
+                c["control_two_way_ci_low"] = float(m.group(6))
+                c["control_two_way_ci_high"] = float(m.group(7))
 
     f = res / "temp_sweep_result.md"
     if f.exists():

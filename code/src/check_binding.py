@@ -477,6 +477,16 @@ R = [
      "revision_r3_3_error_correlation_strict_d_phi_two_way_ci_low", 3),
     (r"95 ci 0\.262 0\.354 two-way 0\.227$", "0.387",
      "revision_r3_3_error_correlation_strict_d_phi_two_way_ci_high", 3),
+    # ------------------------------------ R3.2 two-way sensitivity on the pre-registered endpoints
+    (r"of section they remain so at$", "0.208", "contrast_dkappa_hom_hetlite_two_way_ci_low", 3),
+    (r"section they remain so at 0\.208$", "0.290",
+     "contrast_dkappa_hom_hetlite_two_way_ci_high", 3),
+    (r"remain so at 0\.208 0\.290 and$", "0.045",
+     "contrast_dkappa_hetlite_het_two_way_ci_low", 3),
+    (r"so at 0\.208 0\.290 and 0\.045$", "0.123",
+     "contrast_dkappa_hetlite_het_two_way_ci_high", 3),
+    (r"0\.341 with a two-way interval of$", "0.270", "control_two_way_ci_low", 3),
+    (r"with a two-way interval of 0\.270$", "0.361", "control_two_way_ci_high", 3),
     # ---------------------------------------------------------------------------- discussion
     (r"inference cost\. within-ensemble agreement decreases from$", "0.552",
      "kappa_hom", 3),

@@ -301,36 +301,73 @@ exploratory confidence intervals accordingly.
 
 Author response:
 
-  - Equity remains the pre-registered primary resampling unit because repeated observations are
-    nested within securities. Analysis date is treated as a second crossed source of dependence
-    because all securities evaluated on a date share common market conditions.
-  - For the primary HOM-HET agreement contrast, the point estimate is 0.3363 under all three
-    resampling schemes. The 95% confidence intervals are [0.3035, 0.3689] under equity
-    clustering, [0.2989, 0.3656] under date clustering, and [0.2786, 0.3877] under two-way
-    resampling. All exclude zero.
-  - We also applied two-way sensitivity analysis to the exploratory contrasts carrying
-    inferential claims. The unanimous-incorrect ratio has a two-way interval of [1.13, 3.06].
-    The pile-on contrast has an interval of [0.140, 0.232]. The AURC contrast has an interval of
-    [-0.113, 0.115].
-  - The error-correlation results also remain resolved under two-way resampling. The main φ
-    contrast has a two-way interval of [0.328, 0.586], and the common-subset specification that
-    counts HOLD as an error has an interval of [0.227, 0.387].
-  - The bootstrap implementation was also corrected so that repeated sampled equities retain
-    their multiplicity. The equity-clustered result now reproduces the pre-registered primary
-    interval exactly.
+  - Equity is the pre-registered primary resampling unit because the repeated observations in
+    this design are nested within securities: each equity is evaluated on 12 analysis dates, and
+    every response for that equity shares company-specific context. Analysis date is the second,
+    crossed source of dependence, because all securities evaluated on a given date share common
+    market conditions. Neither margin nests inside the other, so they are resampled
+    independently rather than hierarchically.
+  - The two-way procedure draws equities with replacement and dates with replacement,
+    independently, retains the sampled equity-date intersections, and preserves multiplicity on
+    both margins: a cluster drawn twice contributes twice. It uses 2,000 draws at the
+    pre-registered seed and recomputes the full estimator inside every draw.
+  - Primary HOM-HET agreement contrast, Δκ = 0.3363: [0.3035, 0.3689] under equity clustering
+    (100 clusters), [0.2989, 0.3656] under date clustering (12 clusters), [0.2786, 0.3877] under
+    two-way resampling (1,200 intersections). All exclude zero.
+  - The two pre-registered secondary agreement contrasts are measured on the same grid and are
+    now reported under the same scheme. HOM-HET-LITE Δκ = 0.249: equity [0.218, 0.280], two-way
+    [0.208, 0.290]. HET-LITE-HET Δκ = 0.087: equity [0.067, 0.105], two-way [0.045, 0.123]. Both
+    continue to exclude zero.
+  - The capability-matched control is measured on the same 100 equities and 12 dates and asserts
+    that its interval excludes zero, so it receives the same treatment. Δκ(HOM-SameTier) =
+    0.315: equity [0.288, 0.341], two-way [0.270, 0.361]. Both exclude zero.
+  - Every exploratory contrast that carries an inferential claim is also reported both ways.
+    Error correlation Δφ = 0.454: equity [0.376, 0.534], two-way [0.328, 0.586]. The
+    common-subset specification counting HOLD as an error, Δφ = 0.309: equity [0.262, 0.354],
+    two-way [0.227, 0.387]. Unanimous-incorrect ratio 1.84: equity [1.42, 2.52], two-way [1.13,
+    3.06]. Pile-on Δ = 0.189: equity [0.160, 0.216], two-way [0.140, 0.232]. AURC Δ = -0.001:
+    equity [-0.059, 0.060], two-way [-0.113, 0.115]. No conclusion changes under the wider
+    scheme: the intervals that excluded the null still exclude it, and the AURC interval still
+    contains zero.
+  - Two groups of intervals are deliberately not given a two-way treatment, for reasons of
+    design rather than convenience. The temperature-sensitivity analysis is a small supporting
+    subgrid of eight equities and two analysis dates; two date clusters cannot support
+    date-clustered or two-way inference, so its intervals remain clustered on equities only and
+    the manuscript now states that this analysis contributes no independent multiway evidence.
+    The clinical replication is indexed by MMLU items rather than by equities and dates, so the
+    financial equity-date bootstrap does not apply to it; its intervals are clustered on items.
+  - The Wilson intervals in the secondary directional-accuracy table are marginal and
+    descriptive. They are retained as descriptive only and are not the basis of any inferential
+    claim, so replacing them with a clustered interval would imply an inference the manuscript
+    does not make.
+  - One correction follows from this work rather than from a change of method. The
+    implementation used for the robustness table and for the unanimous-incorrect ratio collapsed
+    each draw to a set of equities, so an equity drawn twice counted once and each draw used
+    only the distinct equities of a 100-draw multiset. That is subsampling, not a cluster
+    bootstrap, and it understated the variance. Multiplicity is now preserved, which is why the
+    equity-clustered robustness row reproduces the primary interval exactly and why the
+    unanimous-incorrect interval is [1.42, 2.52] rather than the narrower [1.51, 2.35]
+    previously reported. The resampling code now asserts multiplicity on both margins and fails
+    if it is ever lost, so the error cannot recur silently.
 
 Author action:
 
-  - Section III-D, "Uncertainty Quantification," was revised to justify equity clustering and
-    define the date-clustered and two-way resampling procedures.
-  - Table 5 was added to report the primary HOM-HET contrast under equity, date, and two-way
-    resampling.
-  - Section V-C, "Agreement, Error Correlation, and Decorrelation," was revised to report
-    two-way sensitivity intervals for both error-correlation specifications.
-  - Section V-H, "Exploratory Analysis of Consensus Errors," was revised to report two-way
-    uncertainty for the unanimous-incorrect ratio and pile-on contrast.
-  - Section V-I, subsection "Selective Prediction," was revised to report the two-way AURC
-    interval.
+  - Section III-D, "Uncertainty Quantification," justifies equity as the primary cluster,
+    identifies date as the crossed dimension, and defines the date-clustered and two-way
+    procedures.
+  - Table 5 reports the primary contrast under equity, date, and two-way resampling.
+  - Section V-A, "Heterogeneity Reduces Ensemble Agreement (Primary)," now reports the two-way
+    intervals for both pre-registered secondary contrasts alongside Table 2.
+  - Section V-J, "Robustness: Capability-Matched Control," now reports the two-way interval for
+    the capability-matched contrast.
+  - Section V-C, "Agreement, Error Correlation, and Decorrelation," reports two-way intervals
+    for both error-correlation specifications.
+  - Section V-H, "Exploratory Analysis of Consensus Errors," reports two-way intervals for the
+    unanimous-incorrect ratio and the pile-on contrast.
+  - Section V-I, subsection "Selective Prediction," reports the two-way AURC interval.
+  - Section V-K, "Robustness: Temperature Sensitivity," states that the subgrid spans two
+    analysis dates, which is too few clusters for date-clustered or two-way inference, and that
+    the analysis therefore contributes no independent multiway evidence.
 
 Reviewer #3, Concern #3
 

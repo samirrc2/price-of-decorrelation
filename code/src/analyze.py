@@ -167,6 +167,12 @@ def main():
     # cluster_bootstrap_pair calls, ~2x faster: each config's κ computed once per draw)
     _boots = S.cluster_bootstrap_multi(
         rows, tickers, [("HOM", "HET"), ("HOM", "HET-LITE"), ("HET-LITE", "HET")], draws, bseed)
+    # R3.2 asked for every main and exploratory interval to admit date dependence as well. The
+    # three pre-registered endpoints are all measured on the same 100 x 12 grid, so the same
+    # two-way scheme applies to all three, not only the primary.
+    _tw = S.cluster_bootstrap_two_way(
+        rows, tickers, cfg["dates"],
+        [("HOM", "HET"), ("HOM", "HET-LITE"), ("HET-LITE", "HET")], draws, bseed)
     primary = _boots[("HOM", "HET")]
     sec1 = _boots[("HOM", "HET-LITE")]
     sec2 = _boots[("HET-LITE", "HET")]
@@ -202,7 +208,7 @@ def main():
 
     # figures + tables (deterministic)
     fig_note = _make_figures(cfg, kappa, cost, hlevel, primary, sec1, sec2, wc, provs, pmat)
-    _make_tables(cfg, kappa, cost, cprov, primary, sec1, sec2, acc, config_names, hlevel)
+    _make_tables(cfg, kappa, cost, cprov, primary, sec1, sec2, acc, config_names, hlevel, _tw)
 
     _write_summary(cfg, verdict, primary, sec1, sec2, kappa, wc, cost, cprov,
                    acc, sign_err, provs, pmat, config_names, hlevel, len(rows), len(ok_rows),
@@ -299,13 +305,16 @@ def _make_figures(cfg, kappa, cost, hlevel, primary, sec1, sec2, wc, provs, pmat
     return f"(figures written to figures/)"
 
 
-def _make_tables(cfg, kappa, cost, cprov, primary, sec1, sec2, acc, config_names, hlevel):
+def _make_tables(cfg, kappa, cost, cprov, primary, sec1, sec2, acc, config_names, hlevel,
+                 twoway):
     tdir = OUT / "tables"; tdir.mkdir(exist_ok=True)
     # endpoints table
-    rows = [["endpoint", "estimate", "ci_low", "ci_high"]]
-    for label, b in (("Dkappa_HOM_HET", primary), ("Dkappa_HOM_HETLITE", sec1),
-                     ("Dkappa_HETLITE_HET", sec2)):
-        rows.append([label, fmt(b["point"]), fmt(b["ci_low"]), fmt(b["ci_high"])])
+    rows = [["endpoint", "estimate", "ci_low", "ci_high", "two_way_ci_low", "two_way_ci_high"]]
+    for label, b, tw in (("Dkappa_HOM_HET", primary, twoway[("HOM", "HET")]),
+                         ("Dkappa_HOM_HETLITE", sec1, twoway[("HOM", "HET-LITE")]),
+                         ("Dkappa_HETLITE_HET", sec2, twoway[("HET-LITE", "HET")])):
+        rows.append([label, fmt(b["point"]), fmt(b["ci_low"]), fmt(b["ci_high"]),
+                     fmt(tw["ci_low"]), fmt(tw["ci_high"])])
     _csv(tdir / "endpoints.csv", rows); _latex(tdir / "endpoints.tex", rows, "Primary and secondary endpoints")
     # frontier table
     frows = [["config", "heterogeneity_level", "kappa", "cost_per_decision_usd"]]

@@ -345,6 +345,7 @@ therefore interpreted as a secondary consistency check rather than a direct
 independence test.
 
 \subsection{Uncertainty quantification}
+\label{subsec:uncertainty}
 Uncertainty in the agreement contrasts is estimated using a cluster bootstrap
 with equities as the resampling unit~\cite{efron1993}. Clustering at the equity
 level preserves the dependence among repeated analysis dates for the same
@@ -549,7 +550,9 @@ that cross-provider heterogeneity reduces within-ensemble agreement is
 supported. In Landis--Koch~\cite{landis1977} terms, homogeneous ensembles reach
 ``moderate--substantial'' internal agreement while fully heterogeneous ones fall
 to ``fair.'' Both pre-registered secondary contrasts are also positive, with
-confidence intervals excluding zero (Table~\ref{tab:endpoints}). Agreement
+confidence intervals excluding zero (Table~\ref{tab:endpoints}); under the
+two-way scheme of Section~\ref{subsec:uncertainty} they remain so, at
+$[0.208,\,0.290]$ and $[0.045,\,0.123]$ respectively. Agreement
 therefore decreases at each observed increase in heterogeneity, from HOM to
 HET-LITE and from HET-LITE to HET. These results establish a monotonic
 relationship between provider heterogeneity and reduced within-ensemble
@@ -1038,7 +1041,7 @@ $\kappa_{\mathrm{HET\text{-}SameTier}}=0.236$. The resulting contrast is
 \Delta\kappa_{\mathrm{HOM-SameTier}}=0.315,\quad
 95\%\ \mathrm{CI}\ [0.288,\ 0.341],
 \]
-which excludes zero. This capability-matched estimate is approximately 94\% of
+with a two-way interval of $[0.270,\,0.361]$; both exclude zero. This capability-matched estimate is approximately 94\% of
 the primary HOM-to-HET contrast. The result indicates that the observed
 reduction in agreement is largely preserved when model tier is held approximately
 constant, indicating that capability differences alone do not account for the
@@ -1075,7 +1078,11 @@ estimate ($0.336$) at the same temperature; this discrepancy is attributable to
 the sampling variance of the small $8\times 2$ subgrid, whose wide confidence
 interval ($[0.21,\ 0.78]$) comfortably contains the full-grid estimate. The
 subgrid is accordingly informative about the sign and ordering of the effect,
-not its magnitude. Because this analysis uses a substantially smaller grid than
+not its magnitude. Its intervals are clustered on the eight equities only: the
+subgrid spans two analysis dates, which is too few clusters to support
+date-clustered or two-way inference, so this analysis contributes no independent
+multiway evidence and the intervals below should be read as indicative rather
+than as a test. Because this analysis uses a substantially smaller grid than
 the primary experiment, it is interpreted as supporting evidence rather than an
 independent replication. The temperature
 analysis was conducted under a documented protocol amendment and does not alter

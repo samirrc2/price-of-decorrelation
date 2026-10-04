@@ -238,3 +238,76 @@ def power_calc(rows, alpha=0.05, target=0.80):
     return {"observed_mean_diff": mean, "observed_sd": sd, "dz": dz,
             "z_alpha": z_a, "z_beta": z_b,
             "cells_needed": cells_needed, "n_cells_observed": n}
+
+
+def _kappa_two_way(rows, config, tick_ms, date_ms):
+    """Average within-run Fleiss kappa over a MULTISET of equities crossed with a multiset of
+    dates. A cluster drawn twice contributes twice, on either margin, which is what makes this
+    a cluster bootstrap rather than subsampling."""
+    cbyrun = _group(rows).get(config, {})
+    ks = []
+    for run in sorted(cbyrun.keys()):
+        tk = cbyrun[run]
+        cells = {}
+        for ri, t in enumerate(tick_ms):
+            td = tk.get(t)
+            if not td:
+                continue
+            for rj, d in enumerate(date_ms):
+                dirs = td.get(d)
+                if dirs:
+                    cells[(ri, rj, t, d)] = dirs       # replica ids keep duplicates distinct
+        k = M.fleiss_kappa(cells)
+        if k is not None:
+            ks.append(k)
+    return (sum(ks) / len(ks)) if ks else None
+
+
+def cluster_bootstrap_two_way(rows, tickers, dates, pairs, draws=2000, seed=42):
+    """Two-way cluster bootstrap: equities and dates resampled independently with replacement,
+    their intersections retained, multiplicity preserved on both margins.
+
+    MULTIPLICITY IS ASSERTED, not assumed. An earlier bootstrap in this repository collapsed each
+    draw to a SET of equities, so an equity drawn twice counted once and every draw used only the
+    ~63 distinct equities of a 100-draw multiset. That is subsampling; it understated the variance
+    and made a robustness interval disagree with the primary endpoint it was supposed to
+    reproduce. The check below recomputes the expected cell count from the two multiplicity
+    counters and fails loudly if the realised count differs.
+    """
+    import collections
+    needed = sorted({c for p in pairs for c in p})
+    point = {c: _kappa_for_ticker_subset(rows, c, tickers) for c in needed}
+    grouped = _group(rows)
+    rng = random.Random(seed)
+    nt, nd = len(tickers), len(dates)
+    deltas = {p: [] for p in pairs}
+    for draw in range(draws):
+        tms = [tickers[rng.randrange(nt)] for _ in range(nt)]
+        dms = [dates[rng.randrange(nd)] for _ in range(nd)]
+        if draw == 0:
+            ct, cd = collections.Counter(tms), collections.Counter(dms)
+            cfg0 = needed[0]
+            byrun = grouped.get(cfg0, {})
+            run0 = sorted(byrun)[0]
+            tk = byrun[run0]
+            want = sum(ct[t] * cd[d] for t in ct for d in cd if tk.get(t, {}).get(d))
+            got = sum(1 for ri, t in enumerate(tms) for rj, d in enumerate(dms)
+                      if tk.get(t, {}).get(d))
+            if want != got:
+                raise SystemExit(f"two-way bootstrap lost multiplicity: expected {want} cells "
+                                 f"from the drawn multisets, built {got}. A repeated cluster "
+                                 f"must contribute repeatedly.")
+        kv = {c: _kappa_two_way(rows, c, tms, dms) for c in needed}
+        for a, b in pairs:
+            if kv[a] is not None and kv[b] is not None:
+                deltas[(a, b)].append(kv[a] - kv[b])
+    out = {}
+    for (a, b) in pairs:
+        d = sorted(deltas[(a, b)])
+        pt = (point[a] - point[b]) if (point[a] is not None and point[b] is not None) else None
+        if len(d) < 20:
+            out[(a, b)] = {"point": pt, "ci_low": None, "ci_high": None, "n_valid": len(d)}
+        else:
+            out[(a, b)] = {"point": pt, "ci_low": d[int(0.025 * len(d))],
+                           "ci_high": d[int(0.975 * len(d)) - 1], "n_valid": len(d)}
+    return out

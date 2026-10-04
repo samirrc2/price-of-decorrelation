@@ -33,12 +33,18 @@ def main():
     boot = S.cluster_bootstrap_multi(
         rows, tickers, [("HOM", "HET-SAMETIER")],
         int(cfg["bootstrap_draws"]), int(cfg["bootstrap_seed"]))[("HOM", "HET-SAMETIER")]
+    # The control arm is measured on the same 100 equities x 12 dates as the primary endpoint and
+    # states that its interval excludes zero, so R3.2's two-way sensitivity applies to it too.
+    two_way = S.cluster_bootstrap_two_way(
+        rows, tickers, cfg["dates"], [("HOM", "HET-SAMETIER")],
+        int(cfg["bootstrap_draws"]), int(cfg["bootstrap_seed"]))[("HOM", "HET-SAMETIER")]
     dk, lo, hi = boot["point"], boot["ci_low"], boot["ci_high"]
     usable = len(M.usable(rows))
     print(f"CONTROL (capability-matched, cross-provider)  usable rows: {usable}")
     print(f"  kappa_HOM         = {fmt(k_hom)}")
     print(f"  kappa_HET-SAMETIER= {fmt(k_st)}")
-    print(f"  Delta-kappa(HOM - HET-SAMETIER) = {fmt(dk)}  95% CI [{fmt(lo)}, {fmt(hi)}]")
+    print(f"  Delta-kappa(HOM - HET-SAMETIER) = {fmt(dk)}  95% CI [{fmt(lo)}, {fmt(hi)}]"
+          f"  two-way [{fmt(two_way['ci_low'])}, {fmt(two_way['ci_high'])}]")
     if dk is not None and lo is not None:
         if dk > 0 and lo > 0:
             print("  => Provider diversity de-correlates even at matched capability "
@@ -52,7 +58,8 @@ def main():
     dest.write_text(
         f"# HET-SameTier control result\n\n"
         f"kappa_HOM = {fmt(k_hom)}; kappa_HET-SAMETIER = {fmt(k_st)}; "
-        f"Delta-kappa = {fmt(dk)} (95% CI [{fmt(lo)}, {fmt(hi)}]), "
+        f"Delta-kappa = {fmt(dk)} (95% CI [{fmt(lo)}, {fmt(hi)}]; "
+        f"two-way [{fmt(two_way['ci_low'])}, {fmt(two_way['ci_high'])}]), "
         f"cluster bootstrap over equities, seed 42, {usable} usable rows.\n")
     print(f"Wrote {dest}")
     return 0
