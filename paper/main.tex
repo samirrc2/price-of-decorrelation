@@ -1350,10 +1350,13 @@ ensemble compositions, and fully tier-matched provider configurations.
 
 \section*{Data and Code Availability}
 To support reproduction, we release: (i)~the immutable, read-only,
-SHA-256-stamped raw dataset (\texttt{runs.csv}), containing 54{,}000 logged
-calls with the per-call model, seed, prompt hash, timestamp, token usage, cost,
-and raw response; (ii)~the pre-registration materials and the cryptographic
-freeze receipt; (iii)~the deterministic, seeded analysis pipeline that
+SHA-256-stamped raw dataset (\texttt{runs.csv}), containing all 94{,}566 logged
+attempts---the 54{,}000 valid responses together with every unsuccessful
+request and its error---each with the per-call model, seed, prompt hash,
+timestamp, token usage, cost, and raw response; (ii)~the pre-registration
+materials and the cryptographic freeze receipts for both the confirmatory study
+and the cross-domain replication; (iii)~the deterministic, seeded analysis
+pipeline that
 regenerates every table and figure in this paper, together with a replication
 check; and (iv)~the orchestration harness, including the Het-SameTier control
 configuration. Code and data are available at

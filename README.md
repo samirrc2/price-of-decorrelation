@@ -6,15 +6,16 @@ Computational artifact for the IEEE Access article:
 
 ### Paper summary
 
-Ensembles of LLM agents are often assumed to benefit from diversity, yet the amount of genuine de-correlation bought by cross-provider heterogeneity—and its inference cost—is rarely measured under a statistically powered, pre-registered design. This article runs **54,000 independent LLM calls** across three five-agent configurations (heterogeneity levels {0, 1, 3}) on a directional financial-analysis task (100 equities × 12 dates). Agreement is measured by Fleiss’ κ with ticker-clustered bootstrap confidence intervals.
+Ensembles of LLM agents are often assumed to benefit from diversity, yet neither the reduction in within-ensemble agreement bought by cross-provider heterogeneity, nor the reduction in error dependence, nor the inference cost of either is routinely measured under a statistically powered, pre-registered design. This article runs **54,000 independent LLM calls** across three five-agent configurations (heterogeneity levels {0, 1, 3}) on a directional financial-analysis task (100 equities × 12 dates), and replicates the ordering on 537 clinical-knowledge items. Output agreement is measured by Fleiss’ κ and error dependence by a φ correlation over paired binary error indicators, both with cluster-bootstrap confidence intervals over equities, over dates, and over the two margins jointly.
 
 **Main findings:**
 
-- Heterogeneity de-correlates ensembles monotonically: κ falls from **0.552** (homogeneous) to **0.302** (one heterogeneous agent) to **0.215** (three), with primary effect **Δκ(HOM−HET) = 0.336** (95% CI [0.304, 0.369]) — *Confirmed*.
-- The de-correlation costs a **~4.4×** inference premium per ensemble decision (explicit agreement–cost frontier).
-- A capability-matched control recovers **~94%** of the effect (**Δκ = 0.315**), indicating the result is provider-driven rather than a capability-tier artifact.
+- Within-ensemble **agreement** falls monotonically as heterogeneity increases: κ = **0.552** (homogeneous), **0.302** (one heterogeneous agent), **0.215** (three), with the pre-registered primary contrast **Δκ(HOM−HET) = 0.336** (95% CI [0.304, 0.369]; two-way [0.279, 0.388]) — *Confirmed*.
+- **Error correlation** falls separately, from φ = **0.984** to **0.530**, a contrast of **0.454** (95% CI [0.376, 0.534]; two-way [0.328, 0.586]). κ measures agreement and φ measures error dependence; "de-correlation" in the title refers to the latter.
+- That reduction costs a **~4.4×** inference premium per ensemble decision (explicit agreement–cost frontier).
+- A capability-matched control preserves **~94%** of the contrast (**Δκ = 0.315**), so it is not explained by capability tier alone. Provider nevertheless remains bundled with model identity, training data, architecture and alignment, and is **not** identified as an independent causal factor.
 - A shared-seed measurement artifact can inflate the effect by ~**4×**; the article contributes an independent-draw protocol that removes it.
-- Average directional accuracy shows no reliable gain at this scale; exploratory analysis finds homogeneous ensembles produce confident, unanimous, wrong calls at ~**1.8×** the heterogeneous rate.
+- Average directional accuracy shows no reliable gain at this scale, and a selective-prediction analysis finds no AURC difference (**−0.001**, 95% CI [−0.059, 0.060]). An **exploratory** analysis finds homogeneous ensembles produce confident, unanimous, wrong calls at ~**1.8×** the heterogeneous rate; it is post hoc, unadjusted for multiplicity, and hypothesis-generating rather than confirmatory.
 
 This repository is the frozen dataset and analysis pipeline that regenerates those numerical results and figures.
 
@@ -66,8 +67,15 @@ A [Code Ocean](https://codeocean.com/) compute capsule for this artifact is avai
 | Mount | Contents |
 |-------|----------|
 | `/code` | `run`, `src/`, `scripts/`, `tests/`, `requirements.txt` |
-| `/data` | the frozen captures, `configs/`, `inputs/`, `inputs_mmlu/`, `datacache/`, `MANIFEST.sha256`, ground truth |
+| `/data` | the frozen captures (confirmatory, clinical, control, temperature, pilot), `configs/`, `inputs/`, `inputs_mmlu/`, `datacache/`, `MANIFEST.sha256`, clinical ground truth |
 | `/results` | written by the run: `claims.json`, metrics, tables, figures, the supporting-arm reports |
+| `docs/` + root | the two freeze receipts, both frozen pre-registrations, `PREREGISTRATION_AMENDMENTS.md`, `DATA_MANIFEST.md` — the evidence the response to reviewers points at |
+
+The capsule is assembled and self-verified by `bash code/scripts/build_capsule.sh`, which builds
+from `git archive HEAD` rather than the working tree, runs the capsule's own entry point inside
+the staged directory, diffs the claims it produces against the committed `claims.json` key by
+key, re-checks the freeze receipts against the artifacts they attest to, and fails if any gate
+reports an error instead of "not checkable" in a capsule layout.
 
 `/data/datacache/` is **not optional**. The analyses prefer its offline forward-return cache
 and fall back to a live `yfinance` call without it — which would turn a keys-free offline

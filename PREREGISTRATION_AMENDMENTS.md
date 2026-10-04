@@ -108,6 +108,34 @@ published contrast pools the two google–xai slot pairs into a provider-level c
 the correct unit for a provider-level claim — giving 0.6066. The pooling is now explicit in
 the code and the selection rule is recorded in the output.
 
+## AMENDMENT #5 — market-data vendor for the price-derived context (2026-10-04)
+
+**What the pre-registration says.** `docs/preregistration.md` specifies that the price-derived
+context is "fully reproducible from public prices via `fetch_prices.py` (yfinance) →
+`build_data.py`". That file is frozen: its SHA-256,
+`d466ac79c34729677b275ae477b18385c5c42482724579332aa85c77bc38e201`, is pinned in
+`docs/freeze_receipt.md` and still matches byte for byte, so the pre-registration is not edited
+here and this amendment is the record of the change.
+
+**What was actually done.** End-of-day closes were fetched once from Financial Modeling Prep.
+`code/src/fetch_prices.py` calls the FMP endpoints with an `FMP_API_KEY` and uses neither
+yfinance nor pandas; the result was frozen into `data/datacache/prices.json` and
+`data/datacache/forward_returns.json`, both hash-pinned in `data/MANIFEST.sha256` and verified
+at the start of every reproduction run. `code/src/metrics.py` retains yfinance strictly as a
+fallback for the case where that cache is absent, which it never is in the released package, so
+no published number depends on it. The manuscript states the vendor correctly.
+
+**Why it changed.** The pilot used yfinance. For the confirmatory capture a single vendor with a
+documented end-of-day endpoint and an API key was preferred over a scraping library, so that the
+price series underlying every context snippet came from one auditable source and could be frozen
+once with a receipt.
+
+**What it does and does not affect.** Nothing in the agreement or error-correlation analysis
+depends on the vendor: prices enter only through the frozen context snippets and the frozen
+forward-return cache, both verified by hash before any estimate is computed, and the no-lookahead
+rule is unchanged. The deviation is one of documentation, and it is recorded here because the
+pre-registration argument rests on the freeze being honoured rather than silently updated.
+
 ## Scope note
 
 No amendment modifies the primary endpoint, its estimator, the frozen confirmatory capture,

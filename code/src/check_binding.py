@@ -528,8 +528,8 @@ R = [
      "cost_ratio_het_over_hom", 1),
     # ----------------------------------------------------------------- data/code availability
     (r"release i the immutable read-only sha-$", "256", "!algorithm name SHA-256", 0),
-    (r"read-only sha-256-stamped raw dataset runs\.csv containing$", "54000",
-     "calls_usable", 0),
+    (r"sha-256-stamped raw dataset runs.csv containing all$", "94566", "calls_logged", 0),
+    (r"runs.csv containing all 94566 logged attempts---the$", "54000", "calls_usable", 0),
     (r"keys-free reproduction is available at doi$", "10.24433",
      "!Code Ocean DOI prefix", 5),
     (r"10\.24433 co\.9524962\.v1 \. the dataset sha-$", "256",

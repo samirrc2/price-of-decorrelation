@@ -47,10 +47,17 @@ rm -rf "$DEST"; mkdir -p "$DEST"
 # Export the committed tree, then keep only the capsule mounts.
 TMP="$(mktemp -d)"; trap 'rm -rf "$TMP"' EXIT
 git archive HEAD | tar -x -C "$TMP"
-for p in code data environment metadata; do
+for p in code data environment metadata docs; do
   [[ -e "$TMP/$p" ]] && cp -R "$TMP/$p" "$DEST/$p"
 done
-cp "$TMP/LICENSE" "$DEST/" 2>/dev/null || true
+# docs/ carries the evidence the response letter promises the reader: the two freeze receipts and
+# the frozen pre-registrations. R3.5 says "the released package also contains timestamped
+# cryptographic freeze receipts for both the confirmatory study and the cross-domain
+# replication", and the first capsule this script built did not contain them -- the promise was
+# kept by the GitHub release and broken by the capsule, which is the artifact a reviewer runs.
+for f in LICENSE PREREGISTRATION_AMENDMENTS.md DATA_MANIFEST.md archive_manifest.md; do
+  cp "$TMP/$f" "$DEST/" 2>/dev/null || true
+done
 mkdir -p "$DEST/results"
 
 # data/raw/ and cache/ are gitignored and absent from the archive by construction; say so
@@ -78,6 +85,21 @@ TXT
 
 echo "  size: $(du -sh "$DEST" | cut -f1)"
 echo "  mounts: $(cd "$DEST" && ls -d */ | tr '\n' ' ')"
+
+echo "== evidence the response letter promises the reader =="
+MISSING_EVIDENCE=0
+for f in docs/freeze_receipt.md docs/freeze_receipt_mmlu.md docs/preregistration.md \
+         docs/preregistration_mmlu.md PREREGISTRATION_AMENDMENTS.md; do
+  if [[ -e "$DEST/$f" ]]; then
+    echo "   present: $f"
+  else
+    echo "   MISSING: $f" >&2; MISSING_EVIDENCE=1
+  fi
+done
+if [[ "$MISSING_EVIDENCE" != "0" ]]; then
+  echo "!! the capsule is missing evidence the response letter tells reviewers it contains" >&2
+  exit 1
+fi
 
 echo "== capsule completeness =="
 ( cd "$DEST" && "$PY" code/src/make_manifest.py --capsule ) | sed 's/^/   /'
@@ -115,4 +137,27 @@ for k in diff[:20]:
     print(f"     DIFFERS {k}: capsule {got.get(k, '<absent>')!r} vs committed {want.get(k, '<absent>')!r}")
 raise SystemExit(1 if diff else 0)
 TXT
+echo "== freeze receipts inside the capsule still match what they attest =="
+"$PY" - "$DEST" <<'TXT'
+import hashlib, re, sys
+from pathlib import Path
+dest = Path(sys.argv[1])
+rec = dest / "docs" / "freeze_receipt.md"
+text = rec.read_text(errors="replace")
+bad = 0
+checked = 0
+# each "| `name` | <sha256> |" row names a frozen artifact the receipt attests to
+for name, want in re.findall(r"\|\s*`([^`]+)`\s*\|\s*([0-9a-f]{64})\s*\|", text):
+    for cand in (dest / "docs" / name, dest / name, dest / "data" / name):
+        if cand.is_file():
+            got = hashlib.sha256(cand.read_bytes()).hexdigest()
+            checked += 1
+            if got != want:
+                print(f"   MISMATCH {name}: {got[:16]} vs receipt {want[:16]}")
+                bad += 1
+            break
+print(f"   {checked - bad}/{checked} artifacts named in the receipt hash as the receipt says")
+raise SystemExit(1 if bad else 0)
+TXT
+
 echo "== capsule ready: $DEST =="
