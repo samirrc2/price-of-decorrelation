@@ -236,8 +236,9 @@ Author response:
 
 Author action:
 
-  - The manuscript Index Terms were revised to: algorithmic monoculture, inter-rater agreement,
-    large language models, model heterogeneity, and multi-agent systems.
+  - The manuscript Index Terms were revised to: ensemble learning, error correlation, large
+    language models, model heterogeneity, and multi-agent systems. The five terms are listed
+    alphabetically, as IEEE Access requires.
 
 Reviewer #2, Concern #2
 
@@ -381,7 +382,7 @@ Author action:
     identifies date as the crossed dimension, and defines the date-clustered and two-way
     procedures.
   - Table 5 reports the primary contrast under equity, date, and two-way resampling.
-  - Section V-A, "Heterogeneity Reduces Ensemble Agreement (Primary)," now reports the two-way
+  - Section V-A, "Heterogeneity and Ensemble Agreement (Primary)," now reports the two-way
     intervals for both pre-registered secondary contrasts alongside Table 2.
   - Section V-K, "Robustness: Capability-Matched Control," now reports the two-way interval for
     the capability-matched contrast.
@@ -413,9 +414,12 @@ agreement, error correlation, sampling independence, model diversity, and provid
 Author response:
 
   - We took the second option and now measure error dependence directly.
-  - For every pair of agents within an ensemble cell, we compute φ between binary error
-    indicators. Error correlation decreases from 0.984 for HOM to 0.742 for HET-LITE and 0.530
-    for HET. The HOM-HET contrast is 0.454 with a 95% confidence interval of [0.376, 0.534].
+  - Within each (configuration, equity, date, run) cell we form, for every unordered pair of
+    agent positions, the pair of binary error indicators against the realized forward-return
+    sign. Those pairs are pooled over all cells and all agent-position pairs within a
+    configuration, and φ is the Pearson correlation of the pooled set, so one φ is reported per
+    configuration rather than one per agent pair. Error correlation decreases from 0.984 for HOM
+    to 0.742 for HET-LITE and 0.530 for HET. The HOM-HET contrast is 0.454 with a 95% confidence interval of [0.376, 0.534].
     Under two-way resampling, the interval is [0.328, 0.586].
   - Because treating HOLD as an abstention changes the evaluated subset, we repeat the analysis
     with HOLD counted as an error. The corresponding HOM-HET contrast is 0.309 with a 95%
@@ -430,8 +434,8 @@ Author action:
 
   - Section V-C, "Agreement, Error Correlation, and Decorrelation," was added to define the five
     concepts and report the φ analysis under both treatments of HOLD.
-  - Section V-A was retitled "Heterogeneity Reduces Ensemble Agreement (Primary)" so that the κ
-    result is described explicitly as an agreement result.
+  - Section V-A was retitled "Heterogeneity and Ensemble Agreement (Primary)" so that the κ
+    result is named as an agreement result and the heading itself carries no causal verb.
   - The Abstract was revised to report the φ contrast alongside the κ contrast and to
     distinguish reduced error dependence from reduced agreement.
   - Section VI, "Discussion," and Section VIII, "Conclusion," were revised so that decorrelation

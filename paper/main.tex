@@ -154,8 +154,8 @@ the reliability and cost requirements of a given application.
 This paper makes the following contributions.
 \begin{enumerate}
 \item \emph{Pre-registered empirical measurement.} We conduct a pre-registered
-empirical study comprising 54{,}000 model calls to quantify the effect of
-cross-provider heterogeneity on within-ensemble agreement. Agreement decreases
+empirical study comprising 54{,}000 model calls to quantify the association
+between cross-provider heterogeneity and within-ensemble agreement. Agreement decreases
 substantially and monotonically as provider diversity increases, with a primary
 contrast of $\Delta\kappa=0.336$ and a 95\% confidence interval of
 $[0.304, 0.369]$.
@@ -201,8 +201,9 @@ fingerprint-based ensemble selection of DFPE~\cite{dfpe2025}, and heterogeneous
 consensus frameworks such as Council Mode~\cite{council2026}. Such approaches
 generally evaluate diversity through downstream performance. In contrast, the
 present study treats within-ensemble agreement as the primary quantity of
-interest and directly measures how cross-provider heterogeneity affects
-agreement, statistical uncertainty, and inference cost.
+interest and directly measures how agreement, statistical uncertainty, and
+inference cost vary across configurations with differing cross-provider
+heterogeneity.
 
 \subsection{Correlated errors and algorithmic monoculture}
 Kim \textit{et al.}~\cite{kim2025correlated} document substantial error
@@ -547,7 +548,7 @@ independent runs, and five agents per ensemble. Unless otherwise stated,
 agreement statistics are computed separately within each run and then averaged
 across runs.
 
-\subsection{Heterogeneity reduces ensemble agreement (primary)}
+\subsection{Heterogeneity and ensemble agreement (primary)}
 \label{subsec:primary}
 Within-ensemble agreement decreases monotonically as cross-provider
 heterogeneity increases. Fleiss' $\kappa$ is 0.552 for HOM, 0.302 for HET-LITE,
