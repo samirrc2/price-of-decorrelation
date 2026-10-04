@@ -17,12 +17,15 @@
 \SetMathAlphabet{\mathrm}{bold}{T1}{times}{b}{n}
 \SetMathAlphabet{\mathit}{bold}{T1}{times}{b}{it}
 \SetMathAlphabet{\mathbf}{bold}{T1}{times}{b}{n}
-\SetMathAlphabet{\mathtt}{bold}{OT1}{pcr}{b}{n}
+\SetMathAlphabet{\mathtt}{bold}{OT1}{cmtt}{b}{n}
 \SetSymbolFont{symbols}{bold}{OMS}{cmsy}{b}{n}
 \renewcommand\boldmath{\@nomath\boldmath\mathversion{bold}}}
 \makeatother
 
 \graphicspath{{./}{figures/}}
+% Use Computer Modern typewriter: Adobe Courier (pcr) is missing on some
+% TeX installs, which makes lstlisting (JSON schema, Fig.~2) invisible.
+\renewcommand{\ttdefault}{cmtt}
 \lstset{basicstyle=\ttfamily\footnotesize,breaklines=true,frame=single,
 columns=fullflexible,keepspaces=true}
 
