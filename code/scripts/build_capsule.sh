@@ -23,7 +23,13 @@ CODE_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 REPO_ROOT="$(cd "$CODE_ROOT/.." && pwd)"
 cd "$REPO_ROOT"
 
-DEST="${1:-$REPO_ROOT/build/capsule}"
+# Stage OUTSIDE the repository by default. Staging at build/capsule inside the checkout gave
+# the capsule an enclosing .git, which `git rev-parse` resolves from any nested directory --
+# so a gate that asked "am I in a git checkout?" said yes, fetched the as-submitted baseline
+# from the parent repo, and then failed on a paper/ the capsule correctly lacks. The gate is
+# fixed to require the repo root to be its own tree, and the staging area no longer invites
+# the question.
+DEST="${1:-$(dirname "$REPO_ROOT")/$(basename "$REPO_ROOT")-capsule}"
 PY="${PY:-$REPO_ROOT/.venv/bin/python}"
 [[ -x "$PY" ]] || PY="python3"
 
@@ -83,6 +89,14 @@ echo "== running the capsule's own entry point =="
   exit 1
 }
 grep -E "NOT CHECKABLE|capsule layout|all gates passed" "$DEST/_run.log" | sed 's/^/   /'
+# A document gate inside a capsule must say "not checkable" (exit 2), never "failed" (exit 1).
+# The first build of this script caught check_letter_actions doing exactly that.
+if grep -q "FAILED (exit 1)" "$DEST/_run.log"; then
+  echo "!! a gate reported a FAILURE inside the capsule; a gate that cannot run here must" >&2
+  echo "!! exit 2, not 1. Offending lines:" >&2
+  grep -n "FAILED (exit 1)" "$DEST/_run.log" >&2
+  exit 1
+fi
 
 echo "== claims produced in the capsule vs the committed claims.json =="
 "$PY" - "$DEST" <<'TXT'

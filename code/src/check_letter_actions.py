@@ -71,9 +71,20 @@ def git(*args: str) -> str | None:
 
 
 def main() -> int:
-    if git("rev-parse", "--git-dir") is None:
-        print("[letter-actions] INCOMPLETE: not a git checkout, so there is no baseline to "
-              "compare the letter's claims against", file=sys.stderr)
+    # Two guards, and the second was learned the hard way. `git rev-parse` succeeds from any
+    # directory NESTED inside a repository, so a capsule staged at build/capsule inside this
+    # checkout resolved the enclosing repo, fetched the as-submitted baseline successfully, and
+    # then crashed reading a paper/main.tex that a /code + /data mount correctly does not have --
+    # reporting a FAILURE where the honest answer is "not checkable here". The repository has to
+    # be THIS tree, and the documents this gate reads have to exist.
+    top = git("rev-parse", "--show-toplevel")
+    if top is None or Path(top.strip()).resolve() != ROOT.resolve():
+        print("[letter-actions] INCOMPLETE: this copy is not the root of a git checkout, so "
+              "there is no baseline to compare the letter's claims against", file=sys.stderr)
+        return 2
+    if not (ROOT / "paper" / "main.tex").exists() or not LETTER.exists():
+        print("[letter-actions] INCOMPLETE: no manuscript or response letter in this copy "
+              "(capsule layout)", file=sys.stderr)
         return 2
     old_tex = git("show", f"{BASELINE}:paper/main.tex")
     if old_tex is None:
