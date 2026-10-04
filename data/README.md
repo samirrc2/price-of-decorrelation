@@ -36,9 +36,11 @@ Results: `results/data-<dataDate>_run-<runStamp>/` + `results/latest`.
 
 ## Collect a new dataset (e.g. ~48k today)
 
+**Warning:** `--scratch-run` is a **live** API collection. You must add your own provider API keys, and the run **will cost money** (partial grid: tens of USD; full confirmatory-scale: ~USD 90). It is not required to reproduce the paper from the frozen CSV.
+
 ```bash
-source code/scripts/activate_env.sh
-bash reproduce.sh --scratch-run 48k          # live collect → analyze → results/latest
+source code/scripts/activate_env.sh    # or: python3 -m venv .venv && source .venv/bin/activate && pip install -r code/requirements.txt
+bash reproduce.sh --scratch-run 48k    # live collect → analyze → results/latest
 bash reproduce.sh --scratch-run full
 ```
 

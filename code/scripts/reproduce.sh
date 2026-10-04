@@ -140,7 +140,6 @@ cd "$REPO_ROOT" 2>/dev/null || cd "$CODE_ROOT"
 
 export PATH="/opt/homebrew/bin:/usr/local/bin:${PATH:-}"
 
-_VENV="$REPO_ROOT/.venv"
 _ensure_env() {
   if [[ -d /code/src && -d /data ]]; then
     export PYTHONPATH="/code/src:${PYTHONPATH:-}"
@@ -149,17 +148,17 @@ _ensure_env() {
       return 0
     fi
   fi
-  if [[ -n "${VIRTUAL_ENV:-}" ]]; then
-    _active="$(cd "$VIRTUAL_ENV" 2>/dev/null && pwd)" || _active=""
-    _want="$(cd "$_VENV" 2>/dev/null && pwd)" || _want=""
-    if [[ -n "$_active" && -n "$_want" && "$_active" == "$_want" ]]; then
-      echo "Environment already active: $VIRTUAL_ENV"
-      export PYTHONPATH="$CODE_ROOT/src:${PYTHONPATH:-}"
-      return 0
-    fi
+  export PYTHONPATH="$CODE_ROOT/src:${PYTHONPATH:-}"
+  if ! command -v python >/dev/null 2>&1; then
+    echo "ERROR: python not found on PATH." >&2
+    exit 1
   fi
-  # shellcheck disable=SC1091
-  source "$CODE_ROOT/scripts/activate_env.sh"
+  if ! python -c "import yaml, numpy, matplotlib" 2>/dev/null; then
+    echo "ERROR: missing Python packages." >&2
+    echo "Install with: pip install -r code/requirements.txt" >&2
+    exit 1
+  fi
+  echo "Python: $(python --version 2>&1)"
 }
 
 _ensure_env

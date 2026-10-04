@@ -28,7 +28,7 @@ This repository is the frozen dataset and analysis pipeline that regenerates tho
 | **Authors** | Samir Chincholikar, Robin Chawla |
 | **Affiliations** | Independent researchers |
 | **Code repository** | https://github.com/samirrc2/price-of-decorrelation |
-| **Persistent DOI** | Pending Code Ocean / Zenodo / IEEE DataPort deposit (to be inserted here when minted) |
+| **Persistent DOI** | Code Ocean capsule submitted for review (public DOI pending; insert here when minted). Until then, use this GitHub repository. |
 | **Contact** | Samir Chincholikar: samir.chincholikar@gmail.com; Robin Chawla: robin.chawla.cse14@iitbhu.ac.in |
 | **ORCID** | Samir Chincholikar: https://orcid.org/0009-0007-2779-3492; Robin Chawla: https://orcid.org/0009-0007-2807-3948 |
 
@@ -44,6 +44,23 @@ The artifact enables independent reproduction of the article’s computational r
 4. Configurations and analysis scripts for the capability-matched control and temperature-sensitivity robustness studies.
 
 **Default workflow (this README):** regenerate Phase-3 analysis outputs from the frozen dataset. This path requires **no LLM API keys** and incurs **no inference cost**. Re-collecting the 54,000 API calls is optional, incurs cost (~USD 90), and is **not required** to verify the numerical claims in the article.
+
+---
+
+## Code Ocean
+
+A [Code Ocean](https://codeocean.com/) compute capsule for this artifact has been **submitted for review** and will be **publicly available soon**, with a persistent DOI assigned after Code Ocean’s reproducibility verification.
+
+| Status | Detail |
+|--------|--------|
+| Capsule | Prepared (keys-free Reproducible Run via `/code/run`) |
+| Review | Submitted; awaiting Code Ocean verification |
+| Public link / DOI | Not yet issued — will be added to this README and the manuscript when available |
+| Until then | Reproduce from this GitHub repository (`bash reproduce.sh`) |
+
+The capsule layout matches this repository: `/code` (including `run`, `src/`, `scripts/`), `/data` (frozen confirmatory CSV and configs), `/results` (analysis outputs), and `environment/Dockerfile`. The default Reproducible Run regenerates Phase-3 metrics and figures from the frozen dataset with **no API keys** and **no inference cost**.
+
+After publication on Code Ocean, replace the placeholder in Section 1 (**Persistent DOI**) with the minted DOI.
 
 ---
 
@@ -74,7 +91,7 @@ The artifact enables independent reproduction of the article’s computational r
 
 ### Software libraries
 
-Dependencies are listed in `code/requirements.txt` and installed automatically into a project virtual environment (`.venv`). Primary packages:
+Dependencies are listed in `code/requirements.txt` (install with `pip install -r code/requirements.txt`). Primary packages:
 
 - `pyyaml>=6.0`
 - `numpy==2.2.6`
@@ -112,7 +129,7 @@ Recorded in `archive_manifest.md`.
 
 ### Optional dependencies (live re-collection only)
 
-API credentials for OpenAI, Google Gemini, xAI, and Financial Modeling Prep are required **only** if re-running `code/src/orchestrator.py` to collect new LLM responses. They are not required for the default reproduction path.
+API credentials for OpenAI, Google Gemini, xAI, and Financial Modeling Prep are required **only** for live re-collection (`bash reproduce.sh --scratch-run …` or `code/src/orchestrator.py`). They are **not** required for the default reproduction path. Live runs **cost money** (API inference spend); the frozen confirmatory dataset is enough to verify the article’s numerical claims.
 
 ---
 
@@ -122,37 +139,43 @@ API credentials for OpenAI, Google Gemini, xAI, and Financial Modeling Prep are 
 
 | Step | Typical duration |
 |------|------------------|
-| Create virtual environment and install dependencies (first time) | 1–5 minutes |
+| Install Python dependencies / create venv (first time) | 1–5 minutes |
 | Activate an existing virtual environment | &lt; 5 seconds |
 | Byte-identical replication check (`bash reproduce.sh`, default) | 5–20 minutes |
 | Single analyze pass (`bash reproduce.sh --analyze-only`) | 1–5 minutes |
+| Code Ocean Reproducible Run (`/code/run`) | ~3–5 minutes (observed) |
 
 ### Installation
 
-Clone the repository and run from the repository root.
+**Required before any local `reproduce.sh` run:** activate the project environment. `reproduce.sh` does **not** create or activate a venv for you; if packages are missing it will exit with an install hint.
 
-**Recommended (creates or reuses `.venv`, installs dependencies as needed):**
+**Recommended (creates/reuses `.venv`, installs deps, activates):**
 
 ```bash
 git clone https://github.com/samirrc2/price-of-decorrelation.git
 cd price-of-decorrelation
 source code/scripts/activate_env.sh
+bash reproduce.sh
 ```
 
-**Equivalent manual installation:**
+Do **not** run `./code/scripts/activate_env.sh` — it must be **sourced** so the venv stays active in your shell. Then run `bash reproduce.sh` (or `--analyze-only`, etc.) in that same shell.
+
+**Equivalent manual setup:**
 
 ```bash
 python3 -m venv .venv
-source .venv/bin/activate
+source .venv/bin/activate          # Windows: .venv\Scripts\activate
 pip install -r code/requirements.txt
-export PYTHONPATH="${PWD}/code/src:${PYTHONPATH}"
+bash reproduce.sh
 ```
+
+`reproduce.sh` and `code/run` set `PYTHONPATH` to `code/src` automatically once the env is active. On Code Ocean, packages come from `environment/Dockerfile` — no `activate_env.sh` step.
 
 On some Linux distributions, install `python3-venv` (or the matching versioned package) if `python3 -m venv` is unavailable.
 
 ### Deployment / execution
 
-No compilation step is required. From the repository root, with `data/confirmatory/latest/runs.csv` present:
+No compilation step is required. From the repository root, with the env **already activated** (`source code/scripts/activate_env.sh`) and `data/confirmatory/latest/runs.csv` present:
 
 | Goal | Command |
 |------|---------|
@@ -161,8 +184,12 @@ No compilation step is required. From the repository root, with `data/confirmato
 | Analyze a specific call dataset | `bash reproduce.sh --data data/confirmatory/latest --analyze-only` |
 | Analyze only (environment already activated) | `POD_OUT_DIR=results/latest python code/src/analyze.py` |
 | Replication check only | `python code/src/replication_check.py` |
+| Code Ocean entry point | `/code/run` → `bash code/scripts/reproduce.sh --data data/confirmatory/20260704` |
+| Live re-collection (optional; **not** required to verify the paper) | `bash reproduce.sh --scratch-run 48k` or `--scratch-run full` |
 
-`reproduce.sh` (repository root) delegates to `code/scripts/reproduce.sh` and activates the project environment automatically when needed. Outputs land under `results/<timestamp>/` with `results/latest` pointing at the newest run.
+**Scratch / live runs:** `--scratch-run` calls live LLM APIs. You must supply your own API keys (OpenAI, Google Gemini, xAI; see Section 2). This **incurs real inference cost** (on the order of tens of USD for a partial grid; ~USD 90 for a full confirmatory-scale collection) and is **not** part of the default reproducibility check. Prefer the frozen CSV + `bash reproduce.sh` unless you intentionally want a new dataset.
+
+`reproduce.sh` (repository root) delegates to `code/scripts/reproduce.sh`. Outputs land under `results/<timestamp>/` with `results/latest` pointing at the newest run.
 
 ---
 
@@ -185,7 +212,7 @@ data/confirmatory/latest/runs.csv + data/configs/config.yaml
         ├── tables/endpoints.csv /.tex         → Article Table 2 (Δκ contrasts)
         ├── tables/frontier.csv /.tex          → Article Table 4 (κ and cost by config)
         ├── metrics_summary.md                 → Verdict and primary numerical results
-        └── replication_check.md               → Deterministic: YES (14/14 identical)
+        └── replication_check.md               → Deterministic: YES (13/13 identical)
 ```
 
 Stable path for readers: `results/latest/` (symlink to the newest timestamped folder).
@@ -227,7 +254,7 @@ Generated figures under `results/latest/figures/` correspond to Article Figures 
 After `bash reproduce.sh`, the console and `results/latest/replication_check.md` must report:
 
 ```text
-✔ Deterministic: YES (14/14 identical)
+✔ Deterministic: YES (13/13 identical)
 ```
 
 These outputs are the same quantities reported in the article’s results section for the confirmatory study.
@@ -256,35 +283,45 @@ These outputs are the same quantities reported in the article’s results sectio
 price-of-decorrelation/
 ├── README.md
 ├── LICENSE
-├── reproduce.sh              # → code/scripts/reproduce.sh
+├── reproduce.sh                 # → code/scripts/reproduce.sh
 ├── archive_manifest.md
 ├── docs/
 ├── archive/
-├── paper/                    # reconstructed manuscript (optional)
-├── environment/              # Code Ocean env notes
+├── paper/                       # reconstructed manuscript (optional)
 │
-├── code/                     # capsule "code" (/code)
-│   ├── src/
+├── environment/                 # Code Ocean compute environment
+│   ├── Dockerfile               # pinned pip pkgs (matches working capsule)
+│   └── README.md
+│
+├── metadata/
+│   └── metadata.yml             # capsule title, description, authors
+│
+├── code/                        # capsule "code" (/code)
+│   ├── run                      # Code Ocean Reproducible Run entry point
+│   ├── src/                     # analyze.py, replication_check.py, …
 │   ├── scripts/
+│   │   └── reproduce.sh         # keys-free replication / analyze / scratch-run
 │   ├── tests/
 │   ├── requirements.txt
 │   └── pytest.ini
 │
-├── data/                     # capsule "data" (/data)
+├── data/                        # capsule "data" (/data)
 │   ├── confirmatory/<YYYYMMDD>/runs.csv (+ latest →)
 │   ├── control/
 │   ├── temperature_robustness_small/<YYYYMMDD>/
 │   ├── minipilot/
-│   ├── raw/                  # gitignored
+│   ├── raw/                     # gitignored
 │   ├── configs/
 │   ├── inputs/
 │   ├── datacache/
 │   └── appendix/
 │
-└── results/                  # capsule "results" (/results); gitignored
-    ├── <timestamp>/
-    └── latest -> <timestamp>
+└── results/                     # capsule "results" (/results); gitignored
+    ├── data-<dataDate>_run-<YYYYMMDD_HHMMSS>/
+    └── latest -> <that folder>
 ```
+
+**Code Ocean flow:** `/code/run` calls `reproduce.sh` on the frozen confirmatory CSV → writes under `/results/data-…_run-…/` (one folder per Reproducible Run; the replication check runs analyze twice *into that same folder* and hash-compares).
 
 **Generated at run time** (safe to overwrite): everything under `results/`.  
 **Default review dataset:** `data/confirmatory/latest` (currently `20260704`). New collections write a new dated folder.
@@ -294,6 +331,7 @@ price-of-decorrelation/
 ```bash
 git clone https://github.com/samirrc2/price-of-decorrelation.git
 cd price-of-decorrelation
+source code/scripts/activate_env.sh    # required once per shell: create/activate .venv + deps
 bash reproduce.sh
 ```
 

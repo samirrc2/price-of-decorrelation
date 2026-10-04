@@ -18,10 +18,20 @@ Default Reproducible Run: `/code/run` → `bash code/scripts/reproduce.sh --data
 
 ## Local development
 
-Install deps into a repo-root `.venv` (do not rely on the Code Ocean base image):
+**Activate first, then reproduce** (Python ≥ 3.10):
 
 ```bash
-source code/scripts/activate_env.sh
+source code/scripts/activate_env.sh    # creates/reuses .venv, installs deps, activates
+bash reproduce.sh
 ```
 
-That installs from `code/requirements.txt` (Python ≥ 3.10).
+Or manually:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r code/requirements.txt
+bash reproduce.sh
+```
+
+`reproduce.sh` / `code/run` set `PYTHONPATH` to `code/src`; they do not activate the venv.
