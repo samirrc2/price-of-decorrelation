@@ -234,12 +234,26 @@ def check_new_reference_highlighting():
         if not m:
             fails.append(f"{k} is newly cited but absent from paper/main.bbl")
             continue
-        probe = " ".join(re.sub(r"\\[a-zA-Z]+|[{}~\\]", " ", m.group(1)).split())[:38]
+        # The probe must survive typesetting. Taking the first 38 characters pulled in LaTeX
+        # quote marks, which render as typographic quotes, so the PDF search missed three
+        # entries that WERE highlighted. Use the longest run of letters and spaces instead --
+        # usually part of the title -- which renders unchanged.
+        clean = " ".join(re.sub(r"\\[a-zA-Z]+|[{}~\\]", " ", m.group(1)).split())
+        runs = re.findall(r"[A-Za-z][A-Za-z ]{14,}", clean)
+        probe = max(runs, key=len).strip()[:44] if runs else clean[:38]
+        # A long probe can straddle a line break, which search_for will not match across. Try
+        # progressively shorter prefixes before concluding the entry is unhighlighted.
         hit = False
-        for page in doc:
-            for r in page.search_for(probe) or []:
-                if any(r.intersects(y) for y in yellow_boxes(page)):
-                    hit = True
+        for cut in (44, 34, 26, 20):
+            cand = probe[:cut].rstrip()
+            if len(cand) < 12:
+                continue
+            for page in doc:
+                for r in page.search_for(cand) or []:
+                    if any(r.intersects(y) for y in yellow_boxes(page)):
+                        hit = True
+                        break
+                if hit:
                     break
             if hit:
                 break

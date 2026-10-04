@@ -66,8 +66,8 @@ between agents' binary error indicators. Error correlation decreases by
 $\Delta\phi = 0.454$ (95\% CI: $0.376$ to $0.534$), while mean per-agent accuracy
 remains essentially unchanged. This indicates that the observed change reflects
 lower error dependence rather than differences in average correctness.
-Capability-matched analyses further show that capability differences alone do not
-explain the observed contrast, although provider remains confounded with other
+The contrast remains substantial under approximate capability
+matching, although that control does not isolate provider from other
 model-specific characteristics.
 We also introduce an independent-draw measurement protocol designed to prevent
 shared sampling conditions from inflating estimated agreement. A pre-registered
@@ -85,8 +85,8 @@ cost premium.
 \end{abstract}
 
 \begin{keywords}
-Algorithmic monoculture, inter-rater agreement, large language models, model
-heterogeneity, multi-agent systems.
+Ensemble learning, error correlation, large language models, model heterogeneity,
+multi-agent systems.
 \end{keywords}
 
 \titlepgskip=-21pt
@@ -367,10 +367,17 @@ observations for the same security share company-specific context. Analysis date
 constitute a second crossed source of dependence because all securities evaluated
 on a given date share common market conditions.
 
-We therefore assess the primary contrast under three resampling schemes: equity
-clustering with 100 clusters, date clustering with 12 clusters, and a two-way
-procedure in which equities and dates are resampled independently and their
-intersections are retained. Results appear in Table~\ref{tab:clustering}. The
+Because equity and analysis date are crossed rather than nested, we additionally
+assess uncertainty under a two-way resampling procedure. This follows the
+crossed-resampling principle of the pigeonhole
+bootstrap~\cite{owen2007pigeonhole}, in which the two margins are resampled
+separately, and is motivated by the broader multiway-inference literature for
+non-nested clustering dimensions~\cite{cameron2011multiway}; it is not an
+implementation of a multiway variance estimator. We therefore assess the primary
+contrast under three resampling schemes: equity clustering over 100 equities,
+date clustering over 12 dates, and a two-way procedure in which equities and
+dates are resampled independently, with multiplicity preserved on both margins,
+and their sampled intersections retained. Results appear in Table~\ref{tab:clustering}. The
 point estimate is unchanged across schemes. The two-way interval is the widest, as
 expected when both dependence structures are admitted, and it continues to exclude
 zero.
@@ -499,7 +506,13 @@ Before confirmatory data collection, we froze the hypotheses, ensemble
 configurations, prompt template, experimental grid, random-seed construction,
 primary and secondary endpoints, uncertainty-estimation procedure, and decision
 rule. The resulting pre-registration was assigned a SHA-256 hash to establish
-that the design preceded the collection of the confirmatory dataset. Raw outputs
+that the design preceded the collection of the confirmatory dataset. The released
+package contains the freeze receipts themselves: the confirmatory freeze is
+timestamped 2026-07-03T20:41:51Z and records the SHA-256 of the configuration,
+agent and analysis code, prompt template, pre-registration, grid, and model
+manifest together with the commit that carried them; the cross-domain replication
+has its own receipt, timestamped 2026-09-29T14:47:54Z and recorded before any API
+call for that arm. Raw outputs
 were collected once and stored in an immutable, read-only, hash-verified
 dataset. The analysis pipeline reads only the frozen dataset and experimental
 configuration, and all stochastic procedures, including bootstrap resampling,
@@ -628,11 +641,11 @@ resampling units. The point estimate does not depend on the resampling scheme.}
 \setlength{\tabcolsep}{4pt}
 \begin{tabular}{@{}lccc@{}}
 \toprule
-Resampling unit & Clusters & $\Delta\kappa$ & 95\% CI \\
+Resampling unit & Resampled units & $\Delta\kappa$ & 95\% CI \\
 \midrule
-Equity (pre-reg.) & 100 & 0.3363 & $[0.3035,\,0.3689]$ \\
-Analysis date & 12 & 0.3363 & $[0.2989,\,0.3656]$ \\
-Two-way & 1200 & 0.3363 & $[0.2786,\,0.3877]$ \\
+Equity (pre-reg.) & 100 equities & 0.3363 & $[0.3035,\,0.3689]$ \\
+Analysis date & 12 dates & 0.3363 & $[0.2989,\,0.3656]$ \\
+Two-way & $100\times 12$ & 0.3363 & $[0.2786,\,0.3877]$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -663,7 +676,13 @@ in categorical consensus. Accordingly, the ``price of de-correlation'' in the
 title refers to the additional inference cost associated with ensemble
 configurations that exhibit lower error dependence.
 
-Within each evaluation cell, that is each (configuration, equity, date, run)
+Pairwise dependence between binary error indicators is a standard
+characterization of classifier-ensemble diversity, and that literature also shows
+that diversity and ensemble accuracy are related but not
+interchangeable~\cite{kuncheva2003diversity}. We therefore complement the
+categorical agreement statistic $\kappa$ with a $\phi$ correlation computed from
+paired error indicators. Within each evaluation cell, that is each
+(configuration, equity, date, run)
 combination, we form for every unordered pair of agent positions the pair of
 binary error indicators defined against the realized forward-return sign. These
 paired indicators are pooled over all cells and all agent-position pairs within a
@@ -990,7 +1009,10 @@ secondary directional-accuracy analysis.}
 \subsection{Selective prediction}
 \label{subsec:selective}
 Reduced agreement is only useful if it buys something downstream, so we ask
-whether the configurations differ in their ability to rank their own errors. A
+whether the configurations differ in their ability to rank their own errors.
+Following the selective-classification framework of El-Yaniv and
+Wiener~\cite{elyaniv2010selective}, we evaluate the risk--coverage trade-off
+obtained by ranking ensemble decisions according to mean agent conviction. A
 decision is the majority vote of the five agents in an (equity, date) cell on the
 financial grid. Decisions whose majority is HOLD are excluded, as are cells whose
 forward-return sign is undefined or zero, which leaves the directional decisions
@@ -1048,9 +1070,14 @@ correlations are $0.954$ and $0.607$, a difference of $0.347$
 after approximate capability matching, although provider remains confounded with
 other model-specific characteristics.
 
-This replication supports the observed ordering across two substantially
-different domains. It does not establish that heterogeneity improves predictive
-accuracy.
+The cross-domain replication varies domain and response structure while
+intentionally retaining the five-agent ensemble, prompt structure, aggregation
+rule, and evaluated model mixtures. It therefore tests whether the observed
+ordering is confined to the financial task, rather than establishing invariance
+across ensemble-design choices. The replication supports the ordering across two
+substantially different domains; it does not establish that heterogeneity
+improves predictive accuracy, and the agreement contrast is substantially smaller
+in the clinical arm, so the magnitude is task-dependent.
 
 \subsection{Robustness: capability-matched control}
 \label{sec:control}
@@ -1070,12 +1097,14 @@ $\kappa_{\mathrm{HET\text{-}SameTier}}=0.236$. The resulting contrast is
 with a two-way interval of $[0.270,\,0.361]$; both exclude zero. This capability-matched estimate is approximately 94\% of
 the primary HOM-to-HET contrast. The result indicates that the observed
 reduction in agreement is largely preserved when model tier is held approximately
-constant, indicating that capability differences alone do not account for the
-primary contrast. Provider nevertheless remains confounded with other
-model-specific characteristics and is not identified as an independent causal
-factor. The capability-matched control therefore reduces, but does not eliminate,
+constant. The contrast therefore remains substantial under approximate
+capability matching, although that control does not isolate provider from other
+model-specific characteristics, which are not independently identified by this
+design. The capability-matched control therefore reduces, but does not eliminate,
 the capability-tier confound, because matching is approximate and covers only two
-providers.
+providers. The close reproduction of $\kappa_{\mathrm{HOM}}$ across independently
+collected datasets provides an additional consistency check for the homogeneous
+baseline.
 
 \subsection{Robustness: temperature sensitivity}
 Agreement can vary with sampling temperature, raising the possibility that the
@@ -1141,11 +1170,27 @@ rate~\cite{wang2024moa}. The present study instead measures how ensemble
 composition changes output agreement, error dependence, and inference cost under
 fixed task conditions.
 
-The contribution is therefore a measurement framework that separates output
-agreement from error correlation, controls the shared-seed artifact observed in
-repeated model sampling, quantifies uncertainty, and incorporates inference cost.
-These measurements complement performance-based evaluations rather than
-constitute a competing aggregation method.
+The distinction is one of estimand rather than of quality. Mixture-of-agents,
+debate, pruning, and ensemble-selection studies ask whether a particular
+aggregation or selection method improves downstream performance, and a
+leaderboard comparison is the appropriate test of that question. This study holds
+the decision task, prompt, information set, and aggregation rule fixed and asks
+how ensemble \emph{composition} relates to output agreement, error dependence,
+and inference cost. A leaderboard-style accuracy comparison would therefore
+answer a different question than the one posed here.
+
+The appropriate comparison with prior work is methodological, along four axes:
+how diversity or agreement is measured, whether error dependence is separated
+from categorical agreement, whether sampling artifacts are controlled, and
+whether uncertainty and inference cost are quantified. The classifier-ensemble
+literature already establishes that diversity and ensemble accuracy are related
+but not interchangeable~\cite{kuncheva2003diversity}, which is why reduced
+agreement is not treated here as evidence of improved accuracy. The contribution
+is therefore a measurement framework that separates output agreement from error
+correlation, controls the shared-seed artifact observed in repeated model
+sampling, quantifies uncertainty under crossed dependence, and incorporates
+inference cost. These measurements complement performance-based evaluations
+rather than constitute a competing aggregation method.
 
 \section{Discussion}
 The results provide a quantitative characterization of the relationship between
@@ -1276,10 +1321,9 @@ contrast of $\Delta\kappa=0.336$ (95\% CI: $[0.304, 0.369]$). This reduction is
 accompanied by an approximately $4.4\times$ increase in inference cost,
 producing an explicit agreement--cost frontier for the evaluated
 configurations. A capability-matched control preserves approximately 94\% of the
-primary effect, indicating that capability differences alone do not account for
-the observed contrast. Provider nevertheless remains confounded with other
-model-specific characteristics and is not identified as an independent causal
-factor. We
+primary contrast, which therefore remains substantial under approximate
+capability matching; provider nevertheless remains bundled with other
+model-specific characteristics and is not independently identified. We
 also introduce an independent-draw measurement protocol that controls dependence
 caused by shared sampling seeds. In a controlled pilot, shared per-run seeding
 inflated the estimated agreement contrast by approximately fourfold,

@@ -78,6 +78,8 @@ Robin Chawla
 
 \item Section V-D, ``The Agreement-Cost Frontier,'' was revised to state that the frontier quantifies the cost associated with greater behavioral diversity and does not by itself establish improved downstream decision quality.
 
+\item Section V-I, ``Selective Prediction,'' is now a standalone subsection rather than part of the clinical replication, since its equity-clustered and two-way intervals concern the financial experiment. It defines the decision unit, the HOLD and undefined-sign exclusions, the coverage denominator, the conviction ranking, selective risk, the trapezoidal AURC, the within-draw paired contrast, and the bootstrap, and it follows the risk-coverage framework of El-Yaniv and Wiener.
+
 \end{itemize}
 
 \vspace{12pt}
@@ -214,6 +216,8 @@ Robin Chawla
 
 \item Table 6 retains the within-run versus cross-run diagnostic and identifies the heterogeneous results as secondary consistency checks rather than direct independence tests.
 
+\item The Conclusion no longer refers to verifying sampling independence; it now describes checking for residual within-run dependence and avoiding shared-seed artifacts, matching Section III-C. The claim that reproducing kappa\_HOM across datasets re-confirms determinism has been removed and replaced with a consistency check, since reproducing an aggregate statistic does not demonstrate determinism.
+
 \end{itemize}
 
 \vspace{12pt}
@@ -297,6 +301,8 @@ Robin Chawla
 
 \item Section II-A, ``LLM Ensembles and Mixture-of-Agents,'' provides the corresponding literature context for mixture-of-agents, diversity-based selection, and heterogeneous ensemble approaches.
 
+\item Section V-M, ``Relation to Existing Ensemble Methods,'' now states the distinction as one of estimand rather than quality: prior aggregation and selection work asks whether a method improves downstream performance, while this study holds the task, prompt, information set and aggregation rule fixed and asks how ensemble composition relates to agreement, error dependence and cost. It identifies the four methodological axes on which the comparison is appropriate, and cites the classifier-ensemble result that diversity and accuracy are related but not interchangeable.
+
 \end{itemize}
 
 \vspace{12pt}
@@ -333,6 +339,8 @@ Robin Chawla
 \item Section V-K, ``Robustness: Capability-Matched Control,'' retains the pre-registered financial capability control.
 
 \item Section VII, ``Threats to Validity,'' subsection ``Heterogeneity vs. capability confound,'' was revised to state explicitly that provider cannot be isolated causally in the present design.
+
+\item Causal attribution to provider has been removed throughout rather than only in the provider-pair subsection. The Abstract, Introduction, the metrics definition, Section V-A, the Discussion and the Conclusion now describe an association across the evaluated configurations. The phrase ``capability differences alone do not explain the observed contrast'' has been replaced in all three places it appeared with the statement that the contrast remains substantial under approximate capability matching, although that control does not isolate provider from other model-specific characteristics.
 
 \end{itemize}
 
@@ -387,6 +395,10 @@ Robin Chawla
 
 \item Section V-L, ``Robustness: Temperature Sensitivity,'' states that the subgrid spans two analysis dates, which is too few clusters for date-clustered or two-way inference, and that the analysis therefore contributes no independent multiway evidence.
 
+\item Section III-D now gives the methodological precedent for the crossed procedure: the pigeonhole bootstrap, which resamples the two margins separately, and the multiway-inference literature for non-nested clustering dimensions. We state explicitly that our procedure is not an implementation of a multiway variance estimator.
+
+\item Table 5 previously labelled the two-way row ``1200 clusters'', which can be read as 1,200 independent clusters. It now reads ``100 x 12'' under a ``Resampled units'' column. The point estimate and interval are unchanged.
+
 \end{itemize}
 
 \vspace{12pt}
@@ -423,6 +435,8 @@ Robin Chawla
 \item The Abstract was revised to report the $\phi$ contrast alongside the $\kappa$ contrast and to distinguish reduced error dependence from reduced agreement.
 
 \item Section VI, ``Discussion,'' and Section VIII, ``Conclusion,'' were revised so that decorrelation claims refer to error dependence rather than categorical agreement. The Conclusion now states that model diversity can reduce both output agreement and error correlation.
+
+\item Section V-C now states the phi computation exactly as implemented: within each (configuration, equity, date, run) cell we form, for every unordered pair of agent positions, the pair of binary error indicators against the realized forward-return sign; those pairs are pooled over all cells and all agent-position pairs within a configuration, and phi is the Pearson correlation of the pooled set, so one phi is reported per configuration rather than one per agent pair. The previous wording implied a correlation per pair, which a single paired observation cannot support.
 
 \end{itemize}
 
@@ -505,6 +519,8 @@ Robin Chawla
 \item Figure 3 was reduced to the two directly comparable pilot HOM-HET agreement contrasts.
 
 \item Table 6 reports the full-study within-run versus cross-run diagnostic separately.
+
+\item Section IV-D now identifies the freeze receipts in the released package: the confirmatory freeze is timestamped 2026-07-03T20:41:51Z and records the SHA-256 of the configuration, agent and analysis code, prompt template, pre-registration, grid and model manifest together with the commit that carried them; the cross-domain replication has its own receipt timestamped 2026-09-29T14:47:54Z, recorded before any API call for that arm.
 
 \end{itemize}
 
