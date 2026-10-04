@@ -59,7 +59,7 @@ R = [
     # ---------------------------------------------------------------- front matter / abstract
     (r"date of publication xxxx 00$", "0000", "!IEEE template placeholder in \\history", 0),
     (r"date of current version xxxx 00$", "0000", "!IEEE template placeholder in \\history", 0),
-    (r"manuscript submitted august 3$", "2026", "!submission date", 0),
+    (r"manuscript submitted october 5$", "2026", "!submission date", 0),
     (r"agreement and inference cost\. in a$", "54000", "calls_usable", 0),
     (r"directional financial-analysis task covering$", "100",
      "revision_r3_2_clustering_ticker_n_clusters", 0),
