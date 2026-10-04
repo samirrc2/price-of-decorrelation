@@ -75,6 +75,7 @@ def run_bodies(tex: str, macro: str) -> list[str]:
 
 def tokens(tex: str) -> list[str]:
     t = re.sub(r"(\d)\{,\}(\d)", r"\1\2", tex)
+    t = re.sub(r"\\(?:begin|end)\{[^{}]*\}", " ", t)   # environment names are not printed text
     t = re.sub(r"\\label\{[^{}]*\}", " ", t)
     t = re.sub(r"\\(?:ref|eqref|cite[a-z]*|url|doi)\{[^{}]*\}", f" {WILD} ", t)
     t = re.sub(r"\\mbox\{", "{", t)
@@ -91,11 +92,16 @@ def tokens(tex: str) -> list[str]:
         n = norm(x)
         if n:
             out.append(n)
-    while out and out[0] == WILD:
-        out.pop(0)
-    while out and out[-1] == WILD:
-        out.pop()
-    return out
+    # Collapse runs of wildcards but KEEP them. A \DIFadd run that is pure math -- a confidence
+    # interval in a table cell -- otherwise contributes no token at all, and the context around
+    # its neighbours then has a hole where the printed table has two numbers, so the surrounding
+    # cells of that row can never be matched.
+    collapsed = []
+    for t in out:
+        if t == WILD and collapsed and collapsed[-1] == WILD:
+            continue
+        collapsed.append(t)
+    return collapsed
 
 
 def word_stream(doc):
@@ -266,7 +272,15 @@ def main() -> int:
     sm = difflib.SequenceMatcher(a=src_words, b=words, autojunk=False)
     placed = set()
     src_to_pdf = {}
+    # Only a matching block of three or more consecutive tokens is evidence. difflib will match
+    # a lone "at" or "to" anywhere in the document, and near the end -- at the biographies and
+    # the reference list, where the source order and the printed order genuinely diverge -- such
+    # an isolated match put a changed word on the author's name. Runs left unplaced by this
+    # restriction are picked up by the per-run search below, which needs real context.
+    MIN_BLOCK = 3
     for blk in sm.get_matching_blocks():
+        if blk.size < MIN_BLOCK:
+            continue
         for k in range(blk.size):
             src_to_pdf[blk.a + k] = blk.b + k
     for i in sorted(changed_src):
@@ -290,12 +304,30 @@ def main() -> int:
     fails, recovered = [], 0
     for ri, (kind, body) in enumerate(runs):
         seq = tokens(body)
+        while seq and seq[0] == WILD:
+            seq.pop(0)
+        while seq and seq[-1] == WILD:
+            seq.pop()
         if not seq or body.strip() in ("#1", "#2", "#3"):
             continue        # a macro parameter in a redefined command, not printed text
         if ri < len(spans):
             a, b = spans[ri]
             if any(i in src_to_pdf for i in range(a, b)):
-                continue                       # stage 1 already placed it
+                # A one-word run is accepted from the alignment only if its surroundings agree.
+                # "Two-way" in Table 5 was being placed on the word "two-way" in the prose, so
+                # that table cell shipped unmarked while the rest of its row was highlighted.
+                if b - a == 1:
+                    at = next(src_to_pdf[i] for i in range(a, b) if i in src_to_pdf)
+                    before = [t for t in src_words[max(0, a - 2):a] if t != WILD]
+                    after = [t for t in src_words[b:b + 2] if t != WILD]
+                    ok = all(t in words[max(0, at - 4):at] for t in before) and \
+                         all(t in words[at + 1:at + 5] for t in after)
+                    if not ok:
+                        placed.discard(at)
+                    else:
+                        continue
+                else:
+                    continue                   # stage 1 already placed it
         probe = seq[:8] if len(seq) >= 2 else seq
         hit = locate(words, probe) if len(probe) >= 2 else None
         if hit is None and len(seq) >= 2:
