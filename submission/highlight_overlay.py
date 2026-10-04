@@ -162,6 +162,50 @@ def match_at(words, start, seq):
     return i
 
 
+def match_trace(words, start, seq):
+    """Like match_at, but returns the PDF index span each source token consumed.
+
+    The context probe needs this. It used to assume the run sat `pad` words into the match, which
+    is only true when every token maps to exactly one word -- and a table row's context is full of
+    wildcards that swallow two or three. Table 5's "Two-way" cell was placed one word short of
+    itself for exactly that reason, so the cell stayed unmarked while the rest of its row was
+    highlighted.
+    """
+    i, j, trace = start, 0, []
+    while j < len(seq):
+        if i >= len(words):
+            return None
+        tok, last = seq[j], j == len(seq) - 1
+        if tok == WILD:
+            if last:
+                trace.append((i, i + 1))
+                return trace
+            nxt = seq[j + 1]
+            for take in range(1, 7):
+                if i + take < len(words) and (words[i + take] == nxt
+                                              or words[i + take].startswith(nxt)):
+                    trace.append((i, i + take))
+                    i += take
+                    j += 1
+                    break
+            else:
+                return None
+            continue
+        w = words[i]
+        if w == tok or (j == 0 and w.endswith(tok)) or (last and w.startswith(tok)):
+            trace.append((i, i + 1))
+            i += 1
+            j += 1
+            continue
+        if i + 1 < len(words) and words[i] + words[i + 1] == tok:
+            trace.append((i, i + 2))
+            i += 2
+            j += 1
+            continue
+        return None
+    return trace
+
+
 def locate(words, seq):
     for s0 in range(len(words)):
         t = seq[0]
@@ -209,7 +253,14 @@ def _skip_arg(s: str, k: int) -> int:
 
 
 def flagged_segments(src: str):
-    """The NEW document as (text, changed) segments: deletions dropped, additions flagged."""
+    """The NEW document as (text, changed, in_float) segments: deletions dropped, additions
+    flagged, and \DIFaddFL marked as float content.
+
+    The distinction matters for placement. A float is typeset where the page has room, not where
+    it sits in the source, so the whole-document alignment -- which is monotonic by construction
+    -- cannot place its contents correctly. Table 5's "Two-way" row is written in the source
+    before the text of Section V-C and printed at the top of the page after it, and the
+    alignment duly anchored that cell to the word "two-way" in the prose instead."""
     segs, i = [], 0
     while i < len(src):
         if any(src.startswith(m, i) for m in DEL_MACROS):
@@ -219,13 +270,13 @@ def flagged_segments(src: str):
         if any(src.startswith(m, i) for m in NEW_DOC_MACROS):
             m = next(m for m in NEW_DOC_MACROS if src.startswith(m, i))
             j = _skip_arg(src, i + len(m))
-            segs.append((src[i + len(m):j - 1], True))
+            segs.append((src[i + len(m):j - 1], True, m.endswith("FL{")))
             i = j
             continue
         j = i
         while j < len(src) and not any(src.startswith(m, j) for m in DEL_MACROS + NEW_DOC_MACROS):
             j += 1
-        segs.append((src[i:j], False))
+        segs.append((src[i:j], False, False))
         i = j
     return segs
 
@@ -266,7 +317,7 @@ def main() -> int:
 
     # ---- stage 1: global alignment of the new document against the PDF
     segs = flagged_segments(src)
-    toks = [(t, flag) for body, flag in segs for t in tokens(body)]
+    toks = [(t, flag) for body, flag, _fl in segs for t in tokens(body)]
     src_words = [t for t, _ in toks]
     changed_src = {i for i, (_, f) in enumerate(toks) if f}
     sm = difflib.SequenceMatcher(a=src_words, b=words, autojunk=False)
@@ -292,15 +343,17 @@ def main() -> int:
     # Runs are taken from the SAME segment list the alignment used, so run i and span i are the
     # same object by construction. Collecting them separately -- all \DIFadd then all \DIFaddFL
     # -- put them in a different order from the spans and silently mismatched the two.
-    runs, spans, cur = [], [], 0
-    for body, flag in segs:
+    runs, spans, is_float, cur = [], [], [], 0
+    for body, flag, fl in segs:
         n = len(tokens(body))
         if flag:
             runs.append(("changed run", body))
             spans.append((cur, cur + n))
+            is_float.append(fl)
         cur += n
     refs = new_bibitems(bbl, old_tex, new_tex) if bbl else []
     runs += [("bibitem", b) for b in refs]
+    is_float += [False] * len(refs)
     fails, recovered = [], 0
     for ri, (kind, body) in enumerate(runs):
         seq = tokens(body)
@@ -312,7 +365,7 @@ def main() -> int:
             continue        # a macro parameter in a redefined command, not printed text
         if ri < len(spans):
             a, b = spans[ri]
-            if any(i in src_to_pdf for i in range(a, b)):
+            if any(i in src_to_pdf for i in range(a, b)) and not is_float[ri]:
                 # A one-word run is accepted from the alignment only if its surroundings agree.
                 # "Two-way" in Table 5 was being placed on the word "two-way" in the prose, so
                 # that table cell shipped unmarked while the rest of its row was highlighted.
@@ -347,8 +400,14 @@ def main() -> int:
                     continue
                 ch = locate(words, ctx)
                 if ch:
-                    s0c = ch[0] + (a - lo)
-                    placed.update(range(s0c, min(len(words), s0c + max(1, b - a))))
+                    tr = match_trace(words, ch[0], ctx)
+                    if tr is None:
+                        continue
+                    off = a - lo                     # index of the run's first token in ctx
+                    span = tr[off:off + max(1, b - a)]
+                    if not span:
+                        continue
+                    placed.update(range(span[0][0], span[-1][1]))
                     recovered += 1
                     break
             else:
