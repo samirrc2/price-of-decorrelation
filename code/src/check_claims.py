@@ -118,6 +118,11 @@ def _check_asserting_doc(path: Path, label: str) -> list[str]:
                                                         rounding=ROUND_HALF_UP)))
                 for mult in (1e3, 1e4, 100.0):
                     forms.add(f"{av*mult:.{nd}f}")
+                    # Half-up was applied to the plain value but not to the scaled ones, so a
+                    # cost written as 2.84 x 10^-3 failed: 0.002835 x 1000 formats as 2.83
+                    # under banker's rounding while the author correctly writes 2.84.
+                    forms.add(str(Decimal(repr(av * mult)).quantize(
+                        Decimal(1).scaleb(-nd), rounding=ROUND_HALF_UP)))
     # The cost premium the README quotes is cost_ratio_het_over_hom, a claim. Generating
     # every pairwise quotient of every cost here explained almost any number, as it did in
     # check_coverage.py, so it is gone.

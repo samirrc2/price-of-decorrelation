@@ -134,9 +134,9 @@ of ensemble design. Third, agreement estimates may be distorted when supposedly
 independent agents share random seeds, sampling trajectories, cached outputs, or
 other elements of the generation context. Consequently, existing evaluations may
 conflate genuine model similarity with artifacts of the measurement procedure.
-We address these limitations by jointly estimating the magnitude of ensemble
-the reduction in ensemble agreement, the associated inference cost, and the
-effect of independent-draw measurement controls.
+We address these limitations by jointly estimating the reduction in ensemble
+agreement, the associated inference cost, and the effect of independent-draw
+measurement controls.
 
 This distinction is practically important because LLM ensembles are increasingly
 considered for financial analysis and other consequential decision-support
@@ -1262,8 +1262,8 @@ of fully heterogeneous ensembles and concentrate more agents around incorrect
 majority decisions. These findings suggest that heterogeneity may provide value
 by reducing concentrated collective errors and preserving disagreement signals,
 although this interpretation requires confirmatory evaluation. Overall, the
-results show that model diversity can reduce output agreement and yield
-less-correlated judgments, but the practical value of that reduced agreement
+results show that model diversity can reduce output agreement and error
+correlation, but the practical value of that reduced agreement
 must be established against a downstream objective such as calibration,
 robustness, abstention quality, or collective-error reduction. Future work
 should evaluate the observed agreement ordering across additional tasks,
