@@ -141,58 +141,56 @@ def body(tex: str) -> str:
 
 
 def check_pdf_text_parity():
-    """The highlighted PDF must carry exactly the manuscript's text.
+    """The highlighted PDF must be the manuscript, line for line.
 
-    The round-trip test proves the diff SOURCE rebuilds the revision. It says nothing about the
-    rendered PDF, so a build that silently dropped or duplicated a run would still pass it. The
-    checklist also claimed the two PDFs aligned page for page; they do not -- inline \\texthl
-    changes a few line breaks and six of fifteen pages start elsewhere -- which is harmless only
-    because the text itself is identical. That is what this asserts.
+    It now is, by construction: highlight_overlay.py paints the changes onto
+    main_manuscript.pdf rather than compiling a second document, so this is no longer a
+    tolerance but an assertion. Every text line must appear on the same page at the same
+    coordinates with the same characters. A reviewer reads the two files side by side; if a line
+    moves, the highlighted copy stops being a usable guide to what changed.
+
+    The earlier build could not meet this -- soul cannot hyphenate inside a highlight, so four of
+    fourteen pages started a line out -- and the check tolerated it. Worse, the tolerance itself
+    was vacuous: it compared the first 60 alphanumeric characters of each page, and the running
+    header is 66, so every page matched on the header alone.
     """
     try:
-        from pypdf import PdfReader
+        import pymupdf
     except ImportError:
-        return 0, [], "pypdf not installed; PDF text parity not checked"
+        return 0, [], "pymupdf not installed; PDF layout parity not checked"
     clean = ROOT / "submission" / "main_manuscript.pdf"
     high = ROOT / "submission" / "highlighted_pdf.pdf"
     if not (clean.exists() and high.exists()):
-        return 0, [], "one of the two PDFs is not built; text parity not checked"
+        return 0, [], "one of the two PDFs is not built; layout parity not checked"
 
-    # The running header -- "Chincholikar et al.: The Price of De-correlation in Heterogeneous
-    # LLM Ensembles" -- is 62 alphanumeric characters, longer than the 60 this once compared.
-    # Every page that carries it therefore matched on the header alone and the check reported
-    # 14/14 pages aligned while five genuinely start elsewhere. The header is stripped before
-    # comparing, so the comparison is against body text.
-    HEADER = re.sub(r"[^A-Za-z0-9]", "",
-                    "Chincholikar et al.: The Price of De-correlation in "
-                    "Heterogeneous LLM Ensembles").lower()
+    def lines(path):
+        d = pymupdf.open(path)
+        out = []
+        for pno, page in enumerate(d, 1):
+            for blk in page.get_text("dict")["blocks"]:
+                if blk.get("type") != 0:
+                    continue
+                for ln in blk["lines"]:
+                    t = "".join(sp["text"] for sp in ln["spans"]).strip()
+                    if t:
+                        out.append((pno, round(ln["bbox"][0], 2), round(ln["bbox"][1], 2), t))
+        return len(d), out
 
-    def flat(path):
-        pages = []
-        for p in PdfReader(path).pages:
-            t = re.sub(r"[^A-Za-z0-9]", "", p.extract_text() or "").lower()
-            if t.startswith(HEADER):
-                t = t[len(HEADER):]
-            pages.append(t)
-        return pages, "".join(pages)
-
-    cp, ca = flat(clean)
-    hp, ha = flat(high)
+    npc, lc = lines(clean)
+    nph, lh = lines(high)
     fails = []
-    if len(cp) != len(hp):
-        fails.append(f"highlighted PDF has {len(hp)} pages, manuscript has {len(cp)}")
-    if len(ca) != len(ha):
-        fails.append(f"highlighted PDF carries {len(ha)} alphanumeric characters, the manuscript "
-                     f"{len(ca)}: the two PDFs do not carry the same text")
-    elif sorted(ca) != sorted(ha):
-        fails.append("the two PDFs have the same character count but not the same characters")
-    moved = [i + 1 for i, (a, b) in enumerate(zip(cp, hp)) if a[:60] != b[:60]]
-    note = (f"all {len(cp)} pages start at the same point" if not moved else
-            f"{len(cp) - len(moved)}/{len(cp)} pages start at the same point; "
-            f"page(s) {', '.join(map(str, moved))} start one line earlier or later because "
-            f"inline highlighting cannot hyphenate, which shifts a few line breaks")
-    return 2, fails, (f"both PDFs: {len(cp)} pages, {len(ca):,} alphanumeric characters, identical "
-                      f"text; {note}")
+    if npc != nph:
+        fails.append(f"highlighted PDF has {nph} pages, manuscript has {npc}")
+    if len(lc) != len(lh):
+        fails.append(f"highlighted PDF has {len(lh)} text lines, manuscript has {len(lc)}")
+    bad = [(a, b) for a, b in zip(lc, lh) if a != b]
+    if bad:
+        a, b = bad[0]
+        fails.append(f"{len(bad)} line(s) differ in page, position or text; first: "
+                     f"manuscript {a[:3]} {a[3][:46]!r} vs highlighted {b[:3]} {b[3][:46]!r}")
+    return 2, fails, (f"highlighted PDF is the manuscript line for line: {npc} pages, "
+                      f"{len(lc)} text lines, every one at the same page and position with the "
+                      f"same text")
 
 
 def base_ref():
@@ -416,8 +414,8 @@ def main():
     print(f"   {pnote}")
     # Verify end-to-end that every reference ADDED since the baseline is visibly highlighted in
     # the built PDF. latexdiff cannot mark these -- it diffs main.tex, where the bibliography is
-    # one \bibliography line -- so highlight_newrefs.py marks them in the generated .bbl, and
-    # nothing checked that it worked. This looks for a yellow fill behind the entry's text
+    # one \bibliography line -- so highlight_overlay.py locates each added entry in the printed
+    # reference list and paints it there. This looks for a yellow fill behind the entry's text
     # rather than trusting the build's own log line.
     nchecks, nfails, nnote = check_new_reference_highlighting()
     fails.extend(nfails)
