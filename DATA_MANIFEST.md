@@ -9,7 +9,7 @@ re-run differed.
 python code/src/make_manifest.py --verify
 ```
 
-1749 files, 93.1 MB total.
+1752 files, 94.2 MB total.
 
 ## primary capture; 54k live model calls
 
@@ -34,6 +34,14 @@ python code/src/make_manifest.py --verify
 | File | Bytes | SHA-256 |
 |---|---:|---|
 | `data/minipilot/20260703/runs.csv` | 414,460 | `96cdf3f318d1ca35f76bc31aa5c7c99aa09983a135047b5fd7e7475951f35e57` |
+
+## temperature-robustness subgrid
+
+| File | Bytes | SHA-256 |
+|---|---:|---|
+| `data/temperature_robustness_small/20260704/runs_T00.csv` | 242,213 | `d75ea6684ba3c0590934954fa2cc9ee2b8a9f09ec462fe3699c8a0dd14015629` |
+| `data/temperature_robustness_small/20260704/runs_T07.csv` | 410,176 | `4bbe826aa79720b7484f8e17263df46b75790399f026bc3524eaff6982272785` |
+| `data/temperature_robustness_small/20260704/runs_T10.csv` | 411,508 | `8dbfff594d2f1761c7f1e529700b8948ed085ff1b15ddeecb8340146ec62ea83` |
 
 ## frozen protocol: grid, models, estimands
 

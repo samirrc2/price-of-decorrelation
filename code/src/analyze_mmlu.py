@@ -58,6 +58,104 @@ def err_pairs(rows, truth, items=None):
     return out
 
 
+def capability_matched(rows, truth, items, draws, seed):
+    """Same-provider vs cross-provider error correlation, holding member accuracy fixed.
+
+    The manuscript asserts this contrast -- member accuracies, phi within and across
+    provider, their difference and a CI -- and NO code in the repository computed it. The
+    five figures existed only in main.tex, so nothing could regenerate or check them. This
+    closes that gap using the same phi and bootstrap primitives as the rest of the file.
+
+    Within the fully heterogeneous configuration every cell holds one agent per provider, so
+    a PAIR of agent slots is either same-provider or cross-provider with the item set and
+    ensemble composition fixed. Pairs are grouped by (provider_i, provider_j); each group's
+    member accuracy is the mean accuracy of the two slots, which is what "capability-matched"
+    refers to.
+    """
+    cells = collections.defaultdict(dict)
+    prov = {}
+    for r in rows:
+        if r["config"] != "HET" or r["ticker"] not in items:
+            continue
+        key = (r["ticker"], r["run_idx"])
+        cells[key][int(r["agent_idx"])] = r
+        prov[int(r["agent_idx"])] = r["provider"]
+
+    # per-pair-group: error pairs, and the accuracy of the two slots involved
+    groups = collections.defaultdict(lambda: collections.defaultdict(list))
+    hits = collections.defaultdict(lambda: [0, 0])
+    for (item, _run), agents in cells.items():
+        e = {i: (0 if a["direction"] == truth[item]["answer"] else 1) for i, a in agents.items()}
+        for i in e:
+            hits[i][0] += 1 - e[i]; hits[i][1] += 1
+        for i, j in itertools.combinations(sorted(e), 2):
+            pi, pj = prov.get(i, "?"), prov.get(j, "?")
+            kind = "same" if pi == pj else "cross"
+            groups[(kind, tuple(sorted((pi, pj))), (i, j))][item].append((e[i], e[j]))
+
+    acc = {i: (h[0] / h[1] if h[1] else float("nan")) for i, h in hits.items()}
+    rec = []
+    for (kind, provs, slots), byitem in sorted(groups.items(), key=lambda kv: str(kv[0])):
+        flat = [p for v in byitem.values() for p in v]
+        a = (acc.get(slots[0], float("nan")) + acc.get(slots[1], float("nan"))) / 2
+        rec.append({"kind": kind, "providers": list(provs), "slots": list(slots),
+                    "member_accuracy": a, "phi": phi(flat), "n_pairs": len(flat),
+                    "_byitem": byitem})
+
+    # The capability-matched contrast groups by PROVIDER COMBINATION, not by individual slot
+    # pair: a provider combination can occupy more than one slot pair, and the contrast is
+    # between provider combinations. (Selecting a single slot pair instead gave phi 0.612
+    # against the 0.607 the manuscript reports -- the manuscript pools the two google-xai
+    # slot pairs, which is the correct estimator for a provider-level claim.)
+    bycombo = collections.defaultdict(list)
+    for r in rec:
+        bycombo[(r["kind"], tuple(r["providers"]))].append(r)
+    combos = []
+    for (kind, provs), members in bycombo.items():
+        allpairs = [p for m in members for v in m["_byitem"].values() for p in v]
+        byitem = collections.defaultdict(list)
+        for m in members:
+            for it, v in m["_byitem"].items():
+                byitem[it].extend(v)
+        combos.append({"kind": kind, "providers": list(provs),
+                       "member_accuracy": sum(m["member_accuracy"] for m in members) / len(members),
+                       "phi": phi(allpairs), "n_pairs": len(allpairs),
+                       "n_slot_pairs": len(members), "_byitem": byitem})
+
+    best = None
+    for a in (r for r in combos if r["kind"] == "same"):
+        for b in (r for r in combos if r["kind"] == "cross"):
+            if math.isnan(a["member_accuracy"]) or math.isnan(b["member_accuracy"]):
+                continue
+            gap = abs(a["member_accuracy"] - b["member_accuracy"])
+            if best is None or gap < best[0]:
+                best = (gap, a, b)
+    out = {"selection_rule": "same/cross PROVIDER COMBINATION minimising "
+                             "|member accuracy difference|; slot pairs within a "
+                             "combination are pooled",
+           "pairs": [{k: v for k, v in r.items() if k != "_byitem"} for r in rec],
+           "provider_combinations": [{k: v for k, v in r.items() if k != "_byitem"}
+                                     for r in combos]}
+    if best is not None:
+        gap, a, b = best
+        fa = lambda its: phi([p for it in its for p in a["_byitem"].get(it, [])])
+        fb = lambda its: phi([p for it in its for p in b["_byitem"].get(it, [])])
+        lo, hi = boot_delta(fa, fb, items, draws, seed)
+        out["matched"] = {
+            "accuracy_gap": gap,
+            "same_provider": {"providers": a["providers"], "member_accuracy": a["member_accuracy"],
+                              "phi": a["phi"]},
+            "cross_provider": {"providers": b["providers"], "member_accuracy": b["member_accuracy"],
+                               "phi": b["phi"]},
+            "d_phi": a["phi"] - b["phi"], "d_phi_ci": [lo, hi]}
+        # the manuscript also asserts EVERY same-provider pair exceeds EVERY cross-provider
+        # pair; that is a checkable statement, so compute it rather than restate it
+        sp = [r["phi"] for r in rec if r["kind"] == "same" and not math.isnan(r["phi"])]
+        cp = [r["phi"] for r in rec if r["kind"] == "cross" and not math.isnan(r["phi"])]
+        out["every_same_exceeds_every_cross"] = bool(sp and cp and min(sp) > max(cp))
+    return out
+
+
 def boot_delta(fn_a, fn_b, items, draws, seed):
     rng = random.Random(seed)
     d = []
@@ -144,7 +242,8 @@ def main() -> int:
         for _b in iter(lambda: _f.read(1 << 20), b""):
             _h.update(_b)
     out = {"runs_csv": rel, "runs_csv_sha256": _h.hexdigest(),
-           "overall": report(rows, truth, items, a.draws, a.seed, "OVERALL")}
+           "overall": report(rows, truth, items, a.draws, a.seed, "OVERALL"),
+           "capability_matched": capability_matched(rows, truth, items, a.draws, a.seed)}
 
     # secondary: difficulty split at median per-item accuracy (pre-registered as exploratory)
     acc = {it: sum(1 for r in rows if r["ticker"] == it and r["direction"] == truth[it]["answer"])

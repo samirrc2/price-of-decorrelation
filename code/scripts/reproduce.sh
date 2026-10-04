@@ -349,10 +349,27 @@ _run_gates() {
     echo "     [mmlu] NOT CHECKABLE: cross-domain capture absent"; GATES_INCOMPLETE=1
   fi
 
+  # Three further analyses feed the manuscript and were NEVER run by reproduce.sh, so the
+  # HET-SameTier control, the temperature sweep and the reviewer-hardening tables were
+  # whatever a past run happened to leave behind. All three are keys-free functions of
+  # frozen inputs; regenerating them is what locks those manuscript values.
+  echo "[gate] supporting analyses (control arm, temperature sweep, reviewer hardening)"
+  for _s in control_kappa temp_analyze reviewer_analysis; do
+    if [[ -f "$CODE_ROOT/src/$_s.py" ]]; then
+      _gate "$_s" "$PY" "$CODE_ROOT/src/$_s.py" || return 1
+    fi
+  done
+
   echo "[gate] claims extraction"
   _gate claims "$PY" "$CODE_ROOT/src/make_claims.py" || return 1
   echo "[gate] manuscript numbers vs frozen analysis"
   _gate check-claims "$PY" "$CODE_ROOT/src/check_claims.py" || return 1
+  # The reverse direction: check_claims verifies that OUR claims appear in the manuscript,
+  # which cannot notice a manuscript number no analysis produces. This walks every literal in
+  # main.tex and demands provenance. It is the gate that found five figures -- the whole
+  # capability-matched passage -- existing only in the manuscript, with no generating code.
+  echo "[gate] manuscript provenance (every number traced to a claim or declared non-result)"
+  _gate coverage "$PY" "$CODE_ROOT/src/check_coverage.py" || return 1
   echo "[gate] unit tests"
   if [[ -d "$CODE_ROOT/tests" ]]; then
     if "$PY" -c "import pytest" >/dev/null 2>&1; then

@@ -27,6 +27,10 @@ PATTERNS = [
     ("data/mmlu/*/runs.csv", "cross-domain replication capture"),
     ("data/minipilot/*/runs.csv", "gating pilot capture"),
     ("data/appendix/*/runs.csv", "appendix capture"),
+    # The temperature-robustness subgrid backs Table 8 and the T=0.0/0.7/1.0 contrasts in
+    # the text. It was tracked in git but absent from this manifest, so those manuscript
+    # numbers rested on inputs nothing verified.
+    ("data/temperature_robustness_small/*/runs_T*.csv", "temperature-robustness subgrid"),
     ("data/configs/*.yaml", "frozen protocol: grid, models, estimands"),
     ("data/inputs/*.json", "serialized model inputs (finance)"),
     ("data/inputs_mmlu/*.json", "serialized model inputs (MMLU)"),
