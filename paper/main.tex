@@ -1052,9 +1052,20 @@ quality.
 \subsection{Cross-domain replication: clinical knowledge}
 \label{subsec:crossdomain}
 To test whether the observed ordering is specific to the financial task, we
-repeated the protocol using 537 questions from the MMLU professional-medicine and
-clinical-knowledge subsets~\cite{hendrycks2021mmlu}. Each item has four response
-options and one correct answer. Choice order is shuffled deterministically to
+repeated the protocol using 537 multiple-choice items from the MMLU
+professional-medicine and clinical-knowledge subsets~\cite{hendrycks2021mmlu}.
+Each item presents a medical or clinical question, often as a short patient
+scenario describing symptoms, medical history, examination findings, or test
+results, and asks the model to identify the most appropriate diagnosis,
+treatment, next clinical step, or factual medical answer. Four candidate answers
+are provided and one is designated correct by the benchmark. For example, an item
+may describe a patient with a particular set of symptoms and laboratory findings
+and ask which diagnosis or management option is most appropriate. The four
+response options correspond to alternative diagnoses, treatments, or clinical
+actions. Each of the five agents independently selects one of the four choices.
+Agreement is therefore measured across the agents' selected answers, while error
+correlation is measured by whether agents are incorrect on the same items.
+Choice order is shuffled deterministically to
 remove positional imbalance in the published answer key. The five-agent
 structure, three configurations, seeding procedure, temperature, number of runs,
 and estimators remain unchanged. The replication design, predicted direction, and
