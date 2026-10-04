@@ -406,6 +406,8 @@ _run_gates() {
   _gate letter-actions "$PY" "$CODE_ROOT/src/check_letter_actions.py" || return 1
   echo "[gate] letter and manuscript tell the reviewers the same story"
   _gate response-consistency "$PY" "$CODE_ROOT/src/check_response_consistency.py" || return 1
+  echo "[gate] freeze receipts vs the commits and artifacts they attest"
+  _gate freeze-receipt "$PY" "$CODE_ROOT/src/check_freeze_receipt.py" || return 1
   echo "[gate] freeze timestamps quoted in prose vs the receipts"
   _gate freeze-timestamps "$PY" "$CODE_ROOT/src/check_freeze_timestamps.py" || return 1
   echo "[gate] unit tests"

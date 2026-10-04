@@ -137,27 +137,35 @@ for k in diff[:20]:
     print(f"     DIFFERS {k}: capsule {got.get(k, '<absent>')!r} vs committed {want.get(k, '<absent>')!r}")
 raise SystemExit(1 if diff else 0)
 TXT
-echo "== freeze receipts inside the capsule still match what they attest =="
+echo "== the frozen pre-registration inside the capsule still hashes as the receipt says =="
+# The first version of this check tried to re-hash every artifact the receipt names and reported
+# "0/0 artifacts" -- the hashes are inside backticks and its regex never matched a single row.
+# A 0/0 pass is worse than no check, so: the rows are parsed with a pattern proven against the
+# real file, the check FAILS if it matches nothing, and it asserts only what must be true of a
+# capsule. The pre-registration must hash exactly as the receipt says, forever, because that is
+# the whole basis of the pre-registration claim. The code and config the receipt also names have
+# legitimately changed since July -- the revision added analysis arms, and the repo moved to the
+# dated Code Ocean layout -- so the receipt is checked against its own freeze COMMIT by the
+# check_freeze_receipt.py gate in the repo, where git is available.
 "$PY" - "$DEST" <<'TXT'
 import hashlib, re, sys
 from pathlib import Path
 dest = Path(sys.argv[1])
-rec = dest / "docs" / "freeze_receipt.md"
-text = rec.read_text(errors="replace")
-bad = 0
-checked = 0
-# each "| `name` | <sha256> |" row names a frozen artifact the receipt attests to
-for name, want in re.findall(r"\|\s*`([^`]+)`\s*\|\s*([0-9a-f]{64})\s*\|", text):
-    for cand in (dest / "docs" / name, dest / name, dest / "data" / name):
-        if cand.is_file():
-            got = hashlib.sha256(cand.read_bytes()).hexdigest()
-            checked += 1
-            if got != want:
-                print(f"   MISMATCH {name}: {got[:16]} vs receipt {want[:16]}")
-                bad += 1
-            break
-print(f"   {checked - bad}/{checked} artifacts named in the receipt hash as the receipt says")
-raise SystemExit(1 if bad else 0)
+rec = (dest / "docs" / "freeze_receipt.md").read_text(errors="replace")
+rows = re.findall(r"\|\s*`([^`]+)`\s*\|\s*`?([0-9a-f]{64})`?\s*\|", rec)
+if not rows:
+    print("   !! the receipt table parsed to zero rows -- the check is vacuous, not passing")
+    raise SystemExit(1)
+want = dict(rows)
+if "preregistration.md" not in want:
+    print("   !! the receipt does not name preregistration.md")
+    raise SystemExit(1)
+got = hashlib.sha256((dest / "docs" / "preregistration.md").read_bytes()).hexdigest()
+ok = got == want["preregistration.md"]
+print(f"   receipt names {len(rows)} frozen artifacts")
+print(f"   preregistration.md: {got[:16]} vs receipt {want['preregistration.md'][:16]} -> "
+      f"{'MATCH' if ok else 'MISMATCH'}")
+raise SystemExit(0 if ok else 1)
 TXT
 
 echo "== capsule ready: $DEST =="

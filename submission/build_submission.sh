@@ -58,6 +58,7 @@ python3 code/src/check_letter_sections.py | sed 's/^/   /'
 python3 code/src/check_letter_actions.py | sed 's/^/   /'
 python3 code/src/check_response_consistency.py | sed 's/^/   /'
 python3 code/src/check_freeze_timestamps.py | sed 's/^/   /'
+python3 code/src/check_freeze_receipt.py | sed 's/^/   /'
 
 echo "== 2/4 Word version =="
 # --citeproc is required: this manuscript builds its reference list from references.bib, and
