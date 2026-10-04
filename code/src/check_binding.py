@@ -489,11 +489,7 @@ R = [
     (r"0\.341 with a two-way interval of$", "0.270", "control_two_way_ci_low", 3),
     (r"with a two-way interval of 0\.270$", "0.361", "control_two_way_ci_high", 3),
     # ---------------------------------------------- freeze receipts and the relabelled Table 5
-    (r"themselves the confirmatory freeze is timestamped$", "2026",
-     "!calendar year of the confirmatory freeze receipt", 0),
-    (r"replication has its own receipt timestamped$", "2026",
-     "!calendar year of the replication freeze receipt", 0),
-    (r"41 51z and records the sha-$", "256", "!algorithm name SHA-256", 0),
+    (r"the frozen artifacts and the sha-$", "256", "!algorithm name SHA-256", 0),
     # ---------------------------------------------------------------------------- discussion
     (r"inference cost\. within-ensemble agreement decreases from$", "0.552",
      "kappa_hom", 3),

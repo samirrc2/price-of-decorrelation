@@ -507,12 +507,11 @@ configurations, prompt template, experimental grid, random-seed construction,
 primary and secondary endpoints, uncertainty-estimation procedure, and decision
 rule. The resulting pre-registration was assigned a SHA-256 hash to establish
 that the design preceded the collection of the confirmatory dataset. The released
-package contains the freeze receipts themselves: the confirmatory freeze is
-timestamped 2026-07-03T20:41:51Z and records the SHA-256 of the configuration,
-agent and analysis code, prompt template, pre-registration, grid, and model
-manifest together with the commit that carried them; the cross-domain replication
-has its own receipt, timestamped 2026-09-29T14:47:54Z and recorded before any API
-call for that arm. Raw outputs
+package contains the freeze receipts themselves. Each records the UTC freeze
+time, the commit that carried the frozen artifacts, and the SHA-256 of the
+configuration, agent and analysis code, prompt template, pre-registration, grid,
+and model manifest. The cross-domain replication has its own receipt, recorded
+before any API call for that arm. Raw outputs
 were collected once and stored in an immutable, read-only, hash-verified
 dataset. The analysis pipeline reads only the frozen dataset and experimental
 configuration, and all stochastic procedures, including bootstrap resampling,
@@ -1162,7 +1161,8 @@ $\kappa_{\mathrm{HET}}$ & $\Delta\kappa$ [95\% CI] \\
 \end{table}
 
 \subsection{Relation to existing ensemble methods}
-This article does not propose a new ensemble algorithm, so a direct performance
+This research paper does not propose a new ensemble algorithm, so a direct
+performance
 benchmark against existing ensemble methods is not the primary comparison.
 Methods such as mixture-of-agents, multi-agent debate, and diversity-based
 ensemble selection are generally evaluated using downstream accuracy or win
