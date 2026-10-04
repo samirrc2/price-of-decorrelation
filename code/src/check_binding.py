@@ -361,7 +361,7 @@ R = [
      "!chance level for a binary directional call", 1),
     # ------------------------------------------------------------------- cross-domain replication
     (r"task we repeated the protocol using$", "537", "mmlu_overall_n_items", 0),
-    (r"registered before collection\. agreement decreases from$", "0.881", "mmlu_overall_kappa_hom", 3),
+    (r"to this task\. agreement decreases from$", "0.881", "mmlu_overall_kappa_hom", 3),
     (r"decreases from 0\.881 for hom to$", "0.809", "mmlu_overall_kappa_het", 3),
     (r"to 0\.809 for het giving hom-het$", "0.072", "mmlu_overall_d_kappa", 3),
     (r"giving hom-het 0\.072 95 ci$", "0.040", "mmlu_overall_d_kappa_ci_low", 3),
