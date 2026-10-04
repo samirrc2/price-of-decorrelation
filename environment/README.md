@@ -1,26 +1,27 @@
 # Environment (Code Ocean–compatible)
 
-Local development installs deps into a repo-root `.venv` via:
+## Code Ocean
+
+`Dockerfile` in this folder matches the capsule environment that successfully
+ran the keys-free replication check (Python 3.12.8 base from Code Ocean’s
+registry + pinned pip packages, including `numpy==2.2.6` and `pandas==2.2.3`).
+
+Capsule mounts:
+
+| Mount | Contents |
+|-------|----------|
+| `/code` | `src/`, `scripts/`, `tests/`, `requirements.txt`, `run` |
+| `/data` | call CSVs, `configs/`, `inputs/`, `datacache/`, `appendix/` |
+| `/results` | analysis outputs |
+
+Default Reproducible Run: `/code/run` → `bash code/scripts/reproduce.sh --data data/confirmatory/20260704`.
+
+## Local development
+
+Install deps into a repo-root `.venv` (do not rely on the Code Ocean base image):
 
 ```bash
 source code/scripts/activate_env.sh
 ```
 
 That installs from `code/requirements.txt` (Python ≥ 3.10).
-
-## Code Ocean
-
-In the capsule Environment UI, select **Python 3.11 or 3.12** and add pip packages
-from `code/requirements.txt` (or the subset needed for Phase-3 offline reproduce:
-`pyyaml`, `numpy`, `matplotlib`). Leave the Post-Install Script empty if it cannot
-access `/code`.
-
-Capsule layout expected by this repo:
-
-| Mount | Contents |
-|-------|----------|
-| `/code` | `src/`, `scripts/`, `tests/`, `requirements.txt` |
-| `/data` | call CSVs, `configs/`, `inputs/`, `datacache/`, `appendix/` |
-| `/results` | analysis outputs |
-
-Default run: `bash /code/scripts/reproduce.sh` (or root `reproduce.sh` if present).

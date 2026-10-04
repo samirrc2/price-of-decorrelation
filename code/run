@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Code Ocean Reproducible Run entry point.
+set -euo pipefail
+# On Code Ocean: /code/run -> repo root is / ; locally -> repo root is code/..
+cd "$(dirname "$0")/.."
+# Frozen confirmatory date (works with or without data/confirmatory/latest).
+exec bash code/scripts/reproduce.sh --data data/confirmatory/20260704 "$@"

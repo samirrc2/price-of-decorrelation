@@ -1,0 +1,12 @@
+metadata_version: 1
+name: "The Price of De-correlation"
+description: >
+  Reproducibility artifact for the IEEE Access article "The Price of
+  De-correlation: Quantifying the Agreement–Cost Trade-off in Heterogeneous
+  Large Language Model Ensembles." Regenerates Fleiss' kappa, Delta-kappa
+  contrasts with cluster-bootstrap confidence intervals, the agreement–cost
+  frontier, the capability-matched control, the temperature-sensitivity check,
+  and all publication figures/tables from the frozen 54,000-call dataset.
+authors:
+  - name: "Samir Chincholikar"
+  - name: "Robin Chawla"
