@@ -10,7 +10,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-_HERE = Path(__file__).resolve().parent
+_HERE = Path(__file__).resolve().parents[1]
 TARGETS = ["metrics_summary.md", "headline_check.md", "protocol_exhibit.md",
            "threats_to_validity.md", "appendix/data_availability.md"]
 TARGET_DIRS = ["figures", "tables"]
@@ -33,7 +33,7 @@ def snapshot() -> dict[str, str]:
 
 
 def run_analyze():
-    return subprocess.run([sys.executable, "analyze.py"], cwd=_HERE,
+    return subprocess.run([sys.executable, "src/analyze.py"], cwd=_HERE,
                           capture_output=True, text=True)
 
 

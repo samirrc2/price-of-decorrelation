@@ -16,7 +16,7 @@ import yaml
 import metrics as M
 import stats as S
 
-_HERE = Path(__file__).resolve().parent
+_HERE = Path(__file__).resolve().parents[1]
 # Archived Δκ(HOM−HET) and HOM within−cross κ gaps for the protocol-collapse figure.
 PILOT_BROKEN = {"dkappa": 0.485, "hom_within_minus_cross": 0.377}   # archive/pilot_v1_broken_perRunSeed
 PILOT_CLEAN = {"dkappa": 0.113, "hom_within_minus_cross": 0.018}    # archive/pilot_v1
@@ -27,7 +27,7 @@ def fmt(x, n=4):
 
 
 def load_cfg():
-    return yaml.safe_load((_HERE / "config.yaml").read_text())
+    return yaml.safe_load((_HERE / "configs" / "config.yaml").read_text())
 
 
 def wilson(k, n, z=1.96):
@@ -98,6 +98,30 @@ def main():
         return 1
     rows = list(csv.DictReader(runs_csv.open()))
     ok_rows = M.usable(rows)
+    # honest manifest: completeness is measured by CELLS WITH A SUCCESSFUL ROW vs the
+    # expected grid — NOT by historical DEFERRED/retry rows (a cell can carry an old
+    # deferred row AND a later successful backfill).
+    import datetime as _dt
+    _cfg = cfg
+    expected = (len(_cfg["tickers"]) * len(_cfg["dates"]) * len(_cfg["configs"])
+                * int(_cfg["runs"]) * 5)
+    ok_slots = {(r["config"], r["ticker"], r["date"], r["run_idx"], r["agent_idx"])
+                for r in rows if r.get("ok") == "True"}
+    missing = expected - len(ok_slots)
+    deferred_rows = [r for r in rows if (r.get("error") or "").startswith("DEFERRED")]
+    still_short = sorted({r["model"] for r in deferred_rows
+                          if (r["config"], r["ticker"], r["date"], r["run_idx"], r["agent_idx"])
+                          not in ok_slots})
+    _ts = _dt.datetime.now(_dt.timezone.utc).isoformat()
+    if missing > 0:
+        manifest_line = (f"- Analyzed {_ts} on {runs_csv.name} ({len(rows)} rows). "
+                         f"Grid {len(ok_slots)}/{expected} cells complete; {missing} still MISSING"
+                         + (f" (models over quota: {still_short})" if still_short else "")
+                         + ".  ⚠️ Dataset INCOMPLETE — backfill remaining cells before final.")
+    else:
+        manifest_line = (f"- Analyzed {_ts} on {runs_csv.name} ({len(rows)} rows). "
+                         f"Grid COMPLETE: {len(ok_slots)}/{expected} cells present. "
+                         f"(Historical deferred/retry rows: {len(deferred_rows)}, all backfilled.)")
     config_names = list(cfg["configs"].keys())
     hlevel = cfg["heterogeneity_level"]
     tickers = cfg["tickers"]
@@ -112,10 +136,13 @@ def main():
         kappa[c] = avg
         wc[c] = {"within": avg, "cross": cross, "gap": gap, "per_run": ks}
 
-    # primary + secondary Δκ (bootstrap over tickers, seed=42)
-    primary = S.cluster_bootstrap_pair(rows, tickers, "HOM", "HET", draws, bseed)
-    sec1 = S.cluster_bootstrap_pair(rows, tickers, "HOM", "HET-LITE", draws, bseed)
-    sec2 = S.cluster_bootstrap_pair(rows, tickers, "HET-LITE", "HET", draws, bseed)
+    # primary + secondary Δκ — one multi-pair bootstrap (byte-identical to 3 separate
+    # cluster_bootstrap_pair calls, ~2x faster: each config's κ computed once per draw)
+    _boots = S.cluster_bootstrap_multi(
+        rows, tickers, [("HOM", "HET"), ("HOM", "HET-LITE"), ("HET-LITE", "HET")], draws, bseed)
+    primary = _boots[("HOM", "HET")]
+    sec1 = _boots[("HOM", "HET-LITE")]
+    sec2 = _boots[("HET-LITE", "HET")]
 
     # verdict on primary
     dk, lo, hi = primary["point"], primary["ci_low"], primary["ci_high"]
@@ -151,7 +178,8 @@ def main():
     _make_tables(cfg, kappa, cost, cprov, primary, sec1, sec2, acc, config_names, hlevel)
 
     _write_summary(cfg, verdict, primary, sec1, sec2, kappa, wc, cost, cprov,
-                   acc, sign_err, provs, pmat, config_names, hlevel, len(rows), len(ok_rows), fig_note)
+                   acc, sign_err, provs, pmat, config_names, hlevel, len(rows), len(ok_rows),
+                   fig_note, manifest_line)
     _write_docs(cfg, verdict, primary, sec1, sec2, kappa, cost, config_names, hlevel)
 
     print(f"VERDICT: {verdict}  primary Δκ(HOM−HET)={fmt(dk)} CI[{fmt(lo)},{fmt(hi)}]")
@@ -207,17 +235,23 @@ def _make_figures(cfg, kappa, cost, hlevel, primary, sec1, sec2, wc, provs, pmat
     ax.set_title("Seeding-nondeterminism inflation collapses to ~0")
     fig.tight_layout(); save(fig, "fig2_protocol")
 
-    # fig3: provider agreement heatmap
+    # fig3: provider agreement heatmap. Undefined cells (no same-provider pair, e.g.
+    # a single xAI agent per HET cell) are rendered N/A, NOT 0.0.
     if provs:
-        mat = np.array([[ (pmat.get((a, b)) or 0.0) for b in provs] for a in provs])
+        mat = np.array([[ (pmat.get((a, b)) if pmat.get((a, b)) is not None else np.nan)
+                          for b in provs] for a in provs])
+        cmap = plt.get_cmap("viridis").copy()
+        cmap.set_bad(color="#d9d9d9")  # grey for N/A
         fig, ax = plt.subplots(figsize=(4.8, 4.2))
-        im = ax.imshow(mat, cmap="viridis", vmin=0, vmax=1)
+        im = ax.imshow(mat, cmap=cmap, vmin=0, vmax=1)
         ax.set_xticks(range(len(provs))); ax.set_xticklabels(provs, rotation=45, ha="right")
         ax.set_yticks(range(len(provs))); ax.set_yticklabels(provs)
         for i in range(len(provs)):
             for j in range(len(provs)):
-                ax.text(j, i, f"{mat[i,j]:.2f}", ha="center", va="center",
-                        color="w", fontsize=8)
+                v = mat[i, j]
+                label = "N/A" if (v != v) else f"{v:.2f}"   # v!=v => NaN
+                ax.text(j, i, label, ha="center", va="center",
+                        color=("#333" if (v != v) else "w"), fontsize=8)
         ax.set_title("Pairwise direction agreement by provider")
         fig.colorbar(im, fraction=0.046, pad=0.04)
         fig.tight_layout(); save(fig, "fig3_provider_heatmap")
@@ -258,7 +292,8 @@ def _latex(path, rows, caption):
 
 # --------------------------------------------------------------------------- #
 def _write_summary(cfg, verdict, primary, sec1, sec2, kappa, wc, cost, cprov,
-                   acc, sign_err, provs, pmat, config_names, hlevel, n_all, n_ok, fig_note):
+                   acc, sign_err, provs, pmat, config_names, hlevel, n_all, n_ok, fig_note,
+                   manifest_line=""):
     L = [f"# Metrics summary — VERDICT: {verdict}\n",
          f"**Primary endpoint Δκ(HOM−HET) = {fmt(primary['point'])}**, "
          f"95% CI [{fmt(primary['ci_low'])}, {fmt(primary['ci_high'])}] "
@@ -267,7 +302,8 @@ def _write_summary(cfg, verdict, primary, sec1, sec2, kappa, wc, cost, cprov,
          f"Verdict rule: CONFIRMED if Δκ>0 and CI excludes 0; WEAKENED if Δκ>0 but CI "
          f"includes 0; CONTRADICTED if Δκ≤0. Model set = OpenAI/Google/xAI (cross-provider; "
          f"differs from the Claude-family pilot — stated explicitly).\n",
-         f"- Calls logged (incl. retries): {n_all}  |  usable: {n_ok}\n",
+         f"- Calls logged (incl. retries): {n_all}  |  usable: {n_ok}",
+         manifest_line + "\n",
          "## Secondary Δκ contrasts\n",
          "| contrast | Δκ | 95% CI |", "|---|---|---|",
          f"| HOM − HET-LITE | {fmt(sec1['point'])} | [{fmt(sec1['ci_low'])}, {fmt(sec1['ci_high'])}] |",

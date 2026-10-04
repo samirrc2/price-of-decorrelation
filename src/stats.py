@@ -12,28 +12,75 @@ import metrics as M
 # --------------------------------------------------------------------------- #
 # Cluster bootstrap over tickers -> 95% CI on Delta-kappa
 # --------------------------------------------------------------------------- #
+# Precompute grouping once per rows object so the bootstrap doesn't re-scan the
+# full log on every draw (turns O(draws x rows) into O(rows + draws x cells)).
+_GROUP_CACHE: dict = {}
+
+
+def _group(rows):
+    """id(rows) -> {config: {run: {ticker: {date: [dirs]}}}} over usable rows."""
+    key = id(rows)
+    g = _GROUP_CACHE.get(key)
+    if g is not None:
+        return g
+    G: dict = {}
+    for r in M.usable(rows):
+        G.setdefault(r["config"], {}).setdefault(int(r["run_idx"]), {}) \
+            .setdefault(r["ticker"], {}).setdefault(r["date"], []).append(r["direction"])
+    _GROUP_CACHE.clear()          # only cache the current rows object
+    _GROUP_CACHE[key] = G
+    return G
+
+
 def _kappa_for_ticker_subset(rows, config, tickers_multiset):
     """Average within-run Fleiss kappa restricted to a (possibly repeated) set of
-    tickers. Repeats are honoured by suffixing a replica id so a ticker drawn
-    twice contributes as two independent clusters."""
-    # group usable rows by (ticker,date,run)
-    by = defaultdict(list)
-    for r in M.usable(rows):
-        if r["config"] != config:
-            continue
-        by[(r["ticker"], r["date"], int(r["run_idx"]))].append(r["direction"])
-    runs = sorted({k[2] for k in by})
+    tickers. Repeats are honoured by a replica id so a ticker drawn twice contributes
+    as two independent clusters. Uses the precomputed grouping for speed."""
+    cbyrun = _group(rows).get(config, {})
     ks = []
-    for run in runs:
+    for run in sorted(cbyrun.keys()):
+        tk = cbyrun[run]
         cells = {}
         for rep, t in enumerate(tickers_multiset):
-            for (tt, d, rr), dirs in by.items():
-                if tt == t and rr == run:
-                    cells[(rep, t, d)] = dirs  # rep keeps duplicate draws distinct
+            td = tk.get(t)
+            if not td:
+                continue
+            for d, dirs in td.items():
+                cells[(rep, t, d)] = dirs  # rep keeps duplicate draws distinct
         k = M.fleiss_kappa(cells)
         if k is not None:
             ks.append(k)
     return sum(ks) / len(ks) if ks else None
+
+
+def cluster_bootstrap_multi(rows, tickers, pairs, draws=2000, seed=42):
+    """One cluster bootstrap for MULTIPLE config pairs. Per resample, each config's
+    κ is computed once and reused across pairs (HOM appears in 2 pairs). Uses one
+    Random(seed) whose sample sequence matches cluster_bootstrap_pair, so the CIs are
+    byte-identical to calling that per pair — just ~2x faster."""
+    needed = sorted({c for p in pairs for c in p})
+    point = {c: _kappa_for_ticker_subset(rows, c, tickers) for c in needed}
+    rng = random.Random(seed)
+    n = len(tickers)
+    deltas = {p: [] for p in pairs}
+    for _ in range(draws):
+        samp = [tickers[rng.randrange(n)] for _ in range(n)]
+        kv = {c: _kappa_for_ticker_subset(rows, c, samp) for c in needed}
+        for a, b in pairs:
+            if kv[a] is not None and kv[b] is not None:
+                deltas[(a, b)].append(kv[a] - kv[b])
+    out = {}
+    for (a, b) in pairs:
+        d = sorted(deltas[(a, b)])
+        pt = (point[a] - point[b]) if (point[a] is not None and point[b] is not None) else None
+        if len(d) < 20:
+            out[(a, b)] = {"pair": f"{a}-{b}", "point": pt, "ci_low": None, "ci_high": None,
+                           "kappa_a": point[a], "kappa_b": point[b], "n_valid": len(d)}
+        else:
+            out[(a, b)] = {"pair": f"{a}-{b}", "point": pt,
+                           "ci_low": d[int(0.025 * len(d))], "ci_high": d[int(0.975 * len(d)) - 1],
+                           "kappa_a": point[a], "kappa_b": point[b], "n_valid": len(d)}
+    return out
 
 
 def cluster_bootstrap_pair(rows, tickers, cfg_a, cfg_b, draws=2000, seed=42):

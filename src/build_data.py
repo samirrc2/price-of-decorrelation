@@ -16,12 +16,12 @@ from pathlib import Path
 
 import yaml
 
-_HERE = Path(__file__).resolve().parent
+_HERE = Path(__file__).resolve().parents[1]
 MIN_HISTORY = 25   # trading days required before as-of to build a snippet
 
 
 def load_cfg():
-    return yaml.safe_load((_HERE / "config.yaml").read_text())
+    return yaml.safe_load((_HERE / "configs" / "config.yaml").read_text())
 
 
 def _ret(closes, n):

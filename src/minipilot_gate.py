@@ -16,7 +16,7 @@ import yaml
 import metrics as M
 import stats as S
 
-_HERE = Path(__file__).resolve().parent
+_HERE = Path(__file__).resolve().parents[1]
 
 
 def fmt(x, n=4):
@@ -24,7 +24,7 @@ def fmt(x, n=4):
 
 
 def main():
-    cfg = yaml.safe_load((_HERE / "config.yaml").read_text())
+    cfg = yaml.safe_load((_HERE / "configs" / "config.yaml").read_text())
     mp = cfg["minipilot"]
     runs_csv = _HERE / mp["paths"]["runs_csv"]
     if not runs_csv.exists():

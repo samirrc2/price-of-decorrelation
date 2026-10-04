@@ -86,6 +86,22 @@ configs:
 
 heterogeneity_level: {HOM: 0, HET-LITE: 1, HET: 3}
 
+# --- CONTROL for the capability-vs-provider confound (reviewer-requested) --------
+# HET-SAMETIER: 5 EFFICIENT-tier models across 3 providers, so provider diversity is
+# varied while holding capability tier ~constant. Compare its κ against HOM's κ:
+# if κ still drops materially, the de-correlation is provider-driven, not tier-driven.
+# To run this control WITHOUT disturbing the frozen main study, put it in a separate
+# config file (e.g. config_control.yaml) with ONLY {HOM, HET-SAMETIER} in `configs:`,
+# add the two efficient models to `models:` (VERIFY exact strings via probe_models.py),
+# and run `python orchestrator.py --phase full` against that file. ~$5, ~15 min.
+# control_configs:
+#   HET-SAMETIER:                          # provider-diverse, capability-matched
+#     - {model: gpt-5.4-nano}              # OpenAI efficient
+#     - {model: gpt-5.4-nano}
+#     - {model: gemini-3.1-flash-lite}     # Google efficient   (VERIFY string)
+#     - {model: gemini-3.1-flash-lite}
+#     - {model: grok-4.1-fast}             # xAI efficient      (VERIFY string)
+
 # --- Model registry (VERIFY strings/pricing/cutoffs via probe_models.py) -------
 models:
   gpt-5.5:
@@ -138,8 +154,23 @@ minipilot:
 spend_cap_usd: 90.0           # hard cap for the single confirmatory execution
 stop_margin_usd: 1.0
 midrun_report_at: 0.50
-max_retries: 3
+max_retries: 5
 concurrency: 24               # parallel worker threads (override with --concurrency)
+
+# Per-provider request-rate caps (requests/min). Keeps the run under org limits;
+# workers self-throttle via a shared limiter. OpenAI org cap is 500 RPM / 200k TPM
+# for gpt-5.4-nano -> 450 leaves margin.
+rpm_limits:
+  openai: 450
+  google: 250
+  xai: 300
+
+# Provider DAILY request caps (per model key). Pre-flight aborts if the grid's
+# planned calls for a model exceed its daily limit (unless --allow-over-quota).
+# gemini-3.5-flash free tier = 10,000/day; the full grid needs ~10,800 gemini calls,
+# so this run WOULD have aborted at launch instead of degrading at 96%.
+daily_limits:
+  gemini-3.5-flash: 10000
 
 # --- Paths -------------------------------------------------------------------
 paths:

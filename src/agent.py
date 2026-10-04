@@ -9,14 +9,48 @@ from __future__ import annotations
 import json
 import re
 import hashlib
+import threading
 from dataclasses import dataclass, asdict
 from datetime import date
 from pathlib import Path
 from typing import Any
 
+# One reused client per provider (thread-safe) — creating a client per call leaks
+# sockets and exhausts the file-descriptor limit under concurrency.
+_CLIENTS: dict[str, Any] = {}
+_CLIENTS_LOCK = threading.Lock()
+
+
+def _client(kind: str):
+    with _CLIENTS_LOCK:
+        c = _CLIENTS.get(kind)
+        if c is not None:
+            return c
+        if kind == "openai":
+            from openai import OpenAI
+            c = OpenAI(api_key=secretstore.get_key("openai"), max_retries=0)
+        elif kind == "xai":
+            from openai import OpenAI
+            c = OpenAI(api_key=secretstore.get_key("xai"),
+                       base_url="https://api.x.ai/v1", max_retries=0)
+        elif kind == "anthropic":
+            from anthropic import Anthropic
+            kwargs = {"api_key": secretstore.get_key("anthropic")}
+            base = secretstore.get_base_url("anthropic")
+            if base:
+                kwargs["base_url"] = base
+            c = Anthropic(**kwargs)
+        elif kind == "gemini":
+            from google import genai
+            c = genai.Client(api_key=secretstore.get_key("google"))
+        else:
+            raise ValueError(f"unknown client kind {kind}")
+        _CLIENTS[kind] = c
+        return c
+
 import secrets as secretstore  # local secrets.py (loads keys.env)
 
-_HERE = Path(__file__).resolve().parent
+_HERE = Path(__file__).resolve().parents[1]
 
 VALID_DIRECTIONS = {"BUY", "HOLD", "SELL"}
 
@@ -24,7 +58,7 @@ VALID_DIRECTIONS = {"BUY", "HOLD", "SELL"}
 def _load_prompt_template():
     """Load the FROZEN prompt from prompt_template.txt (hashed at Phase-1 freeze).
     Sections are delimited by [SYSTEM] and [USER]."""
-    txt = (_HERE / "prompt_template.txt").read_text()
+    txt = (_HERE / "configs" / "prompt_template.txt").read_text()
     sys_part = txt.split("[SYSTEM]", 1)[1].split("[USER]", 1)[0].strip()
     usr_part = txt.split("[USER]", 1)[1].strip()
     return sys_part, usr_part
@@ -182,12 +216,7 @@ def _mock_call(model_cfg, system, user, seed):
 
 
 def _call_anthropic(model_cfg, system, user, temperature, seed):
-    from anthropic import Anthropic
-    kwargs = {"api_key": secretstore.get_key("anthropic")}
-    base = secretstore.get_base_url("anthropic")
-    if base:
-        kwargs["base_url"] = base
-    client = Anthropic(**kwargs)
+    client = _client("anthropic")
     # Anthropic Messages API does not expose a user-seed param; seed is logged for
     # provenance and used for our own RNG only. Independence is guaranteed by
     # issuing a fresh request per agent (no caching, no shared context).
@@ -203,9 +232,7 @@ def _call_anthropic(model_cfg, system, user, temperature, seed):
 
 
 def _call_openai(model_cfg, system, user, temperature, seed):
-    from openai import OpenAI
-    client = OpenAI(api_key=secretstore.get_key("openai"))
-    return _openai_compatible_call(client, model_cfg, system, user, temperature, seed)
+    return _openai_compatible_call(_client("openai"), model_cfg, system, user, temperature, seed)
 
 
 def _openai_compatible_call(client, model_cfg, system, user, temperature, seed):
@@ -256,9 +283,8 @@ def _call_gemini(model_cfg, system, user, temperature, seed):
     max_out = int(model_cfg.get("max_tokens", 512))
     # Prefer the modern google-genai SDK; fall back to legacy google-generativeai.
     try:
-        from google import genai
         from google.genai import types
-        client = genai.Client(api_key=key)
+        client = _client("gemini")
         gc = {"system_instruction": system, "temperature": temperature,
               "max_output_tokens": max_out,
               "response_mime_type": "application/json"}  # force bare JSON
@@ -291,10 +317,7 @@ def _call_gemini(model_cfg, system, user, temperature, seed):
 
 def _call_xai(model_cfg, system, user, temperature, seed):
     # xAI Grok is OpenAI-compatible.
-    from openai import OpenAI
-    client = OpenAI(api_key=secretstore.get_key("xai"),
-                    base_url="https://api.x.ai/v1")
-    return _openai_compatible_call(client, model_cfg, system, user, temperature, seed)
+    return _openai_compatible_call(_client("xai"), model_cfg, system, user, temperature, seed)
 
 
 # --------------------------------------------------------------------------- #

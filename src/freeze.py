@@ -10,10 +10,11 @@ import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 
-_HERE = Path(__file__).resolve().parent
+_HERE = Path(__file__).resolve().parents[1]
 
-FROZEN = ["config.yaml", "agent.py", "analyze.py", "prompt_template.txt",
-          "preregistration.md", "appendix/grid.csv", "model_manifest.md"]
+FROZEN = ["configs/config.yaml", "src/agent.py", "src/analyze.py",
+          "configs/prompt_template.txt", "docs/preregistration.md",
+          "appendix/grid.csv", "docs/model_manifest.md"]
 
 
 def sha256(p: Path) -> str:
@@ -60,7 +61,7 @@ def main():
     lines.append("\n## git commit output\n```")
     lines.append((commit.stdout + commit.stderr).strip())
     lines.append("```")
-    (_HERE / "freeze_receipt.md").write_text("\n".join(lines) + "\n")
+    (_HERE / "docs" / "freeze_receipt.md").write_text("\n".join(lines) + "\n")
     print(f"Wrote freeze_receipt.md. commit={commit_hash}")
     print("Frozen:", ", ".join(hashes))
     return 0

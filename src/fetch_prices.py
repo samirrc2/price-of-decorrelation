@@ -17,7 +17,7 @@ import yaml
 
 import secrets as secretstore
 
-_HERE = Path(__file__).resolve().parent
+_HERE = Path(__file__).resolve().parents[1]
 START = "2025-12-01"
 END = "2026-07-01"
 
@@ -76,7 +76,7 @@ def fetch_one(ticker: str, key: str, debug=False):
 
 def main():
     key = _key()
-    cfg = yaml.safe_load((_HERE / "config.yaml").read_text())
+    cfg = yaml.safe_load((_HERE / "configs" / "config.yaml").read_text())
     tickers = cfg["tickers"]
     out, missing = {}, []
     for i, t in enumerate(tickers, 1):

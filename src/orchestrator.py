@@ -22,8 +22,15 @@ import argparse
 import csv
 import json
 import hashlib
+import re
 import sys
 import threading
+import time
+from collections import Counter
+try:
+    import resource  # POSIX only; used to raise the open-file limit
+except ImportError:
+    resource = None
 from concurrent.futures import ThreadPoolExecutor
 from datetime import date, datetime, timezone
 from pathlib import Path
@@ -33,7 +40,7 @@ import yaml
 import agent as agentmod
 import secrets as secretstore
 
-_HERE = Path(__file__).resolve().parent
+_HERE = Path(__file__).resolve().parents[1]
 _CACHE_DIR = _HERE / "cache" / "responses"
 _RESULTS_DIR = _HERE / "results" / "raw"
 
@@ -66,6 +73,52 @@ def derive_agent_seed(seed_mode, master, run_seed, config, ticker, date, agent_i
     return int(hashlib.sha256(raw.encode()).hexdigest()[:8], 16) & 0x7FFFFFFF
 
 
+class RateLimiter:
+    """Global min-interval limiter: spaces requests to stay under an RPM cap.
+    Shared across all worker threads for one provider."""
+    def __init__(self, rpm):
+        self.min_interval = (60.0 / rpm) if rpm and rpm > 0 else 0.0
+        self.lock = threading.Lock()
+        self.next_time = 0.0
+
+    def acquire(self):
+        if self.min_interval <= 0:
+            return
+        with self.lock:
+            now = time.monotonic()
+            t = max(now, self.next_time)
+            self.next_time = t + self.min_interval
+            wait = t - now
+        if wait > 0:
+            time.sleep(wait)
+
+
+def classify_error(err: str):
+    """Classify a failed call. Returns (kind, retry_delay_seconds|None).
+    kind: 'daily_quota' | 'rate_limit' | 'transient' | 'other'.
+    A daily_quota (e.g. Gemini generate_requests_per_model_per_day, retryDelay ~5917s)
+    must NOT be retried per-cell — the bucket won't refill for hours."""
+    e = err or ""
+    el = e.lower()
+    delay = None
+    m = re.search(r"retrydelay['\":\s]+(\d+(?:\.\d+)?)s", el)
+    if m:
+        delay = float(m.group(1))
+    else:
+        m2 = re.search(r"retry in\s+(?:(\d+)h)?(?:(\d+)m)?(?:([\d.]+)s)?", el)
+        if m2 and any(m2.groups()):
+            delay = int(m2.group(1) or 0) * 3600 + int(m2.group(2) or 0) * 60 + float(m2.group(3) or 0)
+    if any(k in el for k in ("per_day", "perday", "requests_per_model_per_day", "per-day", "requests_per_day")):
+        return "daily_quota", delay
+    if "resource_exhausted" in el and delay and delay > 300:
+        return "daily_quota", delay
+    if "429" in e or "rate limit" in el or "rate_limit" in el or "resource_exhausted" in el or "quota" in el:
+        return "rate_limit", delay
+    if any(k in el for k in ("connection error", "timeout", "timed out", "503", "unavailable", "502")):
+        return "transient", delay
+    return "other", delay
+
+
 def _response_cache_key(mcfg, prompt_hash, seed, temperature):
     raw = f"{mcfg['provider']}|{mcfg['api_model']}|{prompt_hash}|{seed}|{temperature}|" \
           f"{mcfg.get('max_tokens',256)}|{mcfg.get('reasoning_effort','')}"
@@ -85,8 +138,11 @@ def _cache_get(key):
 
 def _cache_put(key, payload):
     import json
-    _CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    (_CACHE_DIR / f"{key}.json").write_text(json.dumps(payload, indent=2))
+    try:
+        _CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        (_CACHE_DIR / f"{key}.json").write_text(json.dumps(payload, indent=2))
+    except OSError:
+        pass  # best-effort cache; never block a logged result
 
 
 def _store_result(mcfg, row):
@@ -99,8 +155,11 @@ def _store_result(mcfg, row):
     (d / name).write_text(json.dumps(row, indent=2))
 
 
-def load_config() -> dict:
-    return yaml.safe_load((_HERE / "config.yaml").read_text())
+def load_config(path: str = "configs/config.yaml") -> dict:
+    p = Path(path)
+    if not p.is_absolute():
+        p = _HERE / p
+    return yaml.safe_load(p.read_text())
 
 
 # --------------------------------------------------------------------------- #
@@ -172,9 +231,21 @@ def main() -> int:
     ap.add_argument("--concurrency", type=int, default=None,
                     help="parallel worker threads (default: config.concurrency or 1). "
                          "Order-independent: does NOT affect analysis determinism.")
+    ap.add_argument("--allow-over-quota", action="store_true",
+                    help="proceed even if a model's planned calls exceed its daily_limit "
+                         "(use after enabling billing / a higher tier).")
+    ap.add_argument("--config", default="configs/config.yaml",
+                    help="config file to use (e.g. configs/config_control.yaml for the "
+                         "HET-SameTier confound control). Keeps control runs separate.")
+    ap.add_argument("--temperature", type=float, default=None,
+                    help="override the sampling temperature for this run (e.g. the "
+                         "T-sweep robustness study). Default: config.temperature.")
+    ap.add_argument("--runs-csv", default=None, dest="runs_csv_override",
+                    help="override the output runs.csv path (keeps a T-sweep or other "
+                         "side-run fully separate from the frozen study file).")
     args = ap.parse_args()
 
-    cfg = load_config()
+    cfg = load_config(args.config)
     today = date.fromisoformat(args.today) if args.today else datetime.now(timezone.utc).date()
     phase = args.phase
 
@@ -194,6 +265,11 @@ def main() -> int:
         cap = float(cfg["spend_cap_usd"])
         runs_csv = _HERE / cfg["paths"]["runs_csv"]
         ledger_path = _HERE / cfg["paths"]["spend_ledger"]
+    if args.runs_csv_override:
+        runs_csv = Path(args.runs_csv_override)
+        if not runs_csv.is_absolute():
+            runs_csv = _HERE / runs_csv
+        ledger_path = runs_csv.with_name(runs_csv.stem + "_ledger.json")
     runs_csv.parent.mkdir(parents=True, exist_ok=True)
     margin = float(cfg["stop_margin_usd"])
     max_retries = int(cfg.get("max_retries", 3))
@@ -225,6 +301,31 @@ def main() -> int:
           f"({len(tickers)} tickers x {len(dates)} dates x {len(config_names)} configs "
           f"x {n_runs} runs x 5 agents).")
 
+    # ---- PRE-FLIGHT daily-quota check ----
+    # Count only REMAINING (not-yet-completed) calls per model, so a backfill/resume
+    # is judged on what it will actually send today, not the whole grid.
+    daily_limits = cfg.get("daily_limits", {}) or {}
+    _done_pre = load_done(runs_csv)
+    _remaining = [c for c in calls if (c[0], c[1], c[2], c[3], c[5]) not in _done_pre]
+    planned = Counter(c[6] for c in _remaining)  # by model key
+    if _done_pre:
+        print(f"Pre-flight: {len(_done_pre)} calls already done; {len(_remaining)} remaining.")
+    over = []
+    for mkey, n_planned in planned.items():
+        lim = daily_limits.get(mkey) or daily_limits.get(cfg["models"][mkey]["api_model"])
+        if lim and n_planned > lim:
+            over.append((mkey, n_planned, lim))
+    if over:
+        print("\nPRE-FLIGHT QUOTA WARNING — planned calls exceed provider daily limits:")
+        for mkey, n_planned, lim in over:
+            print(f"  - {mkey}: {n_planned} planned > {lim}/day  (short by {n_planned - lim})")
+        if not args.allow_over_quota:
+            print("\nABORTING before spending. Options: raise the provider's tier/billing, "
+                  "shrink the grid, or pass --allow-over-quota to run anyway (some cells will "
+                  "be DEFERRED for backfill once the quota resets).")
+            return 3
+        print("  --allow-over-quota set: proceeding; over-quota cells will be deferred.\n")
+
     # Pre-flight cost projection using a token estimate (full grid, worst case out).
     est_in = 320  # ~ system+user prompt tokens; refined below per real call
     proj = 0.0
@@ -249,10 +350,23 @@ def main() -> int:
     for prov in providers:
         secretstore.get_key(prov)  # raises with a clear message if missing
 
+    # Raise the open-file limit so concurrent HTTP sockets + cache writes don't hit
+    # macOS's low default (256).
+    if resource is not None:
+        try:
+            soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
+            resource.setrlimit(resource.RLIMIT_NOFILE, (min(max(soft, 8192), hard), hard))
+        except Exception:
+            pass
+
     seed_mode = str(cfg.get("seed_mode", "per_agent"))
     master = int(cfg["seed_master"])
     workers = args.concurrency or int(cfg.get("concurrency", 1))
     workers = max(1, workers)
+    rpm_limits = cfg.get("rpm_limits", {}) or {}
+    limiters = {prov: RateLimiter(rpm_limits.get(prov, 0)) for prov in providers}
+    if rpm_limits:
+        print(f"Rate limits (RPM): {rpm_limits}")
     print(f"Seed mode: {seed_mode} "
           f"({'INDEPENDENT per-agent draws' if seed_mode=='per_agent' else seed_mode}). "
           f"Concurrency: {workers} worker(s).")
@@ -262,12 +376,22 @@ def main() -> int:
 
     # shared state (thread-safe). Execution order does NOT affect analysis (analyze.py
     # is order-independent); concurrency is purely a wall-clock optimization.
-    st = {"cum": 0.0, "n_done": 0, "n_fail": 0, "stop": False}
+    st = {"cum": 0.0, "n_done": 0, "n_fail": 0, "stop": False,
+          "exhausted": set(), "deferred": 0}  # exhausted: models that hit a daily quota
     lock_spend = threading.Lock()
     lock_io = threading.Lock()
-    temp = float(cfg["temperature"])
+    temp = float(args.temperature) if args.temperature is not None else float(cfg["temperature"])
+    print(f"Sampling temperature: {temp}"
+          + ("  (CLI override)" if args.temperature is not None else "  (from config)"))
 
     def process(slot):
+        try:
+            _process(slot)
+        except Exception as e:  # never let one slot kill the whole pool
+            with lock_io:
+                print(f"  !! worker error on {slot[:4]} {slot[5:]}: {type(e).__name__}: {e}")
+
+    def _process(slot):
         (config_name, ticker, d, run_idx, run_seed, agent_idx, model) = slot
         mcfg = cfg["models"][model]
         seed = derive_agent_seed(seed_mode, master, run_seed, config_name, ticker, d, agent_idx)
@@ -295,16 +419,44 @@ def main() -> int:
                 if st["stop"] or st["cum"] + wc > (cap - margin):
                     st["stop"] = True
                     return
-            for attempt in range(1, max_retries + 2):
-                res = agentmod.run_agent(mcfg, ticker, snip, temp, seed)
-                with lock_spend:
-                    st["cum"] += price_of(mcfg, res.input_tokens, res.output_tokens)
-                if use_cache and res.ok and (res.raw_response or res.output_tokens):
-                    _cache_put(ckey, {"raw": res.raw_response,
-                                      "in_tok": res.input_tokens, "out_tok": res.output_tokens})
-                attempts.append((res, False, attempt))
-                if res.ok:
-                    break
+                model_dead = model in st["exhausted"]
+            if model_dead:
+                # Circuit breaker: this model already hit a daily quota. Do NOT call —
+                # defer for backfill (fail-fast, no wasted spend).
+                res = agentmod.AgentResult(False, None, "", 0, 0,
+                                           f"DEFERRED_DAILY_QUOTA: {model}", ph)
+                attempts.append((res, False, 1))
+            else:
+                lim = limiters.get(mcfg["provider"])
+                for attempt in range(1, max_retries + 2):
+                    if lim:
+                        lim.acquire()
+                    res = agentmod.run_agent(mcfg, ticker, snip, temp, seed)
+                    with lock_spend:
+                        st["cum"] += price_of(mcfg, res.input_tokens, res.output_tokens)
+                    if res.ok:
+                        if use_cache and (res.raw_response or res.output_tokens):
+                            _cache_put(ckey, {"raw": res.raw_response,
+                                              "in_tok": res.input_tokens, "out_tok": res.output_tokens})
+                        attempts.append((res, False, attempt))
+                        break
+                    kind, delay = classify_error(res.error)
+                    if kind == "daily_quota":
+                        # per-DAY exhaustion: stop retrying, trip the breaker, defer.
+                        with lock_spend:
+                            st["exhausted"].add(model)
+                        res = agentmod.AgentResult(
+                            False, None, res.raw_response, res.input_tokens, res.output_tokens,
+                            f"DEFERRED_DAILY_QUOTA: {model} (retry~{int(delay) if delay else '?'}s)", ph)
+                        attempts.append((res, False, attempt))
+                        break
+                    attempts.append((res, False, attempt))
+                    if attempt <= max_retries:
+                        # adaptive backoff: longer for rate-limit/transient
+                        time.sleep(min(30.0, (3.0 if kind in ("rate_limit", "transient") else 0.4)
+                                       * (2 ** (attempt - 1))))
+                    else:
+                        break
 
         with lock_io:
             for (res, is_cached, attempt) in attempts:
@@ -329,9 +481,15 @@ def main() -> int:
                 _store_result(mcfg, row)
                 if not res.ok:
                     st["n_fail"] += 1
-                    tag = "retry" if attempt > 1 else "call"
-                    print(f"  ! {config_name} {ticker} {d} run{run_idx} agent{agent_idx} "
-                          f"({model}) {tag} {attempt} FAILED: {res.error}")
+                    if (res.error or "").startswith("DEFERRED"):
+                        st["deferred"] += 1
+                        if st["deferred"] in (1,) or st["deferred"] % 200 == 0:
+                            print(f"  ~ DEFERRED (daily quota) — {model}; {st['deferred']} cells "
+                                  f"queued for backfill. Not retrying today.")
+                    else:
+                        tag = "retry" if attempt > 1 else "call"
+                        print(f"  ! {config_name} {ticker} {d} run{run_idx} agent{agent_idx} "
+                              f"({model}) {tag} {attempt} FAILED: {res.error}")
             st["n_done"] += 1
             nd = st["n_done"]
             ledger_path.write_text(json.dumps({
@@ -358,9 +516,28 @@ def main() -> int:
     if st["stop"]:
         print(f"\nSTOP: spend cap ${cap:.2f} guard tripped; halted cleanly. "
               f"runs.csv holds all completed calls (resume by re-running).")
-    print(f"\nDone this session: {st['n_done']}/{remaining} slots, {st['n_fail']} attempt-failures, "
-          f"spend ${st['cum']:.4f} / cap ${cap:.2f}.")
-    print(f"Raw log: {runs_csv}")
+
+    # ---- honest run manifest (every session stamped) ----
+    manifest = {
+        "phase": phase,
+        "timestamp_utc": datetime.now(timezone.utc).isoformat(),
+        "runs_csv": str(runs_csv),
+        "slots_completed_this_session": st["n_done"],
+        "attempt_failures_this_session": st["n_fail"],
+        "deferred_this_session": st["deferred"],
+        "models_exhausted_daily_quota": sorted(st["exhausted"]),
+        "spend_usd_this_session": round(st["cum"], 6),
+        "spend_cap_usd": cap,
+    }
+    (runs_csv.parent / "run_manifest.json").write_text(json.dumps(manifest, indent=2))
+
+    print(f"\nDone this session: {st['n_done']}/{remaining} slots, {st['n_fail']} attempt-failures "
+          f"({st['deferred']} DEFERRED for backfill), spend ${st['cum']:.4f} / cap ${cap:.2f}.")
+    if st["exhausted"]:
+        print(f"Models that hit a DAILY quota (backfill after reset / higher tier): "
+              f"{sorted(st['exhausted'])}")
+        print("  -> re-run the same command later to fill DEFERRED cells (resume skips completed).")
+    print(f"Raw log: {runs_csv}   Manifest: run_manifest.json")
     print("Next: python analyze.py")
     return 0
 

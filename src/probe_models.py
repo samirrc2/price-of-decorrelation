@@ -21,8 +21,8 @@ import yaml
 import agent as agentmod
 import secrets as secretstore
 
-_HERE = Path(__file__).resolve().parent
-MANIFEST = _HERE / "model_manifest.md"
+_HERE = Path(__file__).resolve().parents[1]
+MANIFEST = _HERE / "docs" / "model_manifest.md"
 
 TEST_SNIPPET = agentmod.Snippet(
     text="Headline: Test probe. Fundamentals: none.", asof="2025-01-01",
@@ -76,9 +76,19 @@ def _fingerprint(mcfg):
 
 
 def main():
-    cfg = yaml.safe_load((_HERE / "config.yaml").read_text())
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--config", default="configs/config.yaml",
+                    help="config file whose models: registry to probe")
+    ap.add_argument("--only", default=None,
+                    help="comma-separated model keys to probe (default: all)")
+    a = ap.parse_args()
+    cfg = yaml.safe_load((_HERE / a.config).read_text())
+    only = set(a.only.split(",")) if a.only else None
     results = []
     for mk, mcfg in cfg["models"].items():
+        if only and mk not in only:
+            continue
         print(f"probing {mk} ({mcfg['api_model']}) ...")
         results.append(probe_one(mk, mcfg))
 
@@ -93,11 +103,16 @@ def main():
                      f"{r['cutoff_probe']} |")
     lines.append("\nRaw probe log: `model_probe_raw.json`.")
 
-    text = MANIFEST.read_text()
-    marker = "## Verified"
-    text = text[:text.index(marker)] + "\n".join(lines) + "\n"
-    MANIFEST.write_text(text)
-    (_HERE / "model_probe_raw.json").write_text(json.dumps(results, indent=2))
+    # Only overwrite the main manifest when probing the full main config (don't let a
+    # control/subset probe clobber the frozen study manifest).
+    if a.config == "configs/config.yaml" and not only:
+        text = MANIFEST.read_text()
+        marker = "## Verified"
+        text = text[:text.index(marker)] + "\n".join(lines) + "\n"
+        MANIFEST.write_text(text)
+        (_HERE / "model_probe_raw.json").write_text(json.dumps(results, indent=2))
+    else:
+        print("\n".join(lines))  # print-only for control/subset probes
 
     bad = [r["api_model"] for r in results if not r["ok"]]
     print(f"\nProbed {len(results)} models; {len(bad)} failed.")

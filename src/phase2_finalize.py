@@ -14,7 +14,7 @@ from pathlib import Path
 
 import yaml
 
-_HERE = Path(__file__).resolve().parent
+_HERE = Path(__file__).resolve().parents[1]
 
 
 def sha256(p: Path) -> str:
@@ -24,7 +24,7 @@ def sha256(p: Path) -> str:
 
 
 def main():
-    cfg = yaml.safe_load((_HERE / "config.yaml").read_text())
+    cfg = yaml.safe_load((_HERE / "configs" / "config.yaml").read_text())
     runs_csv = _HERE / cfg["paths"]["runs_csv"]
     if not runs_csv.exists():
         print("No runs.csv — run Phase 2 (python orchestrator.py --phase full) first.")
@@ -43,7 +43,7 @@ def main():
          f"- rows (incl. retries): {len(rows)}   usable (ok): {ok}",
          f"- frozen read-only (0444): yes",
          f"- timestamp (UTC): {datetime.now(timezone.utc).isoformat()}",
-         f"- config.yaml SHA-256: `{sha256(_HERE / 'config.yaml')}`\n",
+         f"- config.yaml SHA-256: `{sha256(_HERE / 'configs' / 'config.yaml')}`\n",
          "This file is the paper's dataset. Do NOT regenerate it. Any correction "
          "requires a new versioned file (e.g. runs_v2.csv) plus a changelog entry here."]
     (_HERE / "archive_manifest.md").write_text("\n".join(L) + "\n")

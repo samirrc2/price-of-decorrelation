@@ -11,7 +11,7 @@ from pathlib import Path
 
 import yaml
 
-_HERE = Path(__file__).resolve().parent
+_HERE = Path(__file__).resolve().parents[1]
 LAST_VALID_DATE = date(2026, 6, 1)
 
 
@@ -24,7 +24,7 @@ def used_models(cfg):
 
 
 def main():
-    cfg = yaml.safe_load((_HERE / "config.yaml").read_text())
+    cfg = yaml.safe_load((_HERE / "configs" / "config.yaml").read_text())
     ticker_sector = {}
     for sec, tks in cfg["sectors"].items():
         for t in tks:
