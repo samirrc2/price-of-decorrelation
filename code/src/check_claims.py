@@ -128,8 +128,19 @@ def _check_asserting_doc(path: Path, label: str) -> list[str]:
         lit = m.group(1)
         if lit in forms or lit in allow:
             continue
+        # Version numbers were skipped by SHAPE: any d.dd below 15. That silently exempted every
+        # ratio these documents quote -- 1.84, 2.3, 4.4, 1.42, 2.52, 1.13, 3.06 -- so the
+        # superseded [1.51, 2.35] sat in the response letter and passed. The exemption now needs
+        # the line to actually be about a version.
         if re.match(r"^\d\.\d{1,2}$", lit) and float(lit) < 15:
-            continue        # version numbers: Python 3.11, numpy 2.2, pytest 8.0
+            line = t[t.rfind("\n", 0, m.start()) + 1:t.find("\n", m.end())]
+            before = t[max(0, m.start() - 4):m.start()]
+            if re.search(r"(>=|==|~=|<=|>|<)\s*$", before):
+                continue        # a dependency pin: requests>=2.31, openai>=1.40
+            if re.search(r"\bpython\b|\bnumpy\b|\bmatplotlib\b|\bpytest\b|\byaml\b|"
+                         r"\bpandas\b|\bscipy\b|\bversion\b|\bv\d|\bubuntu\b|\bmacos\b|"
+                         r"\bdocker\b|\bpip\b|\brequirements\b", line, re.I):
+                continue
         # An amendments record documents what CHANGED, so it legitimately quotes values the
         # analysis no longer produces. Allow that only where the sentence says so, and name
         # what was excused -- a superseded number stated as a current one still fails.

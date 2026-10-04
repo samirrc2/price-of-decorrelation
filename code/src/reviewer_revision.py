@@ -230,7 +230,7 @@ def unanimous_wrong(rows, signs):
                 continue
             wrong = (len(set(dirs)) == 1 and dirs[0] in ("BUY", "SELL")
                      and (1 if dirs[0] == "BUY" else -1) != sg)
-            flags.append((t, int(wrong)))
+            flags.append(((t, d), int(wrong)))
         return flags
 
     flags = {c: cell_flags(c) for c in ("HOM", "HET")}
@@ -243,22 +243,39 @@ def unanimous_wrong(rows, signs):
             raise SystemExit(f"unanimous_wrong fast path disagrees for {c} "
                              f"({fast} vs {pts[c][0]}); refusing to bootstrap with it")
 
-    def rate_fast(cfg, keep_t):
+    def rate_fast(cfg, wt):
         n = w = 0
-        for t, f in flags[cfg]:
-            if keep_t(t):
-                n += 1; w += f
+        for key, f in flags[cfg]:
+            k = wt(key)
+            if k:
+                n += k; w += k * f
         return (w / n) if n else None
 
-    rng = random.Random(SEED); rs = []
-    for _ in range(DRAWS):
-        s = set(tick[rng.randrange(len(tick))] for _ in tick)
-        keep_t = lambda t: t in s
-        a = rate_fast("HOM", keep_t); b = rate_fast("HET", keep_t)
-        if a and b: rs.append(a / b)
-    rs.sort()
+    # This bootstrap drew a SET of equities, so an equity drawn twice counted once and each
+    # draw used only the ~63 distinct equities of a 100-draw multiset -- subsampling rather
+    # than a cluster bootstrap, understating the variance. It is the same defect that made the
+    # clustering table's equity row disagree with the primary endpoint, in a statistic that
+    # does carry an inferential claim ("excludes unity"). Multiplicity is honoured now.
+    dates = sorted({d for key, _ in flags["HOM"] for d in [key[1]]})
+
+    def boot(mode):
+        rng = random.Random(SEED); rs = []
+        for _ in range(DRAWS):
+            ct = collections.Counter(tick[rng.randrange(len(tick))] for _ in tick)
+            if mode == "equity":
+                wt = lambda key: ct.get(key[0], 0)
+            else:
+                cd = collections.Counter(dates[rng.randrange(len(dates))] for _ in dates)
+                wt = lambda key: ct.get(key[0], 0) * cd.get(key[1], 0)
+            a = rate_fast("HOM", wt); b = rate_fast("HET", wt)
+            if a and b: rs.append(a / b)
+        rs.sort()
+        return ([rs[int(.025*len(rs))], rs[int(.975*len(rs))-1]] if len(rs) >= 20
+                else [None, None])
+
     return {"hom": pts["HOM"], "het": pts["HET"], "ratio": ratio,
-            "ratio_ci": [rs[int(.025*len(rs))], rs[int(.975*len(rs))-1]] if len(rs) >= 20 else [None, None]}
+            "ratio_ci": boot("equity"), "ratio_two_way_ci": boot("two_way"),
+            "n_dates": len(dates)}
 
 
 # ------------------------------------- R1.5 independence: different-model pairs only
@@ -364,7 +381,7 @@ def error_correlation(rows, signs, hold_is_wrong=False):
             else:
                 err[i] = 0 if pred == s else 1
         for i, j in itertools.combinations(sorted(err), 2):
-            per[cfg][t_].append((err[i], err[j]))
+            per[cfg][(t_, d_)].append((err[i], err[j]))
 
     def phi(v):
         n = len(v)
@@ -373,17 +390,38 @@ def error_correlation(rows, signs, hold_is_wrong=False):
         den = math.sqrt(x*(1-x)*y*(1-y))
         return (sum((a-x)*(b-y) for a, b in v)/n)/den if den > 1e-12 else float("nan")
 
-    tick = sorted({t_ for cfg in per for t_ in per[cfg]})
-    pt = {c: phi([x for t_ in tick for x in per[c].get(t_, [])]) for c in per}
-    rng = random.Random(SEED); d = []
-    for _ in range(DRAWS):
-        s = [tick[rng.randrange(len(tick))] for _ in tick]
-        a = phi([x for t_ in s for x in per["HOM"].get(t_, [])])
-        b = phi([x for t_ in s for x in per["HET"].get(t_, [])])
-        if not (math.isnan(a) or math.isnan(b)): d.append(a-b)
-    d.sort()
+    keys = sorted({k for cfg in per for k in per[cfg]})
+    tick = sorted({k[0] for k in keys})
+    dates = sorted({k[1] for k in keys})
+    pt = {c: phi([x for k in keys for x in per[c].get(k, [])]) for c in per}
+
+    # phi is now the quantity the title rests on, so it carries the same two-way sensitivity as
+    # the primary endpoint: equities and dates resampled independently, a cell entering with the
+    # product of its two multiplicities. The equity path is unchanged -- it already honoured
+    # multiplicity by drawing a LIST rather than a set -- so the published interval does not move.
+    def boot(mode):
+        rng = random.Random(SEED); d = []
+        for _ in range(DRAWS):
+            ct = collections.Counter(tick[rng.randrange(len(tick))] for _ in tick)
+            if mode == "equity":
+                w = lambda k: ct.get(k[0], 0)
+            else:
+                cd = collections.Counter(dates[rng.randrange(len(dates))] for _ in dates)
+                w = lambda k: ct.get(k[0], 0) * cd.get(k[1], 0)
+            pool = {c: [] for c in ("HOM", "HET")}
+            for k in keys:
+                n = w(k)
+                if not n: continue
+                for c in ("HOM", "HET"):
+                    v = per[c].get(k)
+                    if v: pool[c].extend(v * n)
+            a, b = phi(pool["HOM"]), phi(pool["HET"])
+            if not (math.isnan(a) or math.isnan(b)): d.append(a - b)
+        d.sort()
+        return ([d[int(.025*len(d))], d[int(.975*len(d))-1]] if len(d) >= 20 else [None, None])
+
     return {"phi": pt, "d_phi": pt["HOM"]-pt["HET"],
-            "d_phi_ci": [d[int(.025*len(d))], d[int(.975*len(d))-1]] if len(d) >= 20 else [None, None]}
+            "d_phi_ci": boot("equity"), "d_phi_two_way_ci": boot("two_way")}
 
 
 def paired_cluster_contrasts(rows, signs, tick):

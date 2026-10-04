@@ -80,8 +80,10 @@ Author response:
     and the cross-provider pairing answer those items at 0.951 and 0.955 mean member accuracy
     respectively, a gap of 0.005. The same-provider Gemini pair has error correlation 0.954; the
     cross-provider Gemini-Grok pairing has 0.607, a difference of 0.347 (95% CI [0.207, 0.507]).
-  - The comparison holds the item set, the configuration and the ensemble composition fixed, so
-    capability is matched by construction rather than by assumption.
+  - The comparison holds the item set, the configuration and the ensemble composition fixed, and
+    the two pairings have near-identical observed member accuracy (0.951 and 0.955). We describe
+    this as approximate capability matching, which is the wording the manuscript uses; it is not
+    matching by construction.
   - Every same-provider pairing shows higher error correlation than every cross-provider pairing,
     at both accuracy levels present in the ensemble.
 
@@ -107,8 +109,10 @@ Author response:
     data.
   - The protocol is otherwise unchanged: the same five agents, the same three configurations, the
     same per-agent independent-draw seeding, the same temperature, the same number of runs and the
-    same estimators. Only the domain differs, so any change in the endpoint is attributable to
-    domain rather than to a redesign.
+    same estimators. The domain is what the replication varies; the response structure also
+    changes, from three ordered labels to four options with one correct answer, which is inherent
+    in moving to a knowledge task and which we state in the manuscript. No other element of the
+    protocol was redesigned.
   - The design, the predicted direction and the decision rule were registered and hashed before
     collection began.
   - We predicted in advance that the effect would replicate in direction but be smaller than in
@@ -139,8 +143,17 @@ Author response:
 
   - We accept the framing and have adopted the remedy the reviewer specifies.
   - The interval is now reported. The ratio is 1.84 with a 95% equity-clustered bootstrap
-    confidence interval of [1.51, 2.35], which excludes unity. The underlying rates are 0.0583 for
+    confidence interval of [1.42, 2.52], which excludes unity. The underlying rates are 0.0583 for
     HOM and 0.0317 for HET over 3600 scoreable cells each.
+  - This interval has been corrected since the previous revision, which previously reported the
+    superseded [1.51, 2.35]. That
+    bootstrap drew a SET of equities, so an equity drawn twice counted once and each draw used
+    only the distinct equities of a 100-draw multiset. That is subsampling rather than a cluster
+    bootstrap and it understated the variance. It is the same defect the reviewer identified in
+    the clustering table, found by auditing for it elsewhere once it had been corrected there.
+  - Because this statement is inferential rather than descriptive, it also carries the two-way
+    sensitivity: admitting date dependence widens the interval to [1.13, 3.06], which still
+    excludes unity.
   - We state plainly that the configuration compared and the statistic reported were both chosen
     after inspecting the data, that several such comparisons are available within that section,
     and that no multiplicity adjustment is applied.
@@ -356,8 +369,11 @@ Author response:
 
 Author action:
 
-  - Added "Agreement, error correlation, and what 'de-correlation' denotes", containing the
-    five-way distinction and the phi analysis under both label treatments.
+  - Added "Agreement, error correlation, and decorrelation", containing the five-way distinction
+    and the phi analysis under both label treatments. That subsection defines decorrelation as a
+    reduction in error correlation measured by phi, and the sections that report kappa have been
+    retitled accordingly: the primary results section is now "Heterogeneity reduces ensemble
+    agreement".
   - The abstract now reports the phi contrast alongside the kappa contrast.
 
 Reviewer #3, Concern #4
@@ -465,8 +481,9 @@ Author response:
   - The result is reported under Reviewer #1, Concern #3. Both pre-registered predictions hold.
   - The comparison across the two domains is itself informative. Agreement compresses by roughly a
     factor of five between domains while error correlation barely attenuates (0.393 against 0.454).
-    Agreement is the accuracy-sensitive quantity and error correlation the portable one, which is
-    why the de-correlation claim is now stated in terms of phi.
+    Error correlation attenuates substantially less than agreement across the two tested domains,
+    which is why the de-correlation claim is now stated in terms of phi. Two domains do not
+    establish portability in general, and we do not claim it.
   - We have not varied prompt format or ensemble size, and we say so. Those are the "preferably"
     items in the reviewer's request; we judged the domain replication to be the part that bears on
     generality and preferred to do one thing completely.

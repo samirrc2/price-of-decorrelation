@@ -82,9 +82,9 @@ R = [
     (r"by 0\.393 95 ci 0\.325 to$", "0.459", "mmlu_overall_d_phi_ci_high", 3),
     (r"ensembles generate unanimous incorrect decisions at$", "1.84",
      "revision_r1_4_unanimous_incorrect_ratio", 2),
-    (r"of fully heterogeneous ensembles 95 ci$", "1.51",
+    (r"of fully heterogeneous ensembles 95 ci$", "1.42",
      "revision_r1_4_unanimous_incorrect_ratio_ci_low", 2),
-    (r"heterogeneous ensembles 95 ci 1\.51 to$", "2.35",
+    (r"heterogeneous ensembles 95 ci 1\.42 to$", "2.52",
      "revision_r1_4_unanimous_incorrect_ratio_ci_high", 2),
     # ------------------------------------------------------------------------- introduction
     (r"pre-registered empirical study comprising$", "54000", "calls_usable", 0),
@@ -272,7 +272,7 @@ R = [
     (r"agreement is 0\.455 in het\-lite and$", "0.490",
      "revision_r1_5_independence_by_pair_type_het_diff_model_agreement", 3),
     # ------------------------------------------------------------------- provider-pair agreement
-    (r"de-correlation\. same-provider agreement is$", "0.92",
+    (r"agreement comes from\. same-provider agreement is$", "0.92",
      "ms_provider_pair_direction_agreement_descriptiv_google_google", 2),
     (r"0\.92 for google agent pairs and$", "0.80",
      "ms_provider_pair_direction_agreement_descriptiv_openai_openai", 2),
@@ -325,9 +325,9 @@ R = [
     (r"for hom 0\.030 for het-lite and$", "0.032", "rev_het_unanimous_wrong_rate", 3),
     (r"form of collective error at approximately$", "1.84",
      "revision_r1_4_unanimous_incorrect_ratio", 2),
-    (r"gives a 95 confidence interval of$", "1.51",
+    (r"gives a 95 confidence interval of$", "1.42",
      "revision_r1_4_unanimous_incorrect_ratio_ci_low", 2),
-    (r"a 95 confidence interval of 1\.51$", "2.35",
+    (r"a 95 confidence interval of 1\.42$", "2.52",
      "revision_r1_4_unanimous_incorrect_ratio_ci_high", 2),
     # The same cost premium is stated twice, in the exploratory subsection and again in the
     # Discussion, and the rewrite gave the two sentences different lead-ins. One rule covered
@@ -466,6 +466,17 @@ R = [
     (r"the corresponding two\-way interval is \-$", "0.113", "revision_r3_4_paired_cluster_contrasts_aurc_two_way_ci_low", 3),
     (r"the corresponding two\-way interval is \-0\.113$", "0.115",
      "revision_r3_4_paired_cluster_contrasts_aurc_two_way_ci_high", 3),
+    # --------------------------------------------- two-way sensitivity on inferential claims
+    (r"primary endpoint the interval widens to$", "1.13", "revision_r1_4_unanimous_incorrect_ratio_two_way_ci_low", 2),
+    (r"endpoint the interval widens to 1\.13$", "3.06", "revision_r1_4_unanimous_incorrect_ratio_two_way_ci_high", 2),
+    (r"date dependence the interval widens to$", "0.328",
+     "revision_r3_3_error_correlation_scored_d_phi_two_way_ci_low", 3),
+    (r"dependence the interval widens to 0\.328$", "0.586",
+     "revision_r3_3_error_correlation_scored_d_phi_two_way_ci_high", 3),
+    (r"0\.309 95 ci 0\.262 0\.354 two-way$", "0.227",
+     "revision_r3_3_error_correlation_strict_d_phi_two_way_ci_low", 3),
+    (r"95 ci 0\.262 0\.354 two-way 0\.227$", "0.387",
+     "revision_r3_3_error_correlation_strict_d_phi_two_way_ci_high", 3),
     # ---------------------------------------------------------------------------- discussion
     (r"inference cost\. within-ensemble agreement decreases from$", "0.552",
      "kappa_hom", 3),

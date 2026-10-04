@@ -78,15 +78,15 @@ decreases by $\Delta\phi = 0.393$ (95\% CI: $0.325$ to $0.459$). Although
 heterogeneity does not produce a statistically reliable improvement in average
 directional accuracy, exploratory analysis shows that homogeneous ensembles
 generate unanimous incorrect decisions at $1.84$ times the rate of fully
-heterogeneous ensembles (95\% CI: $1.51$ to $2.35$). Taken together, the results
+heterogeneous ensembles (95\% CI: $1.42$ to $2.52$). Taken together, the results
 show that heterogeneous model composition can reduce error dependence without
 guaranteeing greater predictive accuracy, while imposing a measurable inference
 cost premium.
 \end{abstract}
 
 \begin{keywords}
-Large language models, multi-agent systems, model heterogeneity, interrater
-agreement, algorithmic monoculture.
+Algorithmic monoculture, inter-rater agreement, large language models, model
+heterogeneity, multi-agent systems.
 \end{keywords}
 
 \titlepgskip=-21pt
@@ -135,8 +135,8 @@ independent agents share random seeds, sampling trajectories, cached outputs, or
 other elements of the generation context. Consequently, existing evaluations may
 conflate genuine model similarity with artifacts of the measurement procedure.
 We address these limitations by jointly estimating the magnitude of ensemble
-de-correlation, the associated inference cost, and the effect of
-independent-draw measurement controls.
+the reduction in ensemble agreement, the associated inference cost, and the
+effect of independent-draw measurement controls.
 
 This distinction is practically important because LLM ensembles are increasingly
 considered for financial analysis and other consequential decision-support
@@ -164,8 +164,8 @@ homogeneous to the fully heterogeneous configuration reduces agreement at an
 approximately $4.4\times$ increase in inference cost.
 \item \emph{A reproducible independent-draw measurement protocol.} We separate
 genuine model agreement from agreement induced by shared sampling conditions. In
-a controlled pilot, shared per-run seeding inflated the estimated de-correlation
-effect by approximately fourfold, whereas unique per-agent seeds removed the
+a controlled pilot, shared per-run seeding inflated the estimated agreement
+contrast by approximately fourfold, whereas unique per-agent seeds removed the
 artifact. To support replication, we provide a frozen, hash-verified dataset,
 fixed experimental configurations, and a deterministic seeded analysis pipeline
 that regenerates the reported figures and tables.
@@ -533,7 +533,7 @@ independent runs, and five agents per ensemble. Unless otherwise stated,
 agreement statistics are computed separately within each run and then averaged
 across runs.
 
-\subsection{Heterogeneity de-correlates ensembles (primary)}
+\subsection{Heterogeneity reduces ensemble agreement (primary)}
 \label{subsec:primary}
 Within-ensemble agreement decreases monotonically as cross-provider
 heterogeneity increases. Fleiss' $\kappa$ is 0.552 for HOM, 0.302 for HET-LITE,
@@ -552,8 +552,8 @@ to ``fair.'' Both pre-registered secondary contrasts are also positive, with
 confidence intervals excluding zero (Table~\ref{tab:endpoints}). Agreement
 therefore decreases at each observed increase in heterogeneity, from HOM to
 HET-LITE and from HET-LITE to HET. These results establish a monotonic
-relationship between provider heterogeneity and within-ensemble de-correlation
-in the evaluated task.
+relationship between provider heterogeneity and reduced within-ensemble
+agreement in the evaluated task.
 
 \begin{figure}[!t]
 \centering
@@ -655,7 +655,7 @@ provider remains bundled with other model-specific characteristics.
 
 In this study, decorrelation denotes a reduction in error correlation, measured
 by $\phi$. The agreement measure $\kappa$ captures a related but distinct change
-in categorical consensus. Accordingly, the ``price of decorrelation'' in the
+in categorical consensus. Accordingly, the ``price of de-correlation'' in the
 title refers to the additional inference cost associated with ensemble
 configurations that exhibit lower error dependence.
 
@@ -663,13 +663,14 @@ For each pair of agents within an ensemble cell, we compute $\phi$ between binar
 error indicators defined relative to the realized forward-return sign. Error
 correlation decreases from $\phi = 0.984$ for HOM to $0.742$ for HET-LITE and
 $0.530$ for HET, giving $\Delta\phi_{\mathrm{HOM-HET}} = 0.454$
-(95\% CI $[0.376,\,0.534]$).
+(95\% CI $[0.376,\,0.534]$). Under the two-way scheme that also admits date
+dependence, the interval widens to $[0.328,\,0.586]$ and still excludes zero.
 
 Because treating HOLD as an abstention changes the scoreable subset, we repeat
 the analysis with HOLD counted as an error. The corresponding values are $0.586$,
 $0.359$, and $0.277$, with $\Delta\phi_{\mathrm{HOM-HET}} = 0.309$
-(95\% CI $[0.262,\,0.354]$). The ordering is preserved under both treatments of
-HOLD.
+(95\% CI $[0.262,\,0.354]$; two-way $[0.227,\,0.387]$). The ordering is preserved
+under both treatments of HOLD, and under both resampling schemes.
 
 Mean per-agent error rates are similar across configurations, indicating that the
 decline in $\phi$ reflects lower error dependence rather than differences in
@@ -723,15 +724,16 @@ seed = f(master, run)
 for agent in 1..5:
     call(model, prompt, seed)  # identical draw
 
-# After (fix): unique per-agent seed,
-# independent draws
+# After (fix): distinct per-agent seed
 seed = SHA256(master, run, config,
               ticker, date, agent) & 0x7FFFFFFF
-call(model, prompt, seed)  # independent draw
+call(model, prompt, seed)  # distinct seed
 \end{lstlisting}
 \caption{The one-line fix. The pilot derived the seed per run, so all five
-same-model agents shared a sampling path; the study derives a distinct
-integer-safe seed per agent, restoring independent draws from the same model.}
+same-model agents shared a sampling path. The study assigns a distinct
+reproducible seed to each agent, removing the shared-seed artifact observed in
+the pilot. As Section~\ref{subsec:estimand} notes, this does not establish
+statistical independence of the responses.}
 \label{fig:seed}
 \end{figure}
 
@@ -751,7 +753,7 @@ agreement among the five agents within a run is nearly identical to agreement
 obtained from separately generated draws across runs. In the controlled pilot,
 the estimated primary contrast was 0.485 under shared per-run seeding and 0.113
 under independent per-agent seeding; shared seeding therefore overstated the
-estimated de-correlation effect by approximately fourfold
+estimated agreement contrast by approximately fourfold
 (Fig.~\ref{fig:trap}). The pilot grid comprised 8 equities $\times$ 2 analysis
 dates $\times$ 2 configurations (HOM and HET) $\times$ 3 runs $\times$ 5
 agents, i.e.\ 480 calls per seeding arm---far smaller than the confirmatory
@@ -813,7 +815,7 @@ of independence.
 
 \subsection{Provider-pair agreement}
 The pairwise directional-agreement matrix in Fig.~\ref{fig:provider} provides
-additional evidence regarding the source of ensemble de-correlation.
+additional evidence on where the reduction in ensemble agreement comes from.
 Same-provider agreement is 0.92 for Google agent pairs and 0.80 for OpenAI agent
 pairs, whereas cross-provider agreement ranges from 0.43 to 0.63. Agents
 supplied by the same provider therefore agree more frequently than agents
@@ -841,8 +843,8 @@ separate these effects further.
 \centering
 \includegraphics[width=0.85\columnwidth]{fig3_provider_heatmap.png}
 \caption{Pairwise directional-agreement matrix by provider. Diagonal
-(within-provider) agreement greatly exceeds off-diagonal (cross-provider), the
-source of ensemble de-correlation. The xAI--xAI diagonal is undefined (marked
+(within-provider) agreement greatly exceeds off-diagonal (cross-provider),
+which is where the reduction in ensemble agreement originates. The xAI--xAI diagonal is undefined (marked
 N/A, not 0): each HET cell contains a single xAI agent, so no within-xAI agent
 pair exists.}
 \label{fig:provider}
@@ -869,7 +871,7 @@ scoring only the subset of cells on which an ensemble commits to a direction.
 Crucially, the agreement estimand is well-defined independent of task
 difficulty: Fleiss' $\kappa$ and the $\Delta\kappa$ contrasts are functionals of
 the joint distribution of agent outputs, computed without reference to outcome
-labels, so the de-correlation results measure how similarly the agents behave
+labels, so the agreement results measure how similarly the agents behave
 regardless of whether the task admits exploitable predictive signal. A
 low-signal task is, if anything, a conservative setting for the primary
 question, because agents cannot inflate measured agreement merely by all being
@@ -912,7 +914,10 @@ of decisions that are unanimous, directional, and incorrect is 0.058 for HOM,
 0.030 for HET-LITE, and 0.032 for HET. The homogeneous ensemble therefore
 produces this form of collective error at approximately $1.84\times$ the rate of
 the fully heterogeneous ensemble. The equity-clustered bootstrap gives a 95\%
-confidence interval of $[1.51,\,2.35]$ for this ratio, which excludes unity.
+confidence interval of $[1.42,\,2.52]$ for this ratio, which excludes unity.
+Because this statement is inferential rather than descriptive, we also admit date
+dependence under the two-way scheme used for the primary endpoint: the interval
+widens to $[1.13,\,3.06]$ and still excludes unity.
 HET-LITE exhibits a similar reduction in unanimous directional errors at an
 approximately $2.3\times$ cost premium, compared with $4.4\times$ for HET.
 
@@ -1035,7 +1040,7 @@ $\kappa_{\mathrm{HET\text{-}SameTier}}=0.236$. The resulting contrast is
 \]
 which excludes zero. This capability-matched estimate is approximately 94\% of
 the primary HOM-to-HET contrast. The result indicates that the observed
-de-correlation is largely preserved when model tier is held approximately
+reduction in agreement is largely preserved when model tier is held approximately
 constant, indicating that capability differences alone do not account for the
 primary contrast. Provider nevertheless remains confounded with other
 model-specific characteristics and is not identified as an independent causal
@@ -1119,8 +1124,9 @@ $\kappa=0.215$ for the fully heterogeneous configuration, while inference cost
 increases by approximately $4.4\times$. The provider-pair analysis further shows
 that agents from the same provider agree more frequently than agents from
 different providers under identical prompt and information conditions. Together
-with the capability-matched control, these findings support provider identity as
-an important source of behavioral similarity within LLM ensembles.
+with the capability-matched analysis, these findings show that the
+provider-associated ordering persists across the evaluated comparisons, although
+provider remains confounded with other model-specific characteristics.
 
 Reduced agreement is a necessary but not sufficient condition for improved
 ensemble performance. Greater behavioral diversity is useful only when the
@@ -1177,7 +1183,7 @@ shows substantially higher agreement for same-provider pairs ($0.80$--$0.92$)
 than for cross-provider pairs ($0.43$--$0.63$). Second, the capability-matched
 control (Section~\ref{sec:control}) holds model tier approximately constant
 across OpenAI and Google and produces a contrast of $\Delta\kappa=0.315$,
-approximately 94\% of the primary HOM-to-HET effect. The de-correlation
+approximately 94\% of the primary HOM-to-HET effect. The reduction in agreement
 therefore remains substantial after approximate tier matching. However, the
 control covers only two providers because an equivalent efficient-tier xAI model
 was unavailable, and differences in training data, architecture, alignment
@@ -1229,16 +1235,6 @@ predictive performance. The reported hit rates should not be interpreted as
 evidence of investment alpha, trading profitability, or economically significant
 forecasting ability.
 
-\textbf{Generalization.}
-The findings are specific to five-agent ensembles, three provider mixtures, the
-selected models, and the tested heterogeneity levels. Different ensemble sizes,
-provider allocations, aggregation rules, model tiers, prompts, or cost
-structures may produce different agreement--cost frontiers. In addition, lower
-agreement is not inherently beneficial; its value depends on whether
-disagreement improves a relevant downstream outcome. Generalization therefore
-requires replication across alternative ensemble compositions and decision
-tasks.
-
 \section{Conclusion}
 This study presents a pre-registered empirical evaluation of how cross-provider
 heterogeneity affects agreement and inference cost in LLM ensembles. Across a
@@ -1254,7 +1250,7 @@ model-specific characteristics and is not identified as an independent causal
 factor. We
 also introduce an independent-draw measurement protocol that controls dependence
 caused by shared sampling seeds. In a controlled pilot, shared per-run seeding
-inflated the estimated de-correlation effect by approximately fourfold,
+inflated the estimated agreement contrast by approximately fourfold,
 demonstrating the importance of verifying sampling independence in
 ensemble-agreement studies.
 

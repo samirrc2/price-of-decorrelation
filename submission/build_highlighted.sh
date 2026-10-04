@@ -38,7 +38,12 @@ cp paper/main.tex "$WORK/new.tex"
 # \DIFaddend rather than \DIFadd{...} around the changed words -- and since only \DIFadd is
 # mapped to \texthl, the new date rendered plain. A reviewer comparing the two PDFs saw the
 # date change with no mark on it.
+# VERBATIMENV=lstlisting: without it latexdiff diffs INSIDE the code listing and emits its
+# "%DIF <" / "%DIF >" markers as literal verbatim lines, so the highlighted PDF carried text the
+# manuscript does not have and stopped rebuilding from the markup. With it, the old listing
+# becomes real LaTeX comments and the new listing is typeset exactly as in main.tex.
 latexdiff --type=CFONT --math-markup=0 --append-textcmd="tfootnote" \
+          --config="VERBATIMENV=lstlisting" \
           "$WORK/old.tex" "$WORK/new.tex" > "$WORK/diff.tex" 2>/dev/null || true
 python3 submission/highlight_markup.py "$WORK/diff.tex"
 

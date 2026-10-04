@@ -383,6 +383,11 @@ _run_gates() {
   # A figure is a reported result, and no text gate can see it. build_submission.sh compiles
   # paper/ directly without syncing, so a stale PNG there ships in every deliverable -- which it
   # did, for two months, with a superseded Fig. 2.
+  # Two IEEE ordering requirements no other gate can see: Index Terms must be alphabetical,
+  # and references must be numbered by order of first mention. The manuscript was SUBMITTED
+  # with unordered Index Terms, which nothing noticed.
+  echo "[gate] IEEE ordering rules (Index Terms, reference numbering)"
+  _gate ieee-style "$PY" "$CODE_ROOT/src/check_ieee_style.py" || return 1
   echo "[gate] manuscript figures vs the analysis output"
   _gate figures "$PY" "$CODE_ROOT/src/check_figures.py" || return 1
   echo "[gate] claim values vs the reviewed lock"

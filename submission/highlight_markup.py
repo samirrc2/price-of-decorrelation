@@ -94,6 +94,7 @@ def main():
     # as "Table " with the number missing, and the PDF text-parity check caught it as a
     # one-character difference against the manuscript. Counting a run is not the same as
     # processing it.
+    s, n_listing = mark_changed_listings(s)
     n_float = s.count("\\DIFaddFL{")
     hl, plain = 0, 0
     for macro in (r"\DIFadd{", r"\DIFaddFL{"):
@@ -104,7 +105,36 @@ def main():
     assert r"\sethlcolor{HLyellow}" in result, "colour setup missing"
     open(p, "w", encoding="utf-8").write(result)
     print(f"   {hl} runs highlighted inline, {plain} left plain (display math or long runs), "
-          f"{n_float} inside floats (tables and captions)")
+          f"{n_float} inside floats (tables and captions), "
+          f"{n_listing} changed code listing(s) given a highlighted background")
+
+
+def mark_changed_listings(s):
+    """Give a listing that latexdiff replaced a highlighted background.
+
+    soul cannot highlight verbatim, so a changed code listing would otherwise render in plain
+    black while every word around it is marked -- the reader sees an unmarked block and assumes
+    it did not change. latexdiff wraps a replaced listing in \\DIFaddbeginFL ... \\DIFaddendFL,
+    which is the signal used here. Listings it did not touch, such as the unchanged JSON schema,
+    keep their default background.
+    """
+    out, n = [], 0
+    i = 0
+    while True:
+        j = s.find("\\DIFaddbeginFL", i)
+        if j < 0:
+            out.append(s[i:]); break
+        k = s.find("\\DIFaddendFL", j)
+        if k < 0:
+            out.append(s[i:]); break
+        block = s[j:k]
+        if "\\begin{lstlisting}" in block:
+            block = block.replace("\\begin{lstlisting}",
+                                  "\\begin{lstlisting}[backgroundcolor=\\color{HLyellow}]", 1)
+            n += 1
+        out.append(s[i:j]); out.append(block)
+        i = k
+    return "".join(out), n
 
 
 def _rewrite_runs(s, macro):

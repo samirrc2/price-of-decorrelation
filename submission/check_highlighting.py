@@ -86,6 +86,18 @@ def words(tex: str) -> list[str]:
     return [w for w in re.split(r"\s+", t) if w]
 
 
+def latexdiff_flags() -> list[str]:
+    """The flags build_highlighted.sh passes to latexdiff, parsed from the script itself."""
+    sh = (ROOT / "submission" / "build_highlighted.sh").read_text()
+    m = re.search(r"^latexdiff((?:[^\n]*\\\n)*[^\n]*)$", sh, re.M)
+    if not m:
+        raise SystemExit("could not find the latexdiff invocation in build_highlighted.sh; "
+                         "this audit must use the build's own flags, not a copy")
+    import shlex
+    line = m.group(1).replace("\\\n", " ")
+    return [tok for tok in shlex.split(line) if tok.startswith("--")]
+
+
 def rebuild(diff: str, keep: str) -> str:
     """Collapse the markup one way or the other: keep='add' gives the revision, 'del' the original."""
     out, i, n = [], 0, len(diff)
@@ -265,9 +277,13 @@ def main():
         op, np_ = Path(d) / "o.tex", Path(d) / "n.tex"
         op.write_text(old, encoding="utf-8")
         np_.write_text(new, encoding="utf-8")
-        # the same invocation the build uses; a different one audits a different document
+        # The same invocation the build uses -- READ FROM the build script rather than copied,
+        # because a copy drifts. It had: the build gained --append-textcmd=tfootnote and then
+        # --config VERBATIMENV=lstlisting while this call kept neither, so the audit was run
+        # against a document the build does not produce, and reported a round-trip failure for
+        # a change the real build handles correctly.
         diff = subprocess.run(
-            ["latexdiff", "--type=CFONT", "--math-markup=0", str(op), str(np_)],
+            ["latexdiff"] + latexdiff_flags() + [str(op), str(np_)],
             capture_output=True, text=True,
             env={"PATH": f"{Path.home()}/Library/TinyTeX/bin/universal-darwin:/usr/bin:/bin"}).stdout
     if not diff:
