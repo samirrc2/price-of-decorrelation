@@ -79,11 +79,30 @@ def _check_asserting_doc(path: Path, label: str) -> list[str]:
     """Paths named in a document must exist; decimals it asserts must be claims."""
     bad = []
     t = path.read_text()
+    # A path may be legitimately absent from a fresh clone -- but only if the sentence naming
+    # it says so. This gate used to demand that every quoted path exist, which passed in the
+    # source working tree (where ignored files are lying around) and failed in a clone on
+    # three paths the README already describes correctly: "avoid cloning ignored cache/ /
+    # data/raw/", "cleanup ... removes data/raw/ and cache/", and "build_paper.sh builds
+    # paper/main.pdf". Requiring the prose to mark them keeps the check non-vacuous: if the
+    # README ever claims one of them SHIPS, the sentence loses the marker and the gate fires.
+    OPTIONAL = re.compile(r"\bignored?\b|\bremoves?\b|\bbuilds?\b|\bgenerate[sd]?\b"
+                          r"|\boptional\b|\bnot distributed\b|\bseparately\b", re.I)
+    excused = []
     for m in re.finditer(r"`((?:code|data|results|docs|paper|environment|metadata|archive)"
                          r"/[A-Za-z0-9_./-]+)`", t):
         rel = m.group(1)
-        if not (ROOT / rel).exists():
-            bad.append(f"{label} names a path that does not exist: {rel}")
+        if (ROOT / rel).exists():
+            continue
+        line = t[t.rfind("\n", 0, m.start()) + 1:t.find("\n", m.end())]
+        if OPTIONAL.search(line):
+            excused.append(rel)
+            continue
+        bad.append(f"{label} names a path that does not exist and is not described as "
+                   f"ignored, generated or distributed separately: {rel}")
+    if excused:
+        print(f"     [{label}] absent by design, and the text says so: "
+              f"{', '.join(sorted(set(excused)))}")
     claims = json.loads(CLAIMS.read_text())
     forms = set()
     for v in claims.values():
@@ -99,14 +118,9 @@ def _check_asserting_doc(path: Path, label: str) -> list[str]:
                                                         rounding=ROUND_HALF_UP)))
                 for mult in (1e3, 1e4, 100.0):
                     forms.add(f"{av*mult:.{nd}f}")
-    # derived ratios the README quotes (the cost premium)
-    costs = [v for k, v in claims.items() if k.endswith("_cost")
-             and isinstance(v, (int, float))]
-    for a in costs:
-        for b in costs:
-            if b:
-                for nd in (1, 2, 3):
-                    forms.add(f"{a/b:.{nd}f}")
+    # The cost premium the README quotes is cost_ratio_het_over_hom, a claim. Generating
+    # every pairwise quotient of every cost here explained almost any number, as it did in
+    # check_coverage.py, so it is gone.
     body = re.sub(r"```.*?```", "", t, flags=re.S)   # code blocks are commands, not claims
     allow = {"0.24433", "10.24433"}                  # DOI fragments
     for m in re.finditer(r"(?<![\w.])(\d+\.\d+)(?![\w])", body):
