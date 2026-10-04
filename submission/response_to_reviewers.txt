@@ -55,7 +55,7 @@ Author response:
 
 Author action:
 
-  - Section V-I, "Cross-Domain Replication: Clinical Knowledge," subsection "Selective
+  - Section V-J, "Cross-Domain Replication: Clinical Knowledge," subsection "Selective
     Prediction," was added to report the risk-coverage analysis and uncertainty for the HOM-HET
     AURC contrast.
   - Section V-H, "Exploratory Analysis of Consensus Errors," was revised to report the
@@ -87,9 +87,9 @@ Author response:
 
 Author action:
 
-  - Section V-I, "Cross-Domain Replication: Clinical Knowledge," was revised to add the
+  - Section V-J, "Cross-Domain Replication: Clinical Knowledge," was revised to add the
     approximate capability-matched same-provider versus cross-provider comparison.
-  - Section V-J, "Robustness: Capability-Matched Control," retains the pre-registered financial
+  - Section V-K, "Robustness: Capability-Matched Control," retains the pre-registered financial
     capability control, which preserves approximately 94% of the primary agreement contrast
     while holding model tier approximately constant.
   - Section VII, "Threats to Validity," subsection "Heterogeneity vs. capability confound," was
@@ -120,7 +120,7 @@ Author response:
 
 Author action:
 
-  - Section V-I, "Cross-Domain Replication: Clinical Knowledge," was added to report the
+  - Section V-J, "Cross-Domain Replication: Clinical Knowledge," was added to report the
     pre-registered 537-item clinical replication.
   - Section VII, "Threats to Validity," subsection "Scope and generalizability," was revised to
     distinguish the dimensions tested across domains from those that remain fixed.
@@ -248,7 +248,7 @@ Author response:
 
 Author action:
 
-  - Section V-L, "Relation to Existing Ensemble Methods," was added to explain the basis of
+  - Section V-M, "Relation to Existing Ensemble Methods," was added to explain the basis of
     comparison with existing ensemble approaches.
   - Section II-A, "LLM Ensembles and Mixture-of-Agents," provides the corresponding literature
     context for mixture-of-agents, diversity-based selection, and heterogeneous ensemble
@@ -283,9 +283,9 @@ Author action:
   - Section V-F, "Provider-Pair Agreement," was rewritten as a configuration-specific
     observational analysis and now states explicitly that provider is bundled with other model
     characteristics.
-  - Section V-I, "Cross-Domain Replication: Clinical Knowledge," was revised to include the
+  - Section V-J, "Cross-Domain Replication: Clinical Knowledge," was revised to include the
     approximate capability-matched same-provider versus cross-provider comparison.
-  - Section V-J, "Robustness: Capability-Matched Control," retains the pre-registered financial
+  - Section V-K, "Robustness: Capability-Matched Control," retains the pre-registered financial
     capability control.
   - Section VII, "Threats to Validity," subsection "Heterogeneity vs. capability confound," was
     revised to state explicitly that provider cannot be isolated causally in the present design.
@@ -358,14 +358,14 @@ Author action:
   - Table 5 reports the primary contrast under equity, date, and two-way resampling.
   - Section V-A, "Heterogeneity Reduces Ensemble Agreement (Primary)," now reports the two-way
     intervals for both pre-registered secondary contrasts alongside Table 2.
-  - Section V-J, "Robustness: Capability-Matched Control," now reports the two-way interval for
+  - Section V-K, "Robustness: Capability-Matched Control," now reports the two-way interval for
     the capability-matched contrast.
   - Section V-C, "Agreement, Error Correlation, and Decorrelation," reports two-way intervals
     for both error-correlation specifications.
   - Section V-H, "Exploratory Analysis of Consensus Errors," reports two-way intervals for the
     unanimous-incorrect ratio and the pile-on contrast.
-  - Section V-I, subsection "Selective Prediction," reports the two-way AURC interval.
-  - Section V-K, "Robustness: Temperature Sensitivity," states that the subgrid spans two
+  - Section V-I, "Selective Prediction," reports the two-way AURC interval.
+  - Section V-L, "Robustness: Temperature Sensitivity," states that the subgrid spans two
     analysis dates, which is too few clusters for date-clustered or two-way inference, and that
     the analysis therefore contributes no independent multiway evidence.
 
@@ -432,7 +432,7 @@ Author response:
 
 Author action:
 
-  - Section V-I, subsection "Selective Prediction," was added to report risk-coverage analysis
+  - Section V-I, "Selective Prediction," was added to report risk-coverage analysis
     and paired clustered AURC inference.
   - Section V-H, "Exploratory Analysis of Consensus Errors," was revised to report
     equity-clustered and two-way uncertainty for unanimous incorrect decisions and pile-on.
@@ -516,7 +516,7 @@ Author response:
 
 Author action:
 
-  - Section V-I, "Cross-Domain Replication: Clinical Knowledge," was added to report the
+  - Section V-J, "Cross-Domain Replication: Clinical Knowledge," was added to report the
     pre-registered 537-item clinical replication.
   - Section VII, "Threats to Validity," subsection "Scope and generalizability," was revised to
     state that the ordering has been evaluated across two substantially different tasks while

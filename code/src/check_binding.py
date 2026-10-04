@@ -209,7 +209,7 @@ R = [
     (r"0\.2989 0\.3656 two-way 1200 0\.3363 0\.2786$", "0.3877",
      "revision_r3_2_clustering_two_way_ci_high", 4),
     # ---------------------------------------------------------------------- error correlation
-    (r"forward-return sign\. error correlation decreases from$", "0.984",
+    (r"agent pair\. error correlation decreases from$", "0.984",
      "revision_r3_3_error_correlation_scored_phi_hom", 3),
     (r"decreases from 0\.984 for hom to$", "0.742",
      "revision_r3_3_error_correlation_scored_phi_het_lite", 3),
@@ -402,7 +402,6 @@ R = [
     (r"the resulting contrast is hom-sametier$", "0.315", "control_delta_kappa", 3),
     (r"contrast is hom-sametier 0\.315 95 ci$", "0.288", "control_ci_low", 3),
     (r"is hom-sametier 0\.315 95 ci 0\.288$", "0.341", "control_ci_high", 3),
-    (r"two providers\. the reproduction of hom$", "0.552", "control_kappa_hom", 3),
     # ------------------------------------------------------------------ temperature sensitivity
     (r"the main operating point of t$", "0.7", "!temperature setting", 1),
     (r"and three independent runs at t$", "0.0", "!temperature setting", 1),
@@ -517,7 +516,7 @@ R = [
      "ms_provider_pair_direction_agreement_descriptiv_openai_xai", 2),
     (r"google and produces a contrast of$", "0.315", "control_delta_kappa", 3),
     # ---------------------------------------------------------------------------- conclusion
-    (r"cost in llm ensembles\. across a$", "54000", "calls_usable", 0),
+    (r"of increasing cross-provider heterogeneity\. across a$", "54000", "calls_usable", 0),
     (r"with a primary hom-to-het contrast of$", "0.336", "primary_delta_kappa", 3),
     (r"hom-to-het contrast of 0\.336 95 ci$", "0.304", "primary_ci_low", 3),
     (r"contrast of 0\.336 95 ci 0\.304$", "0.369", "primary_ci_high", 3),

@@ -57,9 +57,9 @@ genuine independence. This study quantifies the relationship between
 cross-provider model heterogeneity, ensemble agreement, and inference cost. In a
 54{,}000-call primary experiment, we evaluate three five-agent ensemble
 configurations with increasing provider diversity on a directional
-financial-analysis task covering 100 equities across 12 dates. Cross-provider
-heterogeneity significantly reduces within-ensemble agreement, with a primary
-reduction of $\Delta\kappa=0.336$ (95\% CI: $0.304$--$0.369$), but increases
+financial-analysis task covering 100 equities across 12 dates. Within the evaluated configurations, greater cross-provider
+heterogeneity is associated with significantly lower within-ensemble agreement,
+with a primary reduction of $\Delta\kappa=0.336$ (95\% CI: $0.304$--$0.369$), but increases
 inference cost by approximately $4.4\times$. Because agreement does not by itself
 measure dependence between errors, we additionally estimate the correlation
 between agents' binary error indicators. Error correlation decreases by
@@ -128,7 +128,8 @@ empirically.
 
 Despite the growing use of heterogeneous LLM ensembles, three related issues
 remain insufficiently examined. First, few studies directly quantify the extent
-to which cross-provider heterogeneity reduces within-ensemble agreement. Second,
+to which cross-provider heterogeneity is associated with lower within-ensemble
+agreement. Second,
 the corresponding inference-cost premium is rarely incorporated into evaluations
 of ensemble design. Third, agreement estimates may be distorted when supposedly
 independent agents share random seeds, sampling trajectories, cached outputs, or
@@ -307,8 +308,8 @@ The pre-registered secondary contrasts are
 $\Delta\kappa_{\mathrm{HOM-HET\text{-}LITE}}=\kappa_{\mathrm{HOM}}-\kappa_{\mathrm{HET\text{-}LITE}}$
 and
 $\Delta\kappa_{\mathrm{HET\text{-}LITE-HET}}=\kappa_{\mathrm{HET\text{-}LITE}}-\kappa_{\mathrm{HET}}$.
-Positive values indicate that increasing cross-provider heterogeneity reduces
-within-ensemble agreement.
+Positive values indicate that configurations with greater cross-provider
+heterogeneity show lower within-ensemble agreement.
 
 \subsection{Independent-draw estimand}
 \label{subsec:estimand}
@@ -546,17 +547,17 @@ pre-registered primary contrast is
 \]
 with a 95\% cluster-bootstrap confidence interval of $[0.304, 0.369]$. Because
 the confidence interval excludes zero, the pre-registered primary hypothesis
-that cross-provider heterogeneity reduces within-ensemble agreement is
-supported. In Landis--Koch~\cite{landis1977} terms, homogeneous ensembles reach
+that greater cross-provider heterogeneity is associated with lower
+within-ensemble agreement is supported. In Landis--Koch~\cite{landis1977} terms, homogeneous ensembles reach
 ``moderate--substantial'' internal agreement while fully heterogeneous ones fall
 to ``fair.'' Both pre-registered secondary contrasts are also positive, with
 confidence intervals excluding zero (Table~\ref{tab:endpoints}); under the
 two-way scheme of Section~\ref{subsec:uncertainty} they remain so, at
 $[0.208,\,0.290]$ and $[0.045,\,0.123]$ respectively. Agreement
 therefore decreases at each observed increase in heterogeneity, from HOM to
-HET-LITE and from HET-LITE to HET. These results establish a monotonic
-relationship between provider heterogeneity and reduced within-ensemble
-agreement in the evaluated task.
+HET-LITE and from HET-LITE to HET. Across the evaluated
+configurations the ordering is monotonic: agreement is lower at each higher level
+of cross-provider heterogeneity in this task.
 
 \begin{figure}[!t]
 \centering
@@ -662,8 +663,12 @@ in categorical consensus. Accordingly, the ``price of de-correlation'' in the
 title refers to the additional inference cost associated with ensemble
 configurations that exhibit lower error dependence.
 
-For each pair of agents within an ensemble cell, we compute $\phi$ between binary
-error indicators defined relative to the realized forward-return sign. Error
+Within each evaluation cell, that is each (configuration, equity, date, run)
+combination, we form for every unordered pair of agent positions the pair of
+binary error indicators defined against the realized forward-return sign. These
+paired indicators are pooled over all cells and all agent-position pairs within a
+configuration, and $\phi$ is the Pearson correlation of that pooled set, so one
+$\phi$ is reported per configuration rather than one per agent pair. Error
 correlation decreases from $\phi = 0.984$ for HOM to $0.742$ for HET-LITE and
 $0.530$ for HET, giving $\Delta\phi_{\mathrm{HOM-HET}} = 0.454$
 (95\% CI $[0.376,\,0.534]$). Under the two-way scheme that also admits date
@@ -982,6 +987,38 @@ secondary directional-accuracy analysis.}
 \label{fig:cal}
 \end{figure}
 
+\subsection{Selective prediction}
+\label{subsec:selective}
+Reduced agreement is only useful if it buys something downstream, so we ask
+whether the configurations differ in their ability to rank their own errors. A
+decision is the majority vote of the five agents in an (equity, date) cell on the
+financial grid. Decisions whose majority is HOLD are excluded, as are cells whose
+forward-return sign is undefined or zero, which leaves the directional decisions
+that can be scored; the denominator for coverage is that retained set, not the
+full grid. Each decision is scored as erroneous when its direction disagrees with
+the realized forward-return sign, and is assigned the mean conviction its five
+agents reported. Decisions are ranked by that mean conviction in descending
+order, coverage is swept from the single most confident decision to the full set,
+and selective risk at a coverage level is the error rate among the decisions
+retained at that level. AURC is the trapezoidal area under the resulting
+risk--coverage curve, so lower is better. The HOM$-$HET contrast is formed within
+each bootstrap draw rather than between arms, since both configurations are
+measured on the same equities, and its interval is the equity-clustered bootstrap
+used for the primary endpoint, with the two-way scheme reported alongside it.
+
+We evaluate whether reduced agreement improves selective prediction by ranking
+ensemble decisions according to mean agent conviction. AURC is $0.553$ for HOM,
+$0.568$ for HET-LITE, and $0.554$ for HET. The HOM$-$HET difference is $-0.001$
+(95\% CI $[-0.059,\,0.060]$). The corresponding two-way interval is
+$[-0.113,\,0.115]$. Both intervals contain zero.
+
+Restricting evaluation to the most confident half of decisions does not
+materially reduce selective risk in any configuration. These results therefore do
+not establish an improvement in calibration or abstention quality. The agreement
+and cost frontier of Section~\ref{subsec:frontier} describes the cost associated
+with greater behavioral diversity, not a demonstrated improvement in decision
+quality.
+
 \subsection{Cross-domain replication: clinical knowledge}
 \label{subsec:crossdomain}
 To test whether the observed ordering is specific to the financial task, we
@@ -1015,20 +1052,6 @@ This replication supports the observed ordering across two substantially
 different domains. It does not establish that heterogeneity improves predictive
 accuracy.
 
-\paragraph{Selective prediction}
-We evaluate whether reduced agreement improves selective prediction by ranking
-ensemble decisions according to mean agent conviction. AURC is $0.553$ for HOM,
-$0.568$ for HET-LITE, and $0.554$ for HET. The HOM$-$HET difference is $-0.001$
-(95\% CI $[-0.059,\,0.060]$). The corresponding two-way interval is
-$[-0.113,\,0.115]$. Both intervals contain zero.
-
-Restricting evaluation to the most confident half of decisions does not
-materially reduce selective risk in any configuration. These results therefore do
-not establish an improvement in calibration or abstention quality. The agreement
-and cost frontier of Section~\ref{subsec:frontier} describes the cost associated
-with greater behavioral diversity, not a demonstrated improvement in decision
-quality.
-
 \subsection{Robustness: capability-matched control}
 \label{sec:control}
 The primary ensemble configurations vary both provider identity and model
@@ -1052,9 +1075,7 @@ primary contrast. Provider nevertheless remains confounded with other
 model-specific characteristics and is not identified as an independent causal
 factor. The capability-matched control therefore reduces, but does not eliminate,
 the capability-tier confound, because matching is approximate and covers only two
-providers. (The reproduction of $\kappa_{\mathrm{HOM}}=0.552$ to four decimals
-across two independently collected datasets also re-confirms determinism of the
-homogeneous baseline.)
+providers.
 
 \subsection{Robustness: temperature sensitivity}
 Agreement can vary with sampling temperature, raising the possibility that the
@@ -1141,9 +1162,9 @@ provider remains confounded with other model-specific characteristics.
 Reduced agreement is a necessary but not sufficient condition for improved
 ensemble performance. Greater behavioral diversity is useful only when the
 additional judgments provide relevant information or enable more reliable
-downstream decisions. In the present study, cross-provider heterogeneity
-substantially reduces within-ensemble agreement but does not produce a
-statistically reliable improvement in average directional accuracy. This result
+downstream decisions. In the present study, configurations with greater
+cross-provider heterogeneity show substantially lower within-ensemble agreement
+but no statistically reliable improvement in average directional accuracy. This result
 is consistent with the algorithmic-monoculture
 literature~\cite{kim2025correlated} in showing that greater behavioral diversity
 does not automatically translate into greater correctness. The exploratory
@@ -1246,8 +1267,9 @@ evidence of investment alpha, trading profitability, or economically significant
 forecasting ability.
 
 \section{Conclusion}
-This study presents a pre-registered empirical evaluation of how cross-provider
-heterogeneity affects agreement and inference cost in LLM ensembles. Across a
+This study presents a pre-registered empirical evaluation of how agreement and
+inference cost differ across LLM ensemble configurations of increasing
+cross-provider heterogeneity. Across a
 54{,}000-call primary experiment, within-ensemble agreement decreases
 monotonically as provider diversity increases, with a primary HOM-to-HET
 contrast of $\Delta\kappa=0.336$ (95\% CI: $[0.304, 0.369]$). This reduction is
@@ -1261,7 +1283,8 @@ factor. We
 also introduce an independent-draw measurement protocol that controls dependence
 caused by shared sampling seeds. In a controlled pilot, shared per-run seeding
 inflated the estimated agreement contrast by approximately fourfold,
-demonstrating the importance of verifying sampling independence in
+demonstrating the importance of checking for residual within-run dependence and
+avoiding shared-seed artifacts in
 ensemble-agreement studies.
 
 Cross-provider heterogeneity does not produce a statistically reliable
