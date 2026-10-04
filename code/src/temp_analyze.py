@@ -7,12 +7,12 @@ Delta-kappa(HOM-HET) with a cluster-bootstrap 95% CI over tickers. Shows the
 ordering is stable in direction across T (qualitative robustness; not a full
 temperature study).
 
-Writes temp_sweep_result.md and temp_sweep_table.tex. Touches nothing in the frozen
-study. Usage: python temp_analyze.py
+Writes temp_sweep_result.md and temp_sweep_table.tex under results/latest
+(or POD_OUT_DIR). Touches nothing in the frozen study.
+Usage: python temp_analyze.py
 """
 from __future__ import annotations
 import csv
-from pathlib import Path
 
 import io_paths
 
@@ -20,7 +20,6 @@ import yaml
 import metrics as M
 import stats as S
 
-HERE = io_paths.repo_root()
 TEMPS = [("0.0", "data/temperature_robustness_small/latest/runs_T00.csv"),
          ("0.7", "data/temperature_robustness_small/latest/runs_T07.csv"),
          ("1.0", "data/temperature_robustness_small/latest/runs_T10.csv")]
@@ -32,6 +31,7 @@ def fmt(x, n=3):
 
 
 def main():
+    out = io_paths.resolve_out_dir(create=True)
     cfg = yaml.safe_load(io_paths.resolve_config_path("configs/config_temp.yaml").read_text())
     tickers = cfg["tickers"]
     draws = int(cfg["bootstrap_draws"])
@@ -39,7 +39,8 @@ def main():
 
     rows_by_T, present = {}, []
     for T, rel in TEMPS:
-        p = io_paths.resolve_data_path(rel) if rel.startswith("data/") else (HERE / rel)
+        p = io_paths.resolve_data_path(rel) if rel.startswith("data/") else (
+            io_paths.repo_root() / rel)
         if p.exists():
             rows_by_T[T] = list(csv.DictReader(p.open()))
             present.append(T)
@@ -99,7 +100,7 @@ def main():
                   f"de-correlation CONTRAST, not the absolute agreement, that is "
                   f"temperature-stable._")
 
-    (HERE / "temp_sweep_result.md").write_text("\n".join(md) + "\n")
+    (out / "temp_sweep_result.md").write_text("\n".join(md) + "\n")
 
     tex = [r"\begin{table}[t]", r"\centering",
            r"\caption{Temperature-sensitivity robustness (8$\times$2 subgrid, 3 runs "
@@ -113,10 +114,10 @@ def main():
            r"$T$ & $\kappa_{\mathrm{HOM}}$ & $\kappa_{\text{HET-LITE}}$ & "
            r"$\kappa_{\mathrm{HET}}$ & $\Delta\kappa_{\mathrm{HOM-HET}}$ & $95\%$ CI \\",
            r"\midrule", *tex_rows, r"\bottomrule", r"\end{tabular}", r"\end{table}"]
-    (HERE / "temp_sweep_table.tex").write_text("\n".join(tex) + "\n")
+    (out / "temp_sweep_table.tex").write_text("\n".join(tex) + "\n")
 
     print("\n".join(md))
-    print("\nWrote temp_sweep_result.md and temp_sweep_table.tex")
+    print(f"\nWrote {out / 'temp_sweep_result.md'} and {out / 'temp_sweep_table.tex'}")
     if len(present) < 3:
         print(f"NOTE: only temperatures {present} present; re-run for the rest.")
     return 0

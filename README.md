@@ -198,9 +198,9 @@ bash reproduce.sh --analyze-only
 Additional offline analyses on frozen data:
 
 ```bash
-python code/src/reviewer_analysis.py    # Article Fig. 5; exploratory consensus metrics
-python code/src/control_kappa.py        # Section 5.8 (reads data/control/runs.csv)
-python code/src/temp_analyze.py         # Section 5.9 (reads data/temperature_robustness_small/latest/runs_T*.csv)
+python code/src/reviewer_analysis.py    # Fig. 5 + reviewer_metrics.md → results/latest/
+python code/src/control_kappa.py        # Section 5.8 → results/latest/control_result.md
+python code/src/temp_analyze.py         # Section 5.9 → results/latest/temp_sweep_*.{md,tex}
 ```
 
 ### Execution time

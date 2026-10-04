@@ -24,4 +24,4 @@ done
 
 echo "=== Analyzing ==="
 python "$CODE_ROOT/src/temp_analyze.py"
-echo "Done. See temp_sweep_result.md and temp_sweep_table.tex"
+echo "Done. See results/latest/temp_sweep_result.md and temp_sweep_table.tex"

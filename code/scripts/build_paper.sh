@@ -107,13 +107,10 @@ sync_figures() {
     echo "  synced $f  ←  $src/$f"
   done
 
-  # fig5: analysis may put it under results, else repo root figures/, else keep existing
+  # fig5: from results/latest/figures (reviewer_analysis), else keep paper copy
   if [[ -f "$src/fig5_calibration.png" ]]; then
     cp -f "$src/fig5_calibration.png" "$FIG_DST/fig5_calibration.png"
     echo "  synced fig5_calibration.png  ←  $src/fig5_calibration.png"
-  elif [[ -f "$REPO_ROOT/figures/fig5_calibration.png" ]]; then
-    cp -f "$REPO_ROOT/figures/fig5_calibration.png" "$FIG_DST/fig5_calibration.png"
-    echo "  synced fig5_calibration.png  ←  $REPO_ROOT/figures/fig5_calibration.png"
   elif [[ -f "$FIG_DST/fig5_calibration.png" ]]; then
     echo "  keeping existing paper/figures/fig5_calibration.png"
   else

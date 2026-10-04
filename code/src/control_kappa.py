@@ -4,25 +4,23 @@ Computes kappa for HOM and HET-SAMETIER (efficient-tier, cross-provider), the
 Delta-kappa contrast, and its cluster-bootstrap 95% CI (equities, seed 42) using the
 SAME method as the main study. If HOM->HET-SAMETIER still shows a substantial,
 significant kappa drop, the primary de-correlation is provider-driven, not a
-capability-tier artifact.  Usage: python control_kappa.py
+capability-tier artifact.  Writes results/latest/control_result.md (or POD_OUT_DIR).
+Usage: python control_kappa.py
 """
 from __future__ import annotations
 import csv
-from pathlib import Path
 
 import io_paths
 import yaml
 import metrics as M
 import stats as S
 
-_HERE = io_paths.repo_root()
-
-
 def fmt(x, n=4):
     return "n/a" if x is None else f"{x:.{n}f}"
 
 
 def main():
+    out = io_paths.resolve_out_dir(create=True)
     cfg = yaml.safe_load(io_paths.resolve_config_path("configs/config_control.yaml").read_text())
     runs_csv = io_paths.resolve_data_path(cfg["paths"]["runs_csv"])
     if not runs_csv.exists():
@@ -50,12 +48,13 @@ def main():
         else:
             print("  => No drop at matched capability: original effect may be capability-driven.")
     # write a one-paragraph result for the paper
-    (_HERE / "control_result.md").write_text(
+    dest = out / "control_result.md"
+    dest.write_text(
         f"# HET-SameTier control result\n\n"
         f"kappa_HOM = {fmt(k_hom)}; kappa_HET-SAMETIER = {fmt(k_st)}; "
         f"Delta-kappa = {fmt(dk)} (95% CI [{fmt(lo)}, {fmt(hi)}]), "
         f"cluster bootstrap over equities, seed 42, {usable} usable rows.\n")
-    print("Wrote control_result.md")
+    print(f"Wrote {dest}")
     return 0
 
 

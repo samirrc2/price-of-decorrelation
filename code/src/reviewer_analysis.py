@@ -12,21 +12,19 @@ no new data). Produces, per config:
      - Krippendorff's alpha (nominal) and Gwet's AC1, per-run-averaged like kappa
      - BUY/HOLD/SELL marginals per config
 
-Writes reviewer_metrics.md and figures/fig5_calibration.png. All numbers are
-deterministic functions of the frozen inputs.
+Writes reviewer_metrics.md and figures/fig5_calibration.png under results/latest
+(or POD_OUT_DIR). All numbers are deterministic functions of the frozen inputs.
 """
 from __future__ import annotations
 import csv
 import json
 from collections import Counter, defaultdict
-from pathlib import Path
 
 import io_paths
 
 import yaml
 import metrics as M
 
-HERE = io_paths.repo_root()
 DIRS = ["BUY", "HOLD", "SELL"]
 CONFIGS = ["HOM", "HET-LITE", "HET"]
 
@@ -201,6 +199,7 @@ def fmt(x, n=4):
 
 
 def main():
+    out = io_paths.resolve_out_dir(create=True)
     rows, cfg, signs = load()
     lines = ["# Reviewer-hardening re-analysis (frozen data; post-hoc, exploratory)\n"]
 
@@ -249,7 +248,7 @@ def main():
             cells.append(f"{fmt(hr,3)} (n={n})")
         lines.append(f"| {cf} | " + " | ".join(cells) + " |")
 
-    (HERE / "reviewer_metrics.md").write_text("\n".join(lines) + "\n")
+    (out / "reviewer_metrics.md").write_text("\n".join(lines) + "\n")
     print("\n".join(lines))
 
     # ---- calibration figure ----
@@ -265,12 +264,14 @@ def main():
         plt.ylabel("directional hit-rate"); plt.xlabel("agent conviction bucket")
         plt.ylim(0.3, 0.7); plt.axhline(0.5, ls="--", c="grey", lw=0.8)
         plt.legend(); plt.tight_layout()
-        (HERE / "figures").mkdir(exist_ok=True)
-        plt.savefig(HERE / "figures" / "fig5_calibration.png", dpi=150)
-        print("\nWrote figures/fig5_calibration.png")
+        fig_dir = out / "figures"
+        fig_dir.mkdir(exist_ok=True)
+        fig_path = fig_dir / "fig5_calibration.png"
+        plt.savefig(fig_path, dpi=150)
+        print(f"\nWrote {fig_path}")
     except Exception as e:
         print(f"\n(figure skipped: {e})")
-    print("\nWrote reviewer_metrics.md")
+    print(f"\nWrote {out / 'reviewer_metrics.md'}")
     return 0
 
 
