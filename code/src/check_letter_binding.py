@@ -69,7 +69,6 @@ LETTER = ROOT / "submission" / "response_to_reviewers.txt"
 L = [
     (r"original\ manuscript\ id\ access\-$", "2026", "!IEEE manuscript ID Access-2026-38801", 0),
     (r"original\ manuscript\ id\ access\-2026\-$", "38801", "!IEEE manuscript ID Access-2026-38801", 0),
-    (r"protocol\ on\ a\ substantially\ different\ domain$", "537", "mmlu_overall_n_items", 0),
     (r"using\ mean\ agent\ conviction\.\ aurc\ is$", "0.553", "revision_r1_1_r3_4_selective_prediction_hom_aurc", 3),
     (r"conviction\.\ aurc\ is\ 0\.553\ for\ hom$", "0.568", "revision_r1_1_r3_4_selective_prediction_het_lite_aurc", 3),
     (r"for\ hom\ 0\.568\ for\ het\-lite\ and$", "0.554", "revision_r1_1_r3_4_selective_prediction_het_aurc", 3),
