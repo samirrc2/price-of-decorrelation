@@ -305,10 +305,17 @@ homogeneous and fully heterogeneous configurations:
 \Delta\kappa_{\mathrm{HOM-HET}}=\kappa_{\mathrm{HOM}}-\kappa_{\mathrm{HET}}.
 \label{eq:primary}
 \end{equation}
+% Set inline, these two subscripted contrasts are wider than the column: TeX held the relation
+% sign on the line and overran the right margin by 13.76pt, visibly. Displayed and stacked they
+% fit, and they read better beside the primary contrast in (3) directly above. Unnumbered, so no
+% later equation reference shifts.
 The pre-registered secondary contrasts are
-$\Delta\kappa_{\mathrm{HOM-HET\text{-}LITE}}=\kappa_{\mathrm{HOM}}-\kappa_{\mathrm{HET\text{-}LITE}}$
-and
-$\Delta\kappa_{\mathrm{HET\text{-}LITE-HET}}=\kappa_{\mathrm{HET\text{-}LITE}}-\kappa_{\mathrm{HET}}$.
+\[
+\begin{aligned}
+\Delta\kappa_{\mathrm{HOM-HET\text{-}LITE}}&=\kappa_{\mathrm{HOM}}-\kappa_{\mathrm{HET\text{-}LITE}},\\
+\Delta\kappa_{\mathrm{HET\text{-}LITE-HET}}&=\kappa_{\mathrm{HET\text{-}LITE}}-\kappa_{\mathrm{HET}}.
+\end{aligned}
+\]
 Positive values indicate that configurations with greater cross-provider
 heterogeneity show lower within-ensemble agreement.
 

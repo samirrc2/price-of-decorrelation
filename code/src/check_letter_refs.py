@@ -27,6 +27,10 @@ Two checks, both narrow and both stated in the output:
 
 Exit 0 passed, 1 failed, 2 could not be checked here (no main.bbl).
 """
+# Python 3.9 is still the default `python3` on some machines, and "Path | None" is a syntax
+# error there at def time. The build failed on exactly that. Every other gate already has this.
+from __future__ import annotations
+
 import re
 import sys
 from pathlib import Path

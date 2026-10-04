@@ -10,6 +10,21 @@
 #   submission/highlighted_pdf.pdf              every change marked in yellow
 #   submission/IEEE-Access-Response-to-Reviewers.{pdf,docx}
 set -euo pipefail
+
+# Use the project interpreter, not whatever `python3` happens to be first on PATH. On this
+# machine bare "$PY" is 3.9 without pymupdf, and the build silently degraded: check_letter_refs
+# died on a "Path | None" annotation and the new-reference highlighting check reported NOT CHECKED
+# instead of verifying the yellow fill. A build whose coverage depends on the caller's PATH is not
+# a reproducible build.
+PY="${PY:-}"
+if [[ -z "$PY" ]]; then
+  for c in "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/.venv/bin/python" \
+           "$(command -v python3.12 || true)" "$(command -v python3.11 || true)"; do
+    if [[ -x "$c" ]] && "$c" -c "import pymupdf" >/dev/null 2>&1; then PY="$c"; break; fi
+  done
+fi
+[[ -n "$PY" ]] || PY="python3"
+echo "   interpreter: $PY ($("$PY" -V 2>&1), pymupdf $("$PY" -c 'import pymupdf;print(pymupdf.__doc__ and "yes" or "yes")' 2>/dev/null || echo "MISSING"))"
 cd "$(dirname "$0")/.."
 export PATH="$HOME/Library/TinyTeX/bin/universal-darwin:$PATH"
 
@@ -22,7 +37,7 @@ if [ "${1:-}" = "--check" ]; then
     done
     [ submission/IEEE-Access-Response-to-Reviewers.pdf -ot submission/response_to_reviewers.txt ] \
         && { echo "STALE: response PDF older than its source .txt"; rc=1; }
-    python3 submission/check_highlighting.py || rc=1
+    "$PY" submission/check_highlighting.py || rc=1
     [ "$rc" = 0 ] && echo "submission package is current"
     exit "$rc"
 fi
@@ -38,7 +53,7 @@ for f in results/latest/figures/*.png; do
         cp -f "$f" "paper/figures/$b"; echo "   refreshed paper/figures/$b"
     fi
 done
-python3 code/src/check_figures.py | sed 's/^/   /'
+"$PY" code/src/check_figures.py | sed 's/^/   /'
 
 echo "== 1/4 manuscript PDF =="
 ( cd paper && pdflatex -interaction=nonstopmode main.tex >/dev/null 2>&1 || true
@@ -50,15 +65,15 @@ cp paper/main.pdf submission/main_manuscript.pdf
 # The reference-numbering half of the IEEE check needs paper/main.bbl, which exists only after
 # the manuscript is built. reproduce.sh checks the keys from source; this checks the realised
 # numbering, so between them nothing is left unchecked.
-python3 code/src/check_ieee_style.py | sed 's/^/   /'
+"$PY" code/src/check_ieee_style.py | sed 's/^/   /'
 # Same reason: the letter quotes reference numbers, which exist only in main.bbl.
-python3 code/src/check_letter_refs.py | sed 's/^/   /'
-python3 code/src/check_letter_binding.py | sed 's/^/   /'
-python3 code/src/check_letter_sections.py | sed 's/^/   /'
-python3 code/src/check_letter_actions.py | sed 's/^/   /'
-python3 code/src/check_response_consistency.py | sed 's/^/   /'
-python3 code/src/check_freeze_timestamps.py | sed 's/^/   /'
-python3 code/src/check_freeze_receipt.py | sed 's/^/   /'
+"$PY" code/src/check_letter_refs.py | sed 's/^/   /'
+"$PY" code/src/check_letter_binding.py | sed 's/^/   /'
+"$PY" code/src/check_letter_sections.py | sed 's/^/   /'
+"$PY" code/src/check_letter_actions.py | sed 's/^/   /'
+"$PY" code/src/check_response_consistency.py | sed 's/^/   /'
+"$PY" code/src/check_freeze_timestamps.py | sed 's/^/   /'
+"$PY" code/src/check_freeze_receipt.py | sed 's/^/   /'
 
 echo "== 2/4 Word version =="
 # --citeproc is required: this manuscript builds its reference list from references.bib, and
@@ -72,7 +87,7 @@ echo "== 3/4 highlighted PDF =="
 bash submission/build_highlighted.sh
 
 echo "== 4/4 response to reviewers =="
-( cd submission && python3 build_response.py )
+( cd submission && "$PY" build_response.py )
 
 echo
 bash submission/build_submission.sh --check
