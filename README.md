@@ -28,7 +28,7 @@ This repository is the frozen dataset and analysis pipeline that regenerates tho
 | **Authors** | Samir Chincholikar, Robin Chawla |
 | **Affiliations** | Independent researchers |
 | **Code repository** | https://github.com/samirrc2/price-of-decorrelation |
-| **Persistent DOI** | Code Ocean capsule submitted for review (public DOI pending; insert here when minted). Until then, use this GitHub repository. |
+| **Persistent DOI** | https://doi.org/10.24433/CO.9524962.v1 (`10.24433/CO.9524962.v1`) |
 | **Contact** | Samir Chincholikar: samir.chincholikar@gmail.com; Robin Chawla: robin.chawla.cse14@iitbhu.ac.in |
 | **ORCID** | Samir Chincholikar: https://orcid.org/0009-0007-2779-3492; Robin Chawla: https://orcid.org/0009-0007-2807-3948 |
 
@@ -49,18 +49,18 @@ The artifact enables independent reproduction of the article’s computational r
 
 ## Code Ocean
 
-A [Code Ocean](https://codeocean.com/) compute capsule for this artifact has been **submitted for review** and will be **publicly available soon**, with a persistent DOI assigned after Code Ocean’s reproducibility verification.
+A [Code Ocean](https://codeocean.com/) compute capsule for this artifact is available at
+[https://doi.org/10.24433/CO.9524962.v1](https://doi.org/10.24433/CO.9524962.v1)
+(DOI `10.24433/CO.9524962.v1`).
 
 | Status | Detail |
 |--------|--------|
-| Capsule | Prepared (keys-free Reproducible Run via `/code/run`) |
-| Review | Submitted; awaiting Code Ocean verification |
-| Public link / DOI | Not yet issued — will be added to this README and the manuscript when available |
-| Until then | Reproduce from this GitHub repository (`bash reproduce.sh`) |
+| Capsule | Keys-free Reproducible Run via `/code/run` |
+| Environment | `environment/Dockerfile` |
+| Public link / DOI | https://doi.org/10.24433/CO.9524962.v1 |
+| Local reproduce | `bash reproduce.sh` |
 
 The capsule layout matches this repository: `/code` (including `run`, `src/`, `scripts/`), `/data` (frozen confirmatory CSV and configs), `/results` (analysis outputs), and `environment/Dockerfile`. The default Reproducible Run regenerates Phase-3 metrics and figures from the frozen dataset with **no API keys** and **no inference cost**.
-
-After publication on Code Ocean, replace the placeholder in Section 1 (**Persistent DOI**) with the minted DOI.
 
 ---
 
