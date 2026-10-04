@@ -75,52 +75,66 @@ def check_portable() -> list[str]:
 # named a path that had not existed since the layout reorganisation and a config SHA-256 that
 # matched neither the current file nor its pre-reorganisation version -- stale for months,
 # with nothing to catch it, in the one document whose entire purpose is to pin the dataset.
+def _check_asserting_doc(path: Path, label: str) -> list[str]:
+    """Paths named in a document must exist; decimals it asserts must be claims."""
+    bad = []
+    t = path.read_text()
+    for m in re.finditer(r"`((?:code|data|results|docs|paper|environment|metadata|archive)"
+                         r"/[A-Za-z0-9_./-]+)`", t):
+        rel = m.group(1)
+        if not (ROOT / rel).exists():
+            bad.append(f"{label} names a path that does not exist: {rel}")
+    claims = json.loads(CLAIMS.read_text())
+    forms = set()
+    for v in claims.values():
+        if isinstance(v, (int, float)) and not isinstance(v, bool):
+            av = abs(v)
+            for nd in range(7):
+                forms.add(f"{av:.{nd}f}")
+                forms.add(f"{av:.{nd}f}".rstrip("0").rstrip("."))
+                # authors round half UP, Python rounds half to EVEN: 0.3035 must be
+                # allowed to appear as "0.304". Omitting this reported the README's
+                # correct rounding as a provenance failure.
+                forms.add(str(Decimal(str(av)).quantize(Decimal(1).scaleb(-nd),
+                                                        rounding=ROUND_HALF_UP)))
+                for mult in (1e3, 1e4, 100.0):
+                    forms.add(f"{av*mult:.{nd}f}")
+    # derived ratios the README quotes (the cost premium)
+    costs = [v for k, v in claims.items() if k.endswith("_cost")
+             and isinstance(v, (int, float))]
+    for a in costs:
+        for b in costs:
+            if b:
+                for nd in (1, 2, 3):
+                    forms.add(f"{a/b:.{nd}f}")
+    body = re.sub(r"```.*?```", "", t, flags=re.S)   # code blocks are commands, not claims
+    allow = {"0.24433", "10.24433"}                  # DOI fragments
+    for m in re.finditer(r"(?<![\w.])(\d+\.\d+)(?![\w])", body):
+        lit = m.group(1)
+        if lit in forms or lit in allow:
+            continue
+        if re.match(r"^\d\.\d{1,2}$", lit) and float(lit) < 15:
+            continue        # version numbers: Python 3.11, numpy 2.2, pytest 8.0
+        bad.append(f"{label} asserts {lit}, which is not a claim at any rounding")
+
+    return bad
+
+
 def check_documents() -> list[str]:
     bad = []
     # The README is a document that pins paths and asserts results, so it drifts exactly like
     # archive_manifest.md did. Two things are checked: every repo path it names in backticks
     # must exist (it named data/control/runs.csv, which has not existed since captures became
     # dated), and every decimal it asserts outside a code block must be a claim.
-    rd = ROOT / "README.md"
-    if rd.exists() and CLAIMS.exists():
-        t = rd.read_text()
-        for m in re.finditer(r"`((?:code|data|results|docs|paper|environment|metadata|archive)"
-                             r"/[A-Za-z0-9_./-]+)`", t):
-            rel = m.group(1)
-            if not (ROOT / rel).exists():
-                bad.append(f"README.md names a path that does not exist: {rel}")
-        claims = json.loads(CLAIMS.read_text())
-        forms = set()
-        for v in claims.values():
-            if isinstance(v, (int, float)) and not isinstance(v, bool):
-                av = abs(v)
-                for nd in range(7):
-                    forms.add(f"{av:.{nd}f}")
-                    forms.add(f"{av:.{nd}f}".rstrip("0").rstrip("."))
-                    # authors round half UP, Python rounds half to EVEN: 0.3035 must be
-                    # allowed to appear as "0.304". Omitting this reported the README's
-                    # correct rounding as a provenance failure.
-                    forms.add(str(Decimal(str(av)).quantize(Decimal(1).scaleb(-nd),
-                                                            rounding=ROUND_HALF_UP)))
-                    for mult in (1e3, 1e4, 100.0):
-                        forms.add(f"{av*mult:.{nd}f}")
-        # derived ratios the README quotes (the cost premium)
-        costs = [v for k, v in claims.items() if k.endswith("_cost")
-                 and isinstance(v, (int, float))]
-        for a in costs:
-            for b in costs:
-                if b:
-                    for nd in (1, 2, 3):
-                        forms.add(f"{a/b:.{nd}f}")
-        body = re.sub(r"```.*?```", "", t, flags=re.S)   # code blocks are commands, not claims
-        allow = {"0.24433", "10.24433"}                  # DOI fragments
-        for m in re.finditer(r"(?<![\w.])(\d+\.\d+)(?![\w])", body):
-            lit = m.group(1)
-            if lit in forms or lit in allow:
-                continue
-            if re.match(r"^\d\.\d{1,2}$", lit) and float(lit) < 15:
-                continue        # version numbers: Python 3.11, numpy 2.2, pytest 8.0
-            bad.append(f"README.md asserts {lit}, which is not a claim at any rounding")
+    # README.md and PREREGISTRATION_AMENDMENTS.md both assert results and name paths, so both
+    # drift the same way archive_manifest.md did. The amendments file is the higher risk of the
+    # two: it is the document a reviewer reads to decide what was pre-registered, and it
+    # restates roughly twenty-five computed values.
+    for doc in ("README.md", "PREREGISTRATION_AMENDMENTS.md"):
+        rd = ROOT / doc
+        if not (rd.exists() and CLAIMS.exists()):
+            continue
+        bad.extend(_check_asserting_doc(rd, doc))
     am = ROOT / "archive_manifest.md"
     if am.exists():
         t = am.read_text()

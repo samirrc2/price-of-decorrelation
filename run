@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Convenience wrapper: delegates to code/run (the Code Ocean Reproducible Run entry point).
+#
+# Code Ocean invokes /code/run directly, so this file is for a reader who clones the
+# repository and types ./run. It exists because the two entry points must not drift: there is
+# one implementation, in code/run, and this is a one-line delegation to it.
+set -euo pipefail
+exec bash "$(cd "$(dirname "$0")" && pwd)/code/run" "$@"
