@@ -51,6 +51,9 @@ cp paper/main.pdf submission/main_manuscript.pdf
 # the manuscript is built. reproduce.sh checks the keys from source; this checks the realised
 # numbering, so between them nothing is left unchecked.
 python3 code/src/check_ieee_style.py | sed 's/^/   /'
+# Same reason: the letter quotes reference numbers, which exist only in main.bbl.
+python3 code/src/check_letter_refs.py | sed 's/^/   /'
+python3 code/src/check_freeze_timestamps.py | sed 's/^/   /'
 
 echo "== 2/4 Word version =="
 # --citeproc is required: this manuscript builds its reference list from references.bib, and

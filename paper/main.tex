@@ -508,10 +508,11 @@ configurations, prompt template, experimental grid, random-seed construction,
 primary and secondary endpoints, uncertainty-estimation procedure, and decision
 rule. The resulting pre-registration was assigned a SHA-256 hash to establish
 that the design preceded the collection of the confirmatory dataset. The released
-package contains the freeze receipts themselves. Each records the UTC freeze
-time, the commit that carried the frozen artifacts, and the SHA-256 of the
+package contains timestamped cryptographic freeze receipts establishing that the
+pre-registered design preceded data collection. Each receipt records the UTC
+freeze time, the commit that carried the frozen artifacts, and the SHA-256 of the
 configuration, agent and analysis code, prompt template, pre-registration, grid,
-and model manifest. The cross-domain replication has its own receipt, recorded
+and model manifest; the cross-domain replication has its own receipt, recorded
 before any API call for that arm. Raw outputs
 were collected once and stored in an immutable, read-only, hash-verified
 dataset. The analysis pipeline reads only the frozen dataset and experimental

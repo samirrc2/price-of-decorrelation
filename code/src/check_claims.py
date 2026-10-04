@@ -38,6 +38,11 @@ GATED = {
 }
 
 
+ISO_TIMESTAMP = re.compile(
+    r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})?"
+)
+
+
 def tex_numbers(t: str) -> set[str]:
     """Every decimal and integer literal in the body, with LaTeX noise stripped."""
     t = re.sub(r"%.*", "", t)                      # comments
@@ -47,6 +52,11 @@ def tex_numbers(t: str) -> set[str]:
     # away before extracting, or the gate reports its own formatting assumption as a defect.
     t = re.sub(r"(\d)\{,\}(\d)", r"\1\2", t)
     t = re.sub(r"(\d)[,\\][\s]?(\d{3})\b", r"\1\2", t)
+    # ISO-8601 freeze timestamps are machine identifiers, not results. The seconds field of
+    # 2026-07-03T20:41:51.396959+00:00 otherwise extracts as the decimal literal 51.396959 and
+    # is reported as a result that matches no claim. Masked only in this full date-and-time
+    # shape, so no bare ratio can be hidden by it.
+    t = ISO_TIMESTAMP.sub(" ", t)
     return set(re.findall(r"(?<![\w.])\d+(?:\.\d+)?(?![\w])", t))
 
 
@@ -128,6 +138,10 @@ def _check_asserting_doc(path: Path, label: str) -> list[str]:
     # check_coverage.py, so it is gone.
     superseded = []
     body = re.sub(r"```.*?```", "", t, flags=re.S)   # code blocks are commands, not claims
+    # Companion documents quote ISO-8601 freeze timestamps. The seconds field of
+    # 2026-07-03T20:41:51.396959+00:00 extracts as 51.396959 and was reported as a result that
+    # matches no claim. Masked only in the full date-and-time shape, so no ratio hides behind it.
+    body = ISO_TIMESTAMP.sub(" ", body)
     allow = {"0.24433", "10.24433"}                  # DOI fragments
     for m in re.finditer(r"(?<![\w.])(\d+\.\d+)(?![\w])", body):
         lit = m.group(1)

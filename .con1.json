@@ -39,6 +39,8 @@
     "python3 code/src/check_claims.py",
     "python3 code/src/check_claims_bound.py",
     "python3 code/src/check_ieee_style.py",
+    "python3 code/src/check_letter_refs.py",
+    "python3 code/src/check_freeze_timestamps.py",
     "python3 code/src/check_figures.py"
   ],
   "inputs": [

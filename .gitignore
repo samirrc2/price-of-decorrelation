@@ -31,3 +31,4 @@ paper/*.out
 paper/*.toc
 paper/generated_tables/
 paper/pdf_extract.txt
+submission/missfont.log
