@@ -31,32 +31,112 @@ def kappa_sub(rows, cfg, keep):
     return k
 
 
+def _precompute_cells(rows, cfg):
+    """Per-cell direction counts, computed ONCE: {(ticker, date, run): (c_buy, c_hold, ...)}.
+
+    The cluster bootstrap previously called kappa_sub() per draw, which re-filtered all
+    54,000 rows and rebuilt every cell from scratch -- 2,000 draws x 3 resampling modes x
+    54k rows, around 324 million row operations in pure Python, for a result that only ever
+    changes WHICH CELLS are included. Fleiss' kappa is a mean of per-cell P_i plus a
+    marginal term, so the per-cell counts are invariant across draws and only the summation
+    has to be redone. This is the same estimator, not an approximation: kappa_fast() below
+    is checked against M.kappa_per_run_avg() on the full sample before the bootstrap runs.
+    """
+    cells = collections.defaultdict(lambda: [0] * len(M.DIRECTIONS))
+    idx = {d: i for i, d in enumerate(M.DIRECTIONS)}
+    for r in rows:
+        if r["config"] != cfg or r.get("ok") != "True":
+            continue
+        j = idx.get(r["direction"])
+        if j is None:
+            continue
+        cells[(r["ticker"], r["date"], int(r["run_idx"]))][j] += 1
+    return {k: tuple(v) for k, v in cells.items()}
+
+
+def kappa_fast(cells, keep_cell):
+    """Fleiss' kappa averaged over runs, from precomputed counts.
+
+    Mirrors metrics.fleiss_kappa + kappa_per_run_avg exactly, including dropping cells whose
+    rater count differs from the modal count (an agent call can fail) and returning None
+    when fewer than two cells survive.
+    """
+    byrun = collections.defaultdict(list)
+    for (t, d, run), counts in cells.items():
+        if keep_cell(t, d):
+            byrun[run].append(counts)
+    ks = []
+    for run in sorted(byrun):
+        mat = byrun[run]
+        totals = collections.Counter(sum(c) for c in mat)
+        if not totals:
+            continue
+        n = totals.most_common(1)[0][0]
+        mat = [c for c in mat if sum(c) == n]
+        N = len(mat)
+        if N < 2 or n < 2:
+            continue
+        Pi = [(sum(x * x for x in c) - n) / (n * (n - 1)) for c in mat]
+        P_bar = sum(Pi) / N
+        tot = [0] * len(M.DIRECTIONS)
+        for c in mat:
+            for j, x in enumerate(c):
+                tot[j] += x
+        denom = N * n
+        pj = [t / denom for t in tot]
+        P_e = sum(q * q for q in pj)
+        ks.append(1.0 if abs(1 - P_e) < 1e-12 else (P_bar - P_e) / (1 - P_e))
+    return (sum(ks) / len(ks)) if ks else None
+
+
 # ---------------------------------------------------------------- R3.2 clustering
 def clustering(rows):
     tick = sorted({r["ticker"] for r in rows})
     date = sorted({r["date"] for r in rows})
     out = {}
 
-    def delta(keep):
-        a = kappa_sub(rows, "HOM", keep); b = kappa_sub(rows, "HET", keep)
+    hom_cells = _precompute_cells(rows, "HOM")
+    het_cells = _precompute_cells(rows, "HET")
+
+    def delta_fast(keep_cell):
+        a = kappa_fast(hom_cells, keep_cell); b = kappa_fast(het_cells, keep_cell)
         return None if (a is None or b is None) else a - b
 
-    point = delta(lambda r: True)
+    point = delta_fast(lambda t, d: True)
 
+    # EQUIVALENCE CHECK, not an assumption: the fast path must reproduce the estimator the
+    # rest of the paper uses, on the full sample, before any draw is taken. If it does not,
+    # fail loudly rather than publish a number from an unvalidated shortcut.
+    slow = kappa_sub(rows, "HOM", lambda r: True)
+    fast = kappa_fast(hom_cells, lambda t, d: True)
+    if slow is None or fast is None or abs(slow - fast) > 1e-12:
+        raise SystemExit(f"kappa_fast disagrees with metrics.kappa_per_run_avg "
+                         f"({fast} vs {slow}); refusing to bootstrap with it")
+
+    # NOTE on resampling semantics. This bootstrap treats a draw as a SET of clusters: a
+    # ticker drawn twice contributes once. stats.py's primary bootstrap instead honours
+    # multiplicity via a replica id, so a ticker drawn twice contributes as two clusters.
+    # The original code here used Counter(...).get(t, 0) > 0, which is a membership test and
+    # therefore already collapsed duplicates -- the set() below preserves that behaviour
+    # exactly (verified: all 59 output values unchanged). The difference between the two
+    # bootstraps is deliberate and pre-existing, not introduced by the precompute: this is a
+    # supplementary robustness check on the RESAMPLING UNIT, and its intervals are reported
+    # as such, while the headline CI comes from stats.py. Flagged here because a reader
+    # comparing the two implementations would otherwise reasonably suspect a bug.
     def boot(mode):
         rng = random.Random(SEED); d = []
         for _ in range(DRAWS):
             if mode == "ticker":
-                s = collections.Counter(tick[rng.randrange(len(tick))] for _ in tick)
-                keep = lambda r: s.get(r["ticker"], 0) > 0
+                s = set(tick[rng.randrange(len(tick))] for _ in tick)
+                keep = lambda t, dt: t in s
             elif mode == "date":
-                s = collections.Counter(date[rng.randrange(len(date))] for _ in date)
-                keep = lambda r: s.get(r["date"], 0) > 0
+                s = set(date[rng.randrange(len(date))] for _ in date)
+                keep = lambda t, dt: dt in s
             else:  # two-way: resample both margins independently
-                st = collections.Counter(tick[rng.randrange(len(tick))] for _ in tick)
-                sd = collections.Counter(date[rng.randrange(len(date))] for _ in date)
-                keep = lambda r: st.get(r["ticker"], 0) > 0 and sd.get(r["date"], 0) > 0
-            v = delta(keep)
+                st = set(tick[rng.randrange(len(tick))] for _ in tick)
+                sd = set(date[rng.randrange(len(date))] for _ in date)
+                keep = lambda t, dt: t in st and dt in sd
+            v = delta_fast(keep)
             if v is not None: d.append(v)
         d.sort()
         return (d[int(.025*len(d))], d[int(.975*len(d))-1], len(d)) if len(d) >= 20 else (None, None, len(d))
@@ -87,11 +167,48 @@ def unanimous_wrong(rows, signs):
         return (w / n, n) if n else (None, 0)
     pts = {c: rate(c, lambda r: True) for c in ("HOM", "HET")}
     ratio = (pts["HOM"][0] / pts["HET"][0]) if pts["HET"][0] else None
+
+    # Same precompute-once pattern as the clustering bootstrap: rate() rebuilt every cell
+    # from all 54,000 rows on each of the 2,000 draws, when resampling only changes which
+    # TICKERS are in. Reduce each scoreable cell to (ticker, is_wrong) once; a draw is then
+    # a sum over ~1,200 tuples instead of a scan over 54k rows.
+    def cell_flags(cfg):
+        cells = collections.defaultdict(list)
+        for r in rows:
+            if r["config"] == cfg:
+                cells[(r["ticker"], r["date"], r["run_idx"])].append(r["direction"])
+        flags = []
+        for (t, d, _), dirs in cells.items():
+            sg = signs.get((t, d))
+            if sg is None or sg == 0 or len(dirs) != 5:
+                continue
+            wrong = (len(set(dirs)) == 1 and dirs[0] in ("BUY", "SELL")
+                     and (1 if dirs[0] == "BUY" else -1) != sg)
+            flags.append((t, int(wrong)))
+        return flags
+
+    flags = {c: cell_flags(c) for c in ("HOM", "HET")}
+
+    # Equivalence check before use: the reduced form must reproduce rate() exactly.
+    for c in ("HOM", "HET"):
+        n = len(flags[c]); w = sum(f for _, f in flags[c])
+        fast = (w / n) if n else None
+        if pts[c][0] is not None and (fast is None or abs(fast - pts[c][0]) > 1e-12):
+            raise SystemExit(f"unanimous_wrong fast path disagrees for {c} "
+                             f"({fast} vs {pts[c][0]}); refusing to bootstrap with it")
+
+    def rate_fast(cfg, keep_t):
+        n = w = 0
+        for t, f in flags[cfg]:
+            if keep_t(t):
+                n += 1; w += f
+        return (w / n) if n else None
+
     rng = random.Random(SEED); rs = []
     for _ in range(DRAWS):
-        s = collections.Counter(tick[rng.randrange(len(tick))] for _ in tick)
-        keep = lambda r: s.get(r["ticker"], 0) > 0
-        a, _ = rate("HOM", keep); b, _ = rate("HET", keep)
+        s = set(tick[rng.randrange(len(tick))] for _ in tick)
+        keep_t = lambda t: t in s
+        a = rate_fast("HOM", keep_t); b = rate_fast("HET", keep_t)
         if a and b: rs.append(a / b)
     rs.sort()
     return {"hom": pts["HOM"], "het": pts["HET"], "ratio": ratio,
