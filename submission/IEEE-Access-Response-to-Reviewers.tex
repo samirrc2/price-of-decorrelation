@@ -95,7 +95,7 @@ Robin Chawla
 
 \item The reviewer offers two remedies. The cross-domain replication described under Concern \#3 supplies the first in a form we can report with confidence, because on that domain two of the three providers have near-identical accuracy.
 
-\item Within the fully heterogeneous configuration we compare agent pairs whose two members have near-identical accuracy but differ in whether they share a provider. Gemini and Grok answer those items at 0.951 and 0.960 accuracy respectively. A same-provider Gemini pair has error correlation 0.954; a cross-provider Gemini-Grok pair has 0.607, a difference of 0.347 (95\% CI [0.207, 0.507]).
+\item Within the fully heterogeneous configuration we compare agent pairs whose two members have near-identical accuracy but differ in whether they share a provider. The same-provider pairing and the cross-provider pairing answer those items at 0.951 and 0.955 mean member accuracy respectively, a gap of 0.005. The same-provider Gemini pair has error correlation 0.954; the cross-provider Gemini-Grok pairing has 0.607, a difference of 0.347 (95\% CI [0.207, 0.507]).
 
 \item The comparison holds the item set, the configuration and the ensemble composition fixed, so capability is matched by construction rather than by assumption.
 
@@ -331,7 +331,9 @@ Robin Chawla
 
 \item Dates are a second, crossed source of dependence. We report the primary contrast under three schemes: equity clustering (100 clusters), date clustering (12 clusters), and a two-way scheme in which equities and dates are resampled independently.
 
-\item The point estimate is 0.3363 in all three. The intervals are [0.3131, 0.3628] for equities, [0.3090, 0.3625] for dates and [0.2946, 0.3741] two-way. The two-way interval is the widest, as expected when two crossed dependence structures are admitted at once, and still excludes zero.
+\item The point estimate is 0.3363 in all three. The intervals are [0.3035, 0.3689] for equities, [0.2989, 0.3656] for dates and [0.2786, 0.3877] two-way. The two-way interval is the widest, as expected when two crossed dependence structures are admitted at once, and all three exclude zero.
+
+\item The reviewer is right that the earlier equity interval, [0.3131, 0.3628], contradicted the primary [0.3035, 0.3689] reported in the abstract, Table 2, the Results and the Conclusion. They were presented as the same estimand and should have agreed exactly. They did not because the two were computed by different procedures: the primary bootstrap resamples equities with replacement and counts an equity drawn twice as two clusters, while the robustness table treated each draw as a set, so a repeated draw counted once and every draw used only the roughly 63 distinct equities of a 100-draw multiset. That is subsampling, not a cluster bootstrap, and it understated the variance. The robustness table now honours multiplicity and uses the pre-registered equity ordering, so its equity row reproduces the primary interval exactly; the code asserts that equality on every run and fails if it is ever broken. The date and two-way intervals widen for the same reason. No point estimate changed and every interval still excludes zero.
 
 \item We note that the date margin has only twelve clusters, a regime in which cluster-robust inference is known to under-cover. The equity-clustered interval therefore remains the pre-registered primary and the other two are reported as sensitivity analyses.
 
@@ -393,11 +395,15 @@ Robin Chawla
 
 \begin{itemize}
 
-\item We agree on all four points and have acted on each.
+\item We agree on all four points. Three were acted on in the previous revision; the fourth, uncertainty for the pile-on statistic, was claimed but not delivered, and the reviewer is correct to press it. It is now provided.
 
 \item The selective-prediction and coverage analysis is described under Reviewer \#1, Concern \#1.
 
 \item Uncertainty for the unanimous-error statistic is described under Reviewer \#1, Concern \#4; the interval is equity-clustered rather than marginal.
+
+\item Pile-on now carries uncertainty. The rate at which the remaining agents endorse an incorrect majority is 0.824 for HOM and 0.636 for HET; a paired equity-clustered bootstrap over the same 100 equities, 2,000 draws, using the resampling scheme of the primary endpoint, gives a HOM-HET difference of 0.189 (95\% CI [0.160, 0.216]). The draw is shared between the two arms and the difference taken within it, because the two configurations are measured on the same equities and resampling them independently would add back the between-arm variance the design removes.
+
+\item Paired clustered uncertainty for AURC is also feasible and is now reported: the HOM-HET difference is -0.001 (95\% CI [-0.059, 0.060]). The interval contains zero, so these data do not establish a difference in selective-prediction quality between the two configurations, and the manuscript now says exactly that rather than comparing the three AURC values informally.
 
 \item The error-correlation analysis under Reviewer \#3, Concern \#3 is reported under two label treatments precisely because of the subset problem the reviewer identifies: the second treatment fixes an identical subset across configurations and removes the selection.
 
@@ -410,6 +416,8 @@ Robin Chawla
 \begin{itemize}
 
 \item Added the selective-prediction analysis and the clustered interval on the unanimous-error ratio.
+
+\item Added paired equity-clustered bootstrap confidence intervals for the pile-on contrast and for the AURC contrast, and reported both in the Results.
 
 \item Reported the error-correlation contrast under both label treatments.
 

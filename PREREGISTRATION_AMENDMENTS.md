@@ -91,7 +91,7 @@ re-analysis of already-frozen captures; no new collection, no API spend.
 | Agreement robustness (Krippendorff α, Gwet AC1) | whether the ordering survives a different statistic | `results/latest/reviewer_metrics.md` |
 | Capability-matched pair contrast (MMLU) | provider vs capability, holding member accuracy fixed | `results/mmlu_replication.json` |
 
-**Clustering result.** The point estimate is identical across resampling units (0.3363); only the interval widens, from [0.3131, 0.3628] over 100 equity clusters to [0.2946, 0.3741] two-way. Every interval excludes zero.
+**Clustering result.** The point estimate is identical across resampling units (0.3363); only the interval widens, from [0.3035, 0.3689] over 100 equity clusters to [0.2786, 0.3877] two-way. Every interval excludes zero. The equity row reproduces the primary endpoint's interval exactly, which it had not previously done: that bootstrap treated a draw as a SET of clusters, so an equity drawn twice counted once and each draw used only the ~63 distinct equities of a 100-draw multiset. That is subsampling rather than a cluster bootstrap and it understated the variance, giving [0.3131, 0.3628] for what the manuscript presented as the same estimand as the primary [0.3035, 0.3689]. Multiplicity is now honoured and the equality is asserted in code.
 
 **Capability-matched result.** Δφ = 0.3471, 95% CI [0.2070, 0.5073]: same-provider φ 0.9537 against cross-provider 0.6066 at member accuracies 0.951 and 0.955.
 

@@ -121,6 +121,7 @@ def _check_asserting_doc(path: Path, label: str) -> list[str]:
     # The cost premium the README quotes is cost_ratio_het_over_hom, a claim. Generating
     # every pairwise quotient of every cost here explained almost any number, as it did in
     # check_coverage.py, so it is gone.
+    superseded = []
     body = re.sub(r"```.*?```", "", t, flags=re.S)   # code blocks are commands, not claims
     allow = {"0.24433", "10.24433"}                  # DOI fragments
     for m in re.finditer(r"(?<![\w.])(\d+\.\d+)(?![\w])", body):
@@ -129,8 +130,20 @@ def _check_asserting_doc(path: Path, label: str) -> list[str]:
             continue
         if re.match(r"^\d\.\d{1,2}$", lit) and float(lit) < 15:
             continue        # version numbers: Python 3.11, numpy 2.2, pytest 8.0
+        # An amendments record documents what CHANGED, so it legitimately quotes values the
+        # analysis no longer produces. Allow that only where the sentence says so, and name
+        # what was excused -- a superseded number stated as a current one still fails.
+        line = t[t.rfind("\n", 0, m.start()) + 1:t.find("\n", m.end())]
+        if re.search(r"\bpreviously\b|\bsuperseded\b|\bformerly\b|\bearlier\b|\bhad (?:not |been )|"
+                     r"\bunderstated\b|\bincorrect(?:ly)?\b|\bused to\b|\bgiving\b",
+                     line, re.I):
+            superseded.append(lit)
+            continue
         bad.append(f"{label} asserts {lit}, which is not a claim at any rounding")
 
+    if superseded:
+        print(f"     [{label}] quoted as superseded, and the text says so: "
+              f"{', '.join(sorted(set(superseded)))}")
     return bad
 
 
@@ -144,7 +157,12 @@ def check_documents() -> list[str]:
     # drift the same way archive_manifest.md did. The amendments file is the higher risk of the
     # two: it is the document a reviewer reads to decide what was pre-registered, and it
     # restates roughly twenty-five computed values.
-    for doc in ("README.md", "PREREGISTRATION_AMENDMENTS.md"):
+    # The response letter restates dozens of computed values and is read alongside the paper,
+    # yet nothing gated it: when the clustering intervals were corrected, the letter kept the
+    # superseded [0.3131, 0.3628] and no check noticed. It is gated here for the same reason the
+    # other two are.
+    for doc in ("README.md", "PREREGISTRATION_AMENDMENTS.md",
+                "submission/response_to_reviewers.txt"):
         rd = ROOT / doc
         if not (rd.exists() and CLAIMS.exists()):
             continue
@@ -222,7 +240,17 @@ def main() -> int:
         lo, hi = claims.get("primary_ci_low"), claims.get("primary_ci_high")
         excl = (lo is not None and hi is not None and (lo > 0 or hi < 0))
         asserts_excl = bool(re.search(r"\bexcludes?\s+zero", tex, re.I))
-        asserts_incl = bool(re.search(r"\bincludes?\s+zero|\bcontains?\s+zero", tex, re.I))
+        # Scope the inclusion test to the PRIMARY contrast. A sentence reporting that the
+        # AURC interval contains zero -- a different, secondary endpoint -- is not the
+        # manuscript conceding its primary result, and reading it as one made this gate fire
+        # on a correct paper the moment R3.4's selective-prediction uncertainty was added.
+        asserts_incl = False
+        for m in re.finditer(r"\bincludes?\s+zero|\bcontains?\s+zero", tex, re.I):
+            w = tex[max(0, m.start() - 320):m.end() + 160]
+            if re.search(r"AURC|selective[- ]prediction|risk[- ]coverage", w, re.I):
+                continue          # a secondary endpoint's interval, not the primary
+            asserts_incl = True
+            break
         if vw == "confirmed":
             if not excl:
                 fails.append("claims say CONFIRMED but the primary interval contains zero")

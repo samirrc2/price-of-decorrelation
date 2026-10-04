@@ -253,17 +253,27 @@ def _make_figures(cfg, kappa, cost, hlevel, primary, sec1, sec2, wc, provs, pmat
     ax.set_title("Frontier: agreement vs cost across heterogeneity")
     fig.tight_layout(); save(fig, "fig1_frontier", svg=True)
 
-    # fig2: protocol collapse (HOM within−cross gap)
+    # fig2: the seeding artifact, two like-for-like bars ONLY.
+    # This used to plot three bars of the HOM within-minus-cross kappa gap -- two pilot arms and
+    # the full study -- so the figure mixed a protocol diagnostic across two different datasets
+    # and model sets. A reviewer asked for every bar to measure the same estimand. It now shows
+    # the one quantity the pilot arms differ in: Delta-kappa(HOM-HET) under shared per-run
+    # seeding against independent per-agent seeding, on the same 8-equity pilot grid. The
+    # full-study within-minus-cross diagnostic stays in its own table.
     pil = _pilot()
-    stages = [f"broken pilot\n(Δκ={pil['broken']['dkappa']:.3f})",
-              f"clean pilot\n(Δκ={pil['clean']['dkappa']:.3f})", "full study"]
-    gaps = [pil["broken"]["hom_within_minus_cross"], pil["clean"]["hom_within_minus_cross"],
-            wc["HOM"]["gap"] if wc["HOM"]["gap"] is not None else 0.0]
+    stages = ["shared per-run seed\n(one seed for all 5 agents)",
+              "independent per-agent seed"]
+    vals = [pil["broken"]["dkappa"], pil["clean"]["dkappa"]]
     fig, ax = plt.subplots(figsize=(6, 4.2))
-    ax.bar(stages, gaps, color=["#b44", "#c93", "#484"])
+    bars = ax.bar(stages, vals, color=["#b44", "#484"], width=0.55)
+    for b, v in zip(bars, vals):
+        ax.annotate(f"{v:.3f}", (b.get_x() + b.get_width() / 2, v), ha="center", va="bottom",
+                    fontsize=10)
     ax.axhline(0, color="#999", lw=0.8)
-    ax.set_ylabel("HOM κ  (within-run − cross-run)")
-    ax.set_title("Seeding-nondeterminism inflation collapses to ~0")
+    ax.set_ylabel(r"$\Delta\kappa_{\mathrm{HOM-HET}}$ (8-equity pilot grid)")
+    ax.set_title("Shared sampling context inflates the contrast "
+                 f"{pil['broken']['dkappa'] / pil['clean']['dkappa']:.1f}x")
+    ax.set_ylim(0, max(vals) * 1.25)
     fig.tight_layout(); save(fig, "fig2_protocol")
 
     # fig3: provider agreement heatmap. Undefined cells (no same-provider pair, e.g.

@@ -39,9 +39,8 @@ in Heterogeneous Large Language Model Ensembles}
 \author{\uppercase{Samir Chincholikar}\authorrefmark{1},
 \uppercase{Robin Chawla}\authorrefmark{1}}
 
-\address[1]{Independent Researcher (e-mail: samir.chincholikar@gmail.com;
-robin.chawla.cse14@iitbhu.ac.in)}
-\tfootnote{Manuscript submitted August 3, 2026.}
+\address[1]{Independent Researcher (e-mail: samir.chincholikar@gmail.com, ORCID: 0009-0007-2779-3492; robin.chawla.cse14@iitbhu.ac.in, ORCID: 0009-0007-2807-3948)}
+\tfootnote{This work received no specific grant from any funding agency in the public, commercial, or not-for-profit sectors. Manuscript submitted August 3, 2026.}
 
 \markboth
 {Chincholikar \headeretal: The Price of De-correlation in Heterogeneous LLM Ensembles}
@@ -65,9 +64,10 @@ inference cost by approximately $4.4\times$. Because agreement is not by itself 
 measure of dependence between errors, we also report the correlation between
 agents' error indicators, which falls by $\Delta\phi=0.454$ (95\% CI:
 $0.376$--$0.534$) while per-agent accuracy is essentially unchanged: the effect is
-a reduction in error dependence, not a by-product of differing capability. A
-capability-matched control indicates that the effect is driven primarily by
-provider diversity rather than model capability differences. We also introduce an
+a reduction in error dependence, not a by-product of differing capability. The
+capability-matched analyses suggest that capability differences alone do not
+explain the observed contrast, although provider remains confounded with
+model-specific factors. We also introduce an
 independent-draw measurement protocol that prevents shared sampling conditions
 from inflating estimated agreement. A pre-registered replication on a
 substantially different domain---537 expert clinical-decision items---reproduces
@@ -607,9 +607,9 @@ resampling units. The point estimate does not depend on the resampling scheme.}
 \toprule
 Resampling unit & Clusters & $\Delta\kappa$ & 95\% CI \\
 \midrule
-Equity (pre-reg.) & 100 & 0.3363 & $[0.3131,\,0.3628]$ \\
-Analysis date & 12 & 0.3363 & $[0.3090,\,0.3625]$ \\
-Two-way & 1200 & 0.3363 & $[0.2946,\,0.3741]$ \\
+Equity (pre-reg.) & 100 & 0.3363 & $[0.3035,\,0.3689]$ \\
+Analysis date & 12 & 0.3363 & $[0.2989,\,0.3656]$ \\
+Two-way & 1200 & 0.3363 & $[0.2786,\,0.3877]$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -768,18 +768,17 @@ HET & 0.215 & 0.289 & $-0.074$ \\
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\columnwidth]{fig2_protocol.png}
-\caption{Shared-seed dependence inflates measured agreement. Bars one and two are
-the pilot's primary contrast $\Delta\kappa_{\mathrm{HOM-HET}}$ under shared
-per-run seeding ($0.485$) and under independent per-agent seeding ($0.113$), on
-the same 8-equity pilot grid and the same Claude-family model set. Bar three is a
-different quantity and is labelled as such: the confirmatory study's
-within-minus-cross-run $\kappa$ difference for HOM ($\approx 0$), which is a
-residual-dependence diagnostic, not a HOM$-$HET contrast. The first two bars are
-therefore the like-for-like comparison establishing the artifact and its removal;
-the third shows only that no detectable within-run dependence remains once
-per-agent seeds are used. The confirmatory study's own HOM$-$HET contrast is
-$0.336$ and is reported under ``Heterogeneity de-correlates ensembles'', not
-here.}
+\caption{Shared-seed dependence inflates measured agreement. Both bars are the
+same estimand, the pilot's primary contrast $\Delta\kappa_{\mathrm{HOM-HET}}$,
+measured on the same 8-equity pilot grid and the same Claude-family model set,
+and differing only in the seeding protocol: a single seed shared by all five
+agents in a cell ($0.485$) against an independent seed per agent ($0.113$). Under
+shared seeding the five agents returned byte-identical completions, so
+$\kappa_{\mathrm{HOM}}$ was exactly $1.0$ and the ensemble measured one draw five
+times. The confirmatory study's within-minus-cross-run $\kappa$ diagnostic is a
+different quantity and is reported in Table~\ref{tab:nondet}; the
+confirmatory study's own HOM$-$HET contrast is $0.336$ and is reported under
+``Heterogeneity de-correlates ensembles''.}
 \label{fig:trap}
 \end{figure}
 
@@ -917,7 +916,11 @@ a hypothesis for a future confirmatory study, not as guidance for deployment.
 
 Conditional on an incorrect majority vote, the proportion of agents endorsing
 the incorrect majority decreases from 0.824 for HOM to 0.761 for HET-LITE and
-0.636 for HET. Errors in the heterogeneous ensembles therefore contain more
+0.636 for HET. A paired equity-clustered bootstrap over the same 100 equities
+(2{,}000 draws, the resampling scheme used for the primary endpoint) gives a
+HOM$-$HET difference of $0.189$ (95\% CI $[0.160,\,0.216]$), so the gap is
+distinguishable from zero at the equity level. Errors in the heterogeneous
+ensembles therefore contain more
 within-committee dissent, which may provide an observable signal for escalation,
 abstention, or further review. These findings suggest that heterogeneity may
 affect the concentration of collective errors even when it does not produce a
@@ -1017,7 +1020,11 @@ ensemble decisions are ranked by mean agent conviction, coverage is swept from
 the most confident decision to the full set, and selective risk is the error rate
 among decisions retained at each coverage level. Summarising the curve by the
 area under it (AURC, lower is better), the three configurations are
-0.553 for HOM, 0.568 for HET-LITE, and 0.554 for HET, against
+0.553 for HOM, 0.568 for HET-LITE, and 0.554 for HET. The HOM$-$HET difference
+in AURC, from the same paired equity-clustered bootstrap, is $-0.001$ (95\% CI
+$[-0.059,\,0.060]$): the interval contains zero, so these data do not establish
+a difference in selective-prediction quality between the two configurations.
+These values stand against
 full-coverage risks of 0.562, 0.537, and 0.512. Restricting to the most
 confident half of decisions does not materially reduce selective risk in any
 configuration. Conviction, as elicited here, does not rank errors usefully, and
@@ -1162,10 +1169,9 @@ should evaluate whether the resulting diversity improves a task-relevant
 objective, such as calibration, robustness, abstention quality, or the frequency
 of concentrated collective errors. In the exploratory analysis, HET-LITE
 achieves a reduction in unanimous directional errors comparable to HET at an
-approximately $2.3\times$, rather than $4.4\times$, cost premium. A single
-second-provider agent may therefore represent a candidate cost-efficient
-operating point for this task, although this conclusion should be validated
-prospectively before being generalized to other applications.
+approximately $2.3\times$, rather than $4.4\times$, cost premium. This post hoc pattern motivates prospective evaluation of the
+HET-LITE configuration; it is hypothesis-generating and is not deployment
+guidance.
 
 The shared-seed pilot also has a methodological implication for empirical
 studies of LLM ensembles. When repeated model instances receive the same seed or
@@ -1221,18 +1227,19 @@ was unavailable, and differences in training data, architecture, alignment
 procedures, and effective capability cannot be completely separated from
 provider identity.
 
-\textbf{Single task domain.}
-The experiment evaluates one directional financial-analysis task using a single
-prompt template and a three-class BUY/HOLD/SELL output space. The magnitude of
-agreement reduction may differ for other tasks, prompts, domains, label
-structures, or reasoning requirements. In particular, tasks involving factual
-retrieval, open-ended generation, numerical reasoning, or multi-turn interaction
-may exhibit different within-provider and cross-provider dependence. The present
-results should therefore be interpreted as evidence for the evaluated task
-rather than as a universal estimate of LLM ensemble de-correlation. An
-out-of-domain replication using the same ensemble configurations,
-independent-sampling protocol, and agreement estimator is required to determine
-whether the observed ordering generalizes beyond the financial setting.
+\textbf{Limited domain coverage.}
+The primary experiment evaluates one directional financial-analysis task using a
+single prompt template and a three-class BUY/HOLD/SELL output space, and
+Section~\ref{subsec:crossdomain} adds a pre-registered replication on 537 expert
+clinical-decision items. The ordering reproduces across the two domains, so the
+effect is not confined to the financial setting; its magnitude is not portable,
+being roughly a fifth as large in the clinical replication. Coverage nonetheless
+remains limited along dimensions the design holds fixed: prompt format, ensemble
+size, the majority-vote aggregation rule, and the particular model mixtures
+evaluated. Tasks involving factual retrieval, open-ended generation, numerical
+reasoning, or multi-turn interaction may exhibit different within-provider and
+cross-provider dependence, and varying the aggregation rule or ensemble size
+could change the agreement-cost trade-off independently of provider mixture.
 
 \textbf{Model-version pinning.}
 Proprietary model endpoints may be updated by their providers without preserving
@@ -1333,19 +1340,19 @@ ensure accuracy and originality.
 \bibliographystyle{IEEEtran}
 \bibliography{references}
 
-\begin{IEEEbiographynophoto}{Samir Chincholikar}
+\begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{figures/bio_chincholikar.jpg}}]{Samir Chincholikar}
 received the B.E. degree from the University of Mumbai, India, in 2013, the
 M.B.A. degree in finance from the Jamnalal Bajaj Institute of Management
 Studies, University of Mumbai, in 2016, and the M.S. degree in financial
-engineering from the University of Illinois Urbana-Champaign, Urbana, IL, USA,
-in 2019. He has over a decade of professional experience in quantitative risk
+engineering from the University of Illinois at Urbana-Champaign, Urbana, IL, USA,
+in 2019. He has close to a decade of professional experience in quantitative risk
 analytics and machine learning in the financial services industry. His research
 interests include large language models, multi-agent systems, the use of AI to
 automate engineering workflows, machine learning evaluation, and reproducible
 empirical methods in computational finance.
-\end{IEEEbiographynophoto}
+\end{IEEEbiography}
 
-\begin{IEEEbiographynophoto}{Robin Chawla}
+\begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{figures/bio_chawla.jpg}}]{Robin Chawla}
 received the B.Tech. degree in computer science and engineering from the Indian
 Institute of Technology (BHU), Varanasi, India. He has about eight years of
 professional experience as a software engineer at a proprietary trading firm,
@@ -1354,7 +1361,7 @@ AI to automate engineering workflows. His research interests include large
 language models, multi-agent systems, machine learning for engineering
 workflows and automation, and reproducible evaluation of generative AI
 for decision-making.
-\end{IEEEbiographynophoto}
+\end{IEEEbiography}
 
 \EOD
 

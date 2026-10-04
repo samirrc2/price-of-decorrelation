@@ -43,7 +43,10 @@ TEX = ROOT / "paper" / "main.tex"
 # A number followed by letters is a placeholder, not a value. main.tex shipped
 # "(95\% CI $[0.393LO,\,0.393HI]$)" for months: the coverage gate's literal pattern required a
 # non-word character after the digits, so "0.393LO" was never extracted and never reported.
-PLACEHOLDER = re.compile(r"(?<![\w.])\d+\.\d+[A-Za-z]+")
+# A TeX dimension (1.25in, 11pt) is digits followed by letters but is not a placeholder, so the
+# units are excluded; everything else that runs digits into letters still fails.
+PLACEHOLDER = re.compile(r"(?<![\w.])\d+\.\d+"
+                         r"(?!(?:in|cm|mm|pt|ex|em|bp|pc|dd|sp|px|true)\b)[A-Za-z]+")
 
 LIT = re.compile(r"(?<![\w.])(\d+\.\d+|\d{3,})(?![\w])")
 
@@ -187,23 +190,23 @@ R = [
      "revision_r3_2_clustering_ticker_point", 4),
     (r"unit clusters 95 ci equity pre-reg\.$", "100",
      "revision_r3_2_clustering_ticker_n_clusters", 0),
-    (r"95 ci equity pre-reg\. 100 0\.3363$", "0.3131",
+    (r"95 ci equity pre-reg\. 100 0\.3363$", "0.3035",
      "revision_r3_2_clustering_ticker_ci_low", 4),
-    (r"ci equity pre-reg\. 100 0\.3363 0\.3131$", "0.3628",
+    (r"ci equity pre-reg\. 100 0\.3363 0\.3035$", "0.3689",
      "revision_r3_2_clustering_ticker_ci_high", 4),
-    (r"0\.3363 0\.3131 0\.3628 analysis date 12$", "0.3363",
+    (r"0\.3363 0\.3035 0\.3689 analysis date 12$", "0.3363",
      "revision_r3_2_clustering_date_point", 4),
-    (r"0\.3131 0\.3628 analysis date 12 0\.3363$", "0.3090",
+    (r"0\.3035 0\.3689 analysis date 12 0\.3363$", "0.2989",
      "revision_r3_2_clustering_date_ci_low", 4),
-    (r"0\.3628 analysis date 12 0\.3363 0\.3090$", "0.3625",
+    (r"0\.3689 analysis date 12 0\.3363 0\.2989$", "0.3656",
      "revision_r3_2_clustering_date_ci_high", 4),
-    (r"date 12 0\.3363 0\.3090 0\.3625 two-way$", "1200",
+    (r"date 12 0\.3363 0\.2989 0\.3656 two-way$", "1200",
      "revision_r3_2_clustering_two_way_n_clusters", 0),
-    (r"12 0\.3363 0\.3090 0\.3625 two-way 1200$", "0.3363",
+    (r"12 0\.3363 0\.2989 0\.3656 two-way 1200$", "0.3363",
      "revision_r3_2_clustering_two_way_point", 4),
-    (r"0\.3363 0\.3090 0\.3625 two-way 1200 0\.3363$", "0.2946",
+    (r"0\.3363 0\.2989 0\.3656 two-way 1200 0\.3363$", "0.2786",
      "revision_r3_2_clustering_two_way_ci_low", 4),
-    (r"0\.3090 0\.3625 two-way 1200 0\.3363 0\.2946$", "0.3741",
+    (r"0\.2989 0\.3656 two-way 1200 0\.3363 0\.2786$", "0.3877",
      "revision_r3_2_clustering_two_way_ci_high", 4),
     # ---------------------------------------------------------------------- error correlation
     (r"error correlation falls monotonically with heterogeneity$", "0.984",
@@ -258,10 +261,6 @@ R = [
      "ms_within_run_vs_cross_run_nondeterminism_check_het_cross", 3),
     (r"0\.350 -0\.048 het 0\.215 0\.289 -$", "0.074",
      "ms_within_run_vs_cross_run_nondeterminism_check_het_within_cross", 3),
-    (r"contrast hom-het under shared per-run seeding$", "0.485",
-     "pilot_broken_delta_kappa", 3),
-    (r"0\.485 and under independent per-agent seeding$", "0.113",
-     "pilot_clean_delta_kappa", 3),
     (r"own hom - het contrast is$", "0.336", "primary_delta_kappa", 3),
     (r"a model\. same-model pairs agree at$", "0.800",
      "revision_r1_5_independence_by_pair_type_hom_same_model_agreement", 3),
@@ -390,9 +389,9 @@ R = [
      "revision_r1_1_r3_4_selective_prediction_het_lite_aurc", 3),
     (r"for hom 0\.568 for het-lite and$", "0.554",
      "revision_r1_1_r3_4_selective_prediction_het_aurc", 3),
-    (r"for het against full-coverage risks of$", "0.562",
+    (r"values stand against full-coverage risks of$", "0.562",
      "revision_r1_1_r3_4_selective_prediction_hom_full_coverage_risk", 3),
-    (r"het against full-coverage risks of 0\.562$", "0.537",
+    (r"stand against full-coverage risks of 0\.562$", "0.537",
      "revision_r1_1_r3_4_selective_prediction_het_lite_full_coverage_risk", 3),
     (r"full-coverage risks of 0\.562 0\.537 and$", "0.512",
      "revision_r1_1_r3_4_selective_prediction_het_full_coverage_risk", 3),
@@ -450,6 +449,21 @@ R = [
     (r"0\.21 0\.78 1\.0 0\.53 0\.27 0\.15$", "0.38", "temp_T10_dk_hom_het", 2),
     (r"0\.78 1\.0 0\.53 0\.27 0\.15 0\.38$", "0.19", "temp_T10_ci_low", 2),
     (r"1\.0 0\.53 0\.27 0\.15 0\.38 0\.19$", "0.54", "temp_T10_ci_high", 2),
+    (r"section adds a pre-registered replication on$", "537", "mmlu_overall_n_items", 0),
+    # --------------------------------------------------- R3.4 paired equity-clustered CIs
+    (r"all five agents in a cell$", "0.485", "pilot_broken_delta_kappa", 3),
+    (r"against an independent seed per agent$", "0.113", "pilot_clean_delta_kappa", 3),
+    (r"byte-identical completions so hom was exactly$", "1.0", "pilot_broken_kappa_hom", 1),
+    (r"paired equity-clustered bootstrap over the same$", "100",
+     "revision_r3_4_paired_cluster_contrasts_pile_on_n_clusters", 0),
+    (r"bootstrap over the same 100 equities$", "2000", "revision_r3_4_paired_cluster_contrasts_pile_on_draws_used", 0),
+    (r"a hom - het difference of$", "0.189", "revision_r3_4_paired_cluster_contrasts_pile_on_delta_hom_het", 3),
+    (r"het difference of 0\.189 95 ci$", "0.160", "revision_r3_4_paired_cluster_contrasts_pile_on_ci_low", 3),
+    (r"difference of 0\.189 95 ci 0\.160$", "0.216", "revision_r3_4_paired_cluster_contrasts_pile_on_ci_high", 3),
+    (r"same paired equity-clustered bootstrap is -$", "0.001",
+     "revision_r3_4_paired_cluster_contrasts_aurc_delta_hom_het", 3),
+    (r"bootstrap is -0\.001 95 ci -$", "0.059", "revision_r3_4_paired_cluster_contrasts_aurc_ci_low", 3),
+    (r"bootstrap is -0\.001 95 ci -0\.059$", "0.060", "revision_r3_4_paired_cluster_contrasts_aurc_ci_high", 3),
     # ---------------------------------------------------------------------------- discussion
     (r"inference cost\. within-ensemble agreement decreases from$", "0.552",
      "kappa_hom", 3),
@@ -499,7 +513,7 @@ R = [
     (r"the university of mumbai india in$", "2013", "!degree year, author biography", 0),
     (r"management studies university of mumbai in$", "2016",
      "!degree year, author biography", 0),
-    (r"illinois urbana-champaign urbana il usa in$", "2019",
+    (r"at urbana-champaign urbana il usa in$", "2019",
      "!degree year, author biography", 0),
 ]
 
@@ -508,6 +522,10 @@ def normalize(raw: str) -> str:
     t = re.sub(r"(?m)(?<!\\)%.*", "", raw)
     t = re.sub(r"\\(?:label|ref|cite[a-z]*|includegraphics|input|url|eqref|doi)\{[^}]*\}",
                " ", t)
+    # An ORCID is an identifier, not a quantity -- the same reason \doi{} is stripped above.
+    # Declaring its segments (0009, 0007, ...) as bare-string non-results would excuse those
+    # digits anywhere in the paper, which is exactly the string-keyed weakness this gate removed.
+    t = re.sub(r"ORCID:\s*[0-9X-]+", " ", t)
     t = re.sub(r"(\d)\{,\}(\d)", r"\1\2", t)
     return t
 

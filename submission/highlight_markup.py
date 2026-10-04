@@ -87,13 +87,32 @@ def main():
     s = s.replace(r"\begin{document}", PREAMBLE + r"\begin{document}", 1)
     assert s != before, "could not inject the preamble"
 
+    # Both macros map to \texthl in the preamble, so BOTH need their bodies made soul-safe.
+    # Only \DIFadd{ was rewritten: \DIFaddFL{ runs were counted and left untouched, so a
+    # \ref, \cite or $...$ added inside a float went to soul unprotected. soul does not fail
+    # on these, it silently drops them -- a \ref{tab:nondet} added to a figure caption rendered
+    # as "Table " with the number missing, and the PDF text-parity check caught it as a
+    # one-character difference against the manuscript. Counting a run is not the same as
+    # processing it.
+    n_float = s.count("\\DIFaddFL{")
+    hl, plain = 0, 0
+    for macro in (r"\DIFadd{", r"\DIFaddFL{"):
+        s, a, b = _rewrite_runs(s, macro)
+        hl += a
+        plain += b
+    result = s
+    assert r"\sethlcolor{HLyellow}" in result, "colour setup missing"
+    open(p, "w", encoding="utf-8").write(result)
+    print(f"   {hl} runs highlighted inline, {plain} left plain (display math or long runs), "
+          f"{n_float} inside floats (tables and captions)")
+
+
+def _rewrite_runs(s, macro):
     out, i, hl, plain = [], 0, 0, 0
-    macro = r"\DIFadd{"
     # \DIFaddFL is what latexdiff emits inside a float. It used to render plain, so the
     # eleven additions in Table 5 -- the whole SR 26-2 column and the rewritten caption --
     # were invisible while the build still reported success. They are counted separately
     # now: a number that is never reported is a number nobody checks.
-    n_float = s.count("\\DIFaddFL{")
     while True:
         j = s.find(macro, i)
         if j < 0:
@@ -112,11 +131,7 @@ def main():
             out.append(macro + box_for_soul(body) + "}")
             hl += 1
         i = e + 1
-    result = "".join(out)
-    assert r"\sethlcolor{HLyellow}" in result, "colour setup missing"
-    open(p, "w", encoding="utf-8").write(result)
-    print(f"   {hl} runs highlighted inline, {plain} left plain (display math or long runs), "
-          f"{n_float} inside floats (tables and captions)")
+    return "".join(out), hl, plain
 
 
 if __name__ == "__main__":

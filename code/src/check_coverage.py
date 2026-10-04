@@ -89,6 +89,7 @@ def main() -> int:
 
     t = re.sub(r"%.*", "", TEX.read_text())
     t = re.sub(r"\\(?:label|ref|cite[a-z]*|includegraphics|input|url|eqref|doi)\{[^}]*\}", " ", t)
+    t = re.sub(r"ORCID:\s*[0-9X-]+", " ", t)   # an identifier, not a quantity -- as for \doi{}
     t = re.sub(r"(\d)\{,\}(\d)", r"\1\2", t)
     # integers below 100 are overwhelmingly counts, section numbers and "5-agent"; the
     # substantive assertions are decimals and large counts, which is what this gates.
