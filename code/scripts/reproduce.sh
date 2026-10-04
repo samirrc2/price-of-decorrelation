@@ -408,6 +408,12 @@ _run_gates() {
   _gate response-consistency "$PY" "$CODE_ROOT/src/check_response_consistency.py" || return 1
   echo "[gate] freeze receipts vs the commits and artifacts they attest"
   _gate freeze-receipt "$PY" "$CODE_ROOT/src/check_freeze_receipt.py" || return 1
+  # Does the yellow on the page match what actually changed? Nothing else asks this: the other
+  # highlighting checks verify that the two PDFs share a layout and that the build located every
+  # change it was told about, which is not the same question. Four defects reached the author
+  # before this gate existed.
+  echo "[gate] highlighting vs the real diff against as-submitted"
+  _gate highlight-coverage "$PY" "$CODE_ROOT/src/check_highlight_coverage.py" || return 1
   echo "[gate] freeze timestamps quoted in prose vs the receipts"
   _gate freeze-timestamps "$PY" "$CODE_ROOT/src/check_freeze_timestamps.py" || return 1
   echo "[gate] unit tests"
