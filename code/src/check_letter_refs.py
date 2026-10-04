@@ -18,7 +18,12 @@ Two checks, both narrow and both stated in the output:
      rule for, and a number-keyed check skips it silently. Fault injection
      caught exactly that.
   3. every reference that is new in this revision is named somewhere in the
-     letter, so no added citation goes unexplained to the reviewers.
+     letter, so no added citation goes unexplained to the reviewers;
+  4. and named in an Author action, not only in the surrounding prose. Adding a
+     citation is an action taken in response to a concern, so a reference the
+     letter only alludes to has not actually been reported as a change. This
+     caught Kuncheva and Whitaker being described in R2.2 as "the
+     classifier-ensemble result" with no number attached.
 
 Exit 0 passed, 1 failed, 2 could not be checked here (no main.bbl).
 """
@@ -128,6 +133,20 @@ def main() -> int:
             fail.append(f"{key} is new in this revision but the letter never names "
                         f"{surname}, so the reviewers are not told why it was added")
 
+    # 4. each new reference is claimed in at least one Author action block
+    blocks = re.split(r"\n(?=Reviewer #\d, Concern #\d)", text)
+    actions = []
+    for b in blocks:
+        k = b.rfind("Author action")
+        if k >= 0:
+            actions.append(b[k:])
+    for key in sorted(NEW):
+        surname, _ = ATTRIB[key]
+        num = f"[{order[key]}]" if key in order else None
+        if not any(surname.lower() in a.lower() and num and num in a for a in actions):
+            fail.append(f"{key} is never named with {num} in an Author action; an added citation "
+                        f"is a change made in response to a concern and has to be reported as one")
+
     if fail:
         for f in fail:
             print("  " + f, file=sys.stderr)
@@ -135,8 +154,8 @@ def main() -> int:
         return 1
     print(f"[letter-refs] {cited} bracketed citation(s) in the response letter resolve to the "
           f"source the letter names and {anchored} named mention(s) carry the right number; "
-          f"all {len(NEW)} references new in this revision are named in it "
-          f"({len(order)} bibliography entries)")
+          f"all {len(NEW)} references new in this revision are named in it and claimed in an "
+          f"Author action ({len(actions)} action blocks, {len(order)} bibliography entries)")
     return 0
 
 
