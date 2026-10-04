@@ -154,6 +154,15 @@ def _rewrite_runs(s, macro):
             out.append(s[j:])
             break
         body = s[j + len(macro):e]
+        # Strip trailing whitespace inside the run. latexdiff ends most runs with the source
+        # line break, so the body finishes with a newline, which TeX reads as a space -- and
+        # soul highlights that space like any other character. When the run's last line is
+        # already full to the margin, the highlighted trailing space does not fit and is set on
+        # a line of its own: a blank highlighted line, 11.9pt of white, between the run and
+        # whatever follows. In the five-concepts list of Section V-C it opened a visible gap
+        # between items 4 and 5 that the clean manuscript does not have. Stripping it closes
+        # the gap and changes nothing else, since the space was never part of the text.
+        body = body.rstrip()
         if any(tok in body for tok in UNSAFE_IN_RUN) or len(body) > 1200:
             out.append(r"\DIFplain{" + body + "}")     # keep the text, skip the highlight
             plain += 1
