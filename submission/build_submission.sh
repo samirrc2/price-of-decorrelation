@@ -56,6 +56,7 @@ python3 code/src/check_letter_refs.py | sed 's/^/   /'
 python3 code/src/check_letter_binding.py | sed 's/^/   /'
 python3 code/src/check_letter_sections.py | sed 's/^/   /'
 python3 code/src/check_letter_actions.py | sed 's/^/   /'
+python3 code/src/check_response_consistency.py | sed 's/^/   /'
 python3 code/src/check_freeze_timestamps.py | sed 's/^/   /'
 
 echo "== 2/4 Word version =="
