@@ -5,7 +5,7 @@
 Verdict rule: CONFIRMED if Δκ>0 and CI excludes 0; WEAKENED if Δκ>0 but CI includes 0; CONTRADICTED if Δκ≤0. Model set = OpenAI/Google/xAI (cross-provider; differs from the Claude-family pilot — stated explicitly).
 
 - Calls logged (incl. retries): 94566  |  usable: 54000
-- Analyzed 2026-07-04T20:12:10.370612+00:00 on runs.csv (94566 rows). Grid COMPLETE: 54000/54000 cells present. (Historical deferred/retry rows: 3125, all backfilled.)
+- Inputs: `runs.csv` SHA-256=`8a1f5fc78482e87cb7ef5825c6a9425eb377bc80a7a60eb0febf61e70e5c0ee1` ; `configs/config.yaml` SHA-256=`3608d4982d50ffd8b10796e2ab824c4e163d896fc20b02a2893cb4b80126964f` (94566 rows). Grid COMPLETE: 54000/54000 cells present. (Historical deferred/retry rows: 3125, all backfilled.)
 
 ## Secondary Δκ contrasts
 
@@ -47,6 +47,6 @@ Verdict rule: CONFIRMED if Δκ>0 and CI excludes 0; WEAKENED if Δκ>0 but CI i
 
 ## Accuracy proxy — SECONDARY axis (study powered for κ, not accuracy)
 
-- forward returns unavailable: no cache and yfinance/pandas not installed: No module named 'yfinance'
+- forward returns unavailable: no cache and yfinance/pandas not installed: cannot import name randbits
 
 _(figures written to figures/). Tables in tables/ (CSV + LaTeX)._

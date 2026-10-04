@@ -102,7 +102,11 @@ def main():
     # expected grid — NOT by historical DEFERRED/retry rows (a cell can carry an old
     # deferred row AND a later successful backfill).
     import datetime as _dt
+    import hashlib as _hashlib
     _cfg = cfg
+    config_path = _HERE / "configs" / "config.yaml"
+    runs_sha = _hashlib.sha256(runs_csv.read_bytes()).hexdigest()
+    cfg_sha = _hashlib.sha256(config_path.read_bytes()).hexdigest()
     expected = (len(_cfg["tickers"]) * len(_cfg["dates"]) * len(_cfg["configs"])
                 * int(_cfg["runs"]) * 5)
     ok_slots = {(r["config"], r["ticker"], r["date"], r["run_idx"], r["agent_idx"])
@@ -112,16 +116,23 @@ def main():
     still_short = sorted({r["model"] for r in deferred_rows
                           if (r["config"], r["ticker"], r["date"], r["run_idx"], r["agent_idx"])
                           not in ok_slots})
+    # Wall-clock is console-only (not part of the reproducible artifact).
     _ts = _dt.datetime.now(_dt.timezone.utc).isoformat()
+    print(f"Analysis started (UTC): {_ts}")
+    # Manifest stamps input hashes so re-runs are byte-identical for the same data.
     if missing > 0:
-        manifest_line = (f"- Analyzed {_ts} on {runs_csv.name} ({len(rows)} rows). "
-                         f"Grid {len(ok_slots)}/{expected} cells complete; {missing} still MISSING"
-                         + (f" (models over quota: {still_short})" if still_short else "")
-                         + ".  ⚠️ Dataset INCOMPLETE — backfill remaining cells before final.")
+        manifest_line = (
+            f"- Inputs: `{runs_csv.name}` SHA-256=`{runs_sha}` ; "
+            f"`configs/config.yaml` SHA-256=`{cfg_sha}` ({len(rows)} rows). "
+            f"Grid {len(ok_slots)}/{expected} cells complete; {missing} still MISSING"
+            + (f" (models over quota: {still_short})" if still_short else "")
+            + ".  ⚠️ Dataset INCOMPLETE — backfill remaining cells before final.")
     else:
-        manifest_line = (f"- Analyzed {_ts} on {runs_csv.name} ({len(rows)} rows). "
-                         f"Grid COMPLETE: {len(ok_slots)}/{expected} cells present. "
-                         f"(Historical deferred/retry rows: {len(deferred_rows)}, all backfilled.)")
+        manifest_line = (
+            f"- Inputs: `{runs_csv.name}` SHA-256=`{runs_sha}` ; "
+            f"`configs/config.yaml` SHA-256=`{cfg_sha}` ({len(rows)} rows). "
+            f"Grid COMPLETE: {len(ok_slots)}/{expected} cells present. "
+            f"(Historical deferred/retry rows: {len(deferred_rows)}, all backfilled.)")
     config_names = list(cfg["configs"].keys())
     hlevel = cfg["heterogeneity_level"]
     tickers = cfg["tickers"]
@@ -183,6 +194,7 @@ def main():
     _write_docs(cfg, verdict, primary, sec1, sec2, kappa, cost, config_names, hlevel)
 
     print(f"VERDICT: {verdict}  primary Δκ(HOM−HET)={fmt(dk)} CI[{fmt(lo)},{fmt(hi)}]")
+    print(f"Input hashes: runs.csv={runs_sha}  config.yaml={cfg_sha}")
     print("Wrote metrics_summary.md, figures/, tables/, protocol_exhibit.md, "
           "headline_check.md, threats_to_validity.md, appendix/data_availability.md")
     return 0
