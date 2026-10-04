@@ -130,7 +130,21 @@ def main() -> int:
         print("   no successful rows yet"); return 2
     items = sorted({r["ticker"] for r in rows})
 
-    out = {"runs_csv": str(runs_csv), "overall": report(rows, truth, items, a.draws, a.seed, "OVERALL")}
+    # Record the input RELATIVE to the repository root, plus its SHA-256. An absolute path
+    # makes this file unreproducible by construction -- the capsule and a local checkout
+    # produced byte-different JSON for identical data, which defeats the whole point of
+    # hash-comparing outputs. The hash is what actually identifies the input.
+    import hashlib
+    try:
+        rel = runs_csv.resolve().relative_to(ROOT.resolve()).as_posix()
+    except ValueError:
+        rel = runs_csv.name           # input from outside the repo: name only, never a path
+    _h = hashlib.sha256()
+    with runs_csv.open("rb") as _f:
+        for _b in iter(lambda: _f.read(1 << 20), b""):
+            _h.update(_b)
+    out = {"runs_csv": rel, "runs_csv_sha256": _h.hexdigest(),
+           "overall": report(rows, truth, items, a.draws, a.seed, "OVERALL")}
 
     # secondary: difficulty split at median per-item accuracy (pre-registered as exploratory)
     acc = {it: sum(1 for r in rows if r["ticker"] == it and r["direction"] == truth[it]["answer"])

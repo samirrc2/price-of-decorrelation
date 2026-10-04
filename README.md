@@ -217,6 +217,38 @@ data/confirmatory/latest/runs.csv + data/configs/config.yaml
 
 Stable path for readers: `results/latest/` (symlink to the newest timestamped folder).
 
+### Gates
+
+`reproduce.sh` does not merely regenerate the outputs; it refuses to report success unless
+every applicable gate passes. Each prints its own coverage count, so a gate that silently
+checked nothing is visible rather than reassuring.
+
+| Gate | What it asserts | Would catch |
+|---|---|---|
+| Determinism | two analysis passes, 13 outputs hash-compared | order- or seed-dependence |
+| `make_manifest.py --verify` | all 1,749 frozen inputs match their pinned SHA-256 | an input that changed, was regenerated, or vanished |
+| `make_manifest.py --capsule` | the inputs a `/code`+`/data` mount cannot run without are present | a capsule that passes its hashes while missing the offline price cache, which would silently fall back to a network call |
+| `reviewer_revision.py`, `analyze_mmlu.py` | the revision arms regenerate from frozen captures | a stale reviewer or cross-domain number |
+| `make_claims.py` | 65 named claims extract from the regenerated outputs | an analysis that stopped emitting a number the paper cites |
+| `check_claims.py` | `paper/main.tex` agrees with the analysis | a drifted figure, including a plausible near-miss |
+| `pytest code/tests` | metric and bootstrap primitives | a regression in κ, φ or the cluster bootstrap |
+
+Exit codes are a contract: **0** every applicable gate passed; **1** a gate failed; **2** the
+analysis reproduced but a gate that should apply here could not run. A `/code`+`/data`
+capsule has no `paper/`, so the manuscript gate is correctly skipped and the run still
+exits 0 — see `environment/README.md`.
+
+Verify the inputs alone, without running the analysis:
+
+```bash
+python code/src/make_manifest.py --verify     # 0 = intact, 1 = corrupt or missing
+python code/src/make_manifest.py --capsule    # 0 = a capsule has everything it needs
+```
+
+`DATA_MANIFEST.md` lists every pinned file with its size and SHA-256.
+`results/latest/claims.json` is the machine-readable record of every number the paper may
+assert; `SUBMISSION_ARTIFACT.md` summarises the locked values.
+
 Faster single-pass regeneration (no hash compare):
 
 ```bash

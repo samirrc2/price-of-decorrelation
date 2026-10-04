@@ -120,7 +120,7 @@ if [[ "$MODE" == "scratch" && "$DRY_RUN_FLAG" -eq 1 ]]; then
   echo "ERROR: --dry-run cannot be used with --scratch-run." >&2
   echo "--scratch-run is a full live collect + analyze." >&2
   echo "For validation only:" >&2
-  echo "  python code/src/orchestrator.py --phase full --max-calls 48000 --dry-run --fresh" >&2
+  echo "  $PY code/src/orchestrator.py --phase full --max-calls 48000 --dry-run --fresh" >&2
   exit 1
 fi
 
@@ -138,27 +138,48 @@ fi
 
 cd "$REPO_ROOT" 2>/dev/null || cd "$CODE_ROOT"
 
-export PATH="/opt/homebrew/bin:/usr/local/bin:${PATH:-}"
+# APPEND these, do not prepend: prepending forced /usr/local/bin/python3 ahead of whatever
+# interpreter the operator had selected, and that one lacks pyyaml -- so a machine with a
+# perfectly good python failed with "missing Python packages".
+export PATH="${PATH:-}:/opt/homebrew/bin:/usr/local/bin"
+
+# PY is the ONE interpreter every step uses. Overridable, because the environment that can
+# import the dependencies is not always the first `python` on PATH:
+#   PY=./.venv/bin/python bash reproduce.sh
+# Resolution order: an explicit PY, then a repo-local .venv, then python3, then python. The
+# first one that can import the dependencies wins -- selecting by name alone is what made a
+# machine with a working interpreter report "missing Python packages".
+_pick_python() {
+  local cands=()
+  [[ -n "${PY:-}" ]] && cands+=("$PY")
+  [[ -x "$REPO_ROOT/.venv/bin/python" ]] && cands+=("$REPO_ROOT/.venv/bin/python")
+  cands+=(python3 python)
+  for c in "${cands[@]}"; do
+    command -v "$c" >/dev/null 2>&1 || [[ -x "$c" ]] || continue
+    if "$c" -c "import yaml, numpy, matplotlib" >/dev/null 2>&1; then
+      PY="$c"; return 0
+    fi
+  done
+  return 1
+}
 
 _ensure_env() {
   if [[ -d /code/src && -d /data ]]; then
     export PYTHONPATH="/code/src:${PYTHONPATH:-}"
-    if command -v python >/dev/null 2>&1; then
-      echo "Code Ocean env: $(python --version 2>&1)"
+    if _pick_python; then
+      echo "Code Ocean env: $("$PY" --version 2>&1)  [$PY]"
       return 0
     fi
   fi
   export PYTHONPATH="$CODE_ROOT/src:${PYTHONPATH:-}"
-  if ! command -v python >/dev/null 2>&1; then
-    echo "ERROR: python not found on PATH." >&2
-    exit 1
-  fi
-  if ! python -c "import yaml, numpy, matplotlib" 2>/dev/null; then
-    echo "ERROR: missing Python packages." >&2
+  if ! _pick_python; then
+    echo "ERROR: no python on PATH can import yaml, numpy and matplotlib." >&2
+    echo "Tried: ${PY:-} ${REPO_ROOT}/.venv/bin/python python3 python" >&2
     echo "Install with: pip install -r code/requirements.txt" >&2
+    echo "Or point at a working interpreter: PY=/path/to/python bash reproduce.sh" >&2
     exit 1
   fi
-  echo "Python: $(python --version 2>&1)"
+  echo "Python: $("$PY" --version 2>&1)  [$PY]"
 }
 
 _ensure_env
@@ -198,7 +219,7 @@ if [[ "$MODE" == "scratch" ]]; then
     ORCH_ARGS+=(--max-calls "$MAX_CALLS")
   fi
 
-  (cd "$CODE_ROOT" && python src/orchestrator.py "${ORCH_ARGS[@]}")
+  (cd "$CODE_ROOT" && "$PY" src/orchestrator.py "${ORCH_ARGS[@]}")
   echo ""
 
   # Point at the folder we just collected, then analyze once into results/
@@ -215,7 +236,7 @@ if [[ "$MODE" == "scratch" ]]; then
   export POD_RUNS_CSV="$RUNS_CSV"
   export POD_OUT_DIR="$OUT_DIR"
   echo "Collection done. Analyzing → results/$OUT_NAME"
-  (cd "$CODE_ROOT" && python src/analyze.py)
+  (cd "$CODE_ROOT" && "$PY" src/analyze.py)
   ln -sfn "$OUT_NAME" "$RESULTS_ROOT/latest"
   echo "results/latest -> results/$OUT_NAME"
   echo "Done. Open results/latest/ (figures/, tables/, metrics_summary.md)."
@@ -283,14 +304,93 @@ echo "POD_RUNS_CSV=$POD_RUNS_CSV"
 echo "data date=$DATA_DATE"
 echo "POD_OUT_DIR=$POD_OUT_DIR"
 
+# --------------------------------------------------------------------------- #
+# Gates. Every one prints its own coverage count, and exit 2 means "this copy
+# cannot run this gate" (the /code + /data capsule has no paper/ or submission/),
+# which must not read as a pass. Modelled on Paper 2's code/reproduce.sh.
+# --------------------------------------------------------------------------- #
+GATES_INCOMPLETE=0
+
+_gate() {   # name, then the command
+  local name="$1"; shift
+  local rc=0
+  "$@" || rc=$?
+  case "$rc" in
+    0) ;;
+    2) echo "     [$name] NOT CHECKABLE in this copy (exit 2)"; GATES_INCOMPLETE=1 ;;
+    *) echo "     [$name] FAILED (exit $rc)"; return "$rc" ;;
+  esac
+  return 0
+}
+
+_run_gates() {
+  echo "[gate] input integrity (SHA-256 of every frozen input)"
+  _gate manifest "$PY" "$CODE_ROOT/src/make_manifest.py" --verify || return 1
+
+  # Hashes verifying is not the same as the inputs being COMPLETE. The capsule passed its
+  # hash check while data/datacache/forward_returns.json was missing, which silently turned
+  # an offline run into a network-dependent one and then crashed the reviewer analyses.
+  echo "[gate] capsule completeness (inputs a /code + /data mount must carry)"
+  _gate capsule "$PY" "$CODE_ROOT/src/make_manifest.py" --capsule || return 1
+
+  # The revision arms are keys-free: both read only frozen captures. Regenerating them here
+  # is what LOCKS them -- previously reproduce.sh rebuilt the primary endpoint and left
+  # results/revision_metrics.json and results/mmlu_replication.json as whatever was last
+  # committed, so a stale revision number could not be detected by any run.
+  echo "[gate] revision arms (reviewer analyses + cross-domain replication)"
+  if [[ -f "$DATA_ROOT/confirmatory/latest/runs.csv" || -d "$DATA_ROOT/confirmatory" ]]; then
+    _gate revision "$PY" "$CODE_ROOT/src/reviewer_revision.py" || return 1
+  else
+    echo "     [revision] NOT CHECKABLE: confirmatory capture absent"; GATES_INCOMPLETE=1
+  fi
+  if compgen -G "$DATA_ROOT/mmlu/*/runs.csv" >/dev/null; then
+    _gate mmlu "$PY" "$CODE_ROOT/src/analyze_mmlu.py" || return 1
+  else
+    echo "     [mmlu] NOT CHECKABLE: cross-domain capture absent"; GATES_INCOMPLETE=1
+  fi
+
+  echo "[gate] claims extraction"
+  _gate claims "$PY" "$CODE_ROOT/src/make_claims.py" || return 1
+  echo "[gate] manuscript numbers vs frozen analysis"
+  _gate check-claims "$PY" "$CODE_ROOT/src/check_claims.py" || return 1
+  echo "[gate] unit tests"
+  if [[ -d "$CODE_ROOT/tests" ]]; then
+    if "$PY" -c "import pytest" >/dev/null 2>&1; then
+      _gate tests "$PY" -m pytest -q "$CODE_ROOT/tests" || return 1
+    else
+      echo "     [tests] NOT CHECKABLE: pytest not installed in $PY"
+      GATES_INCOMPLETE=1
+    fi
+  fi
+  return 0
+}
+
 if [[ "$MODE" == "analyze" ]]; then
-    echo "Running: python src/analyze.py"
-    (cd "$CODE_ROOT" && python src/analyze.py)
+    echo "Running: $PY src/analyze.py"
+    (cd "$CODE_ROOT" && "$PY" src/analyze.py)
     _point_latest
+    _run_gates || exit 1
     echo "Done. Open results/latest/ (figures/, tables/, metrics_summary.md)."
 elif [[ "$MODE" == "replication" ]]; then
-    echo "Running: python src/replication_check.py"
+    echo "Running: $PY src/replication_check.py"
     unset POD_OUT_DIR
-    (cd "$CODE_ROOT" && python src/replication_check.py)
+    (cd "$CODE_ROOT" && "$PY" src/replication_check.py)
+    _run_gates || exit 1
     echo "Done. See results/latest/replication_check.md"
 fi
+
+# A gate that could not run is not a pass -- but a /code + /data capsule has no paper/ and
+# no submission/ BY DESIGN, so "the manuscript gate did not run" is the documented layout
+# there and must exit 0. Only a FULL checkout that is missing them is incomplete. Paper 2
+# draws the same distinction, and getting it wrong means every capsule run reports failure.
+if [[ "$GATES_INCOMPLETE" == 1 ]]; then
+  if [[ -d "$REPO_ROOT/paper" || -d "$REPO_ROOT/submission" ]]; then
+    echo "[reproduce] INCOMPLETE: this is a full checkout, yet a gate could not run"
+    exit 2
+  fi
+  echo "[reproduce] capsule layout: analysis and data gates passed; document gates are"
+  echo "[reproduce] not part of a /code + /data capsule and were correctly skipped"
+  exit 0
+fi
+echo "[reproduce] all gates passed"
+exit 0
