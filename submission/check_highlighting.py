@@ -181,6 +181,65 @@ def base_ref():
     return m.group(1)
 
 
+def check_new_reference_highlighting():
+    """Every reference newly cited since the baseline must be highlighted in the PDF."""
+    import subprocess
+    pdf = ROOT / "submission" / "highlighted_pdf.pdf"
+    if not pdf.exists():
+        return 0, [], "new-reference highlighting: no highlighted PDF to check"
+    try:
+        import pymupdf
+    except Exception:
+        return 0, [], ("new-reference highlighting NOT CHECKED: pymupdf unavailable, so the "
+                       "yellow fill behind an entry cannot be read")
+    base = subprocess.run(["git", "show", "as-submitted:paper/main.tex"], cwd=ROOT,
+                          capture_output=True, text=True).stdout
+    if not base:
+        return 0, [], "new-reference highlighting NOT CHECKED: baseline main.tex unavailable"
+    cite = re.compile(r"\\cite[a-z]*\{([^}]*)\}")
+    def keys(t):
+        return {k.strip() for m in cite.finditer(t) for k in m.group(1).split(",") if k.strip()}
+    added = keys((ROOT / "paper" / "main.tex").read_text()) - keys(base)
+    if not added:
+        return 0, [], "new-reference highlighting: no references added since the baseline"
+
+    bbl = (ROOT / "paper" / "main.bbl")
+    if not bbl.exists():
+        return 0, [], "new-reference highlighting NOT CHECKED: paper/main.bbl absent"
+    btext = bbl.read_text()
+    doc = pymupdf.open(pdf)
+    # the yellow the build sets via \sethlcolor{HLyellow}
+    def yellow_boxes(page):
+        out = []
+        for d in page.get_drawings():
+            f = d.get("fill")
+            if f and len(f) == 3 and f[0] > 0.85 and f[1] > 0.8 and f[2] < 0.6:
+                out.append(d["rect"])
+        return out
+    fails, checked = [], 0
+    for k in sorted(added):
+        m = re.search(r"\\bibitem\{" + re.escape(k) + r"\}\s*\n(.{0,120})", btext, re.S)
+        if not m:
+            fails.append(f"{k} is newly cited but absent from paper/main.bbl")
+            continue
+        probe = " ".join(re.sub(r"\\[a-zA-Z]+|[{}~\\]", " ", m.group(1)).split())[:38]
+        hit = False
+        for page in doc:
+            for r in page.search_for(probe) or []:
+                if any(r.intersects(y) for y in yellow_boxes(page)):
+                    hit = True
+                    break
+            if hit:
+                break
+        checked += 1
+        if not hit:
+            fails.append(f"reference {k} was added in this revision but its entry in the "
+                         f"REFERENCES list is not highlighted in the PDF")
+    return checked, fails, (f"new-reference highlighting: {checked - len(fails)}/{checked} "
+                            f"added reference(s) highlighted in the reference list "
+                            f"({', '.join(sorted(added))})")
+
+
 def main():
     base = sys.argv[1] if len(sys.argv) > 1 else base_ref()
     old = subprocess.run(["git", "show", f"{base}:paper/main.tex"],
@@ -308,6 +367,15 @@ def main():
     pchecks, pfails, pnote = check_pdf_text_parity()
     fails.extend(pfails)
     print(f"   {pnote}")
+    # Verify end-to-end that every reference ADDED since the baseline is visibly highlighted in
+    # the built PDF. latexdiff cannot mark these -- it diffs main.tex, where the bibliography is
+    # one \bibliography line -- so highlight_newrefs.py marks them in the generated .bbl, and
+    # nothing checked that it worked. This looks for a yellow fill behind the entry's text
+    # rather than trusting the build's own log line.
+    nchecks, nfails, nnote = check_new_reference_highlighting()
+    fails.extend(nfails)
+    print(f"   {nnote}")
+
     if re.search(r"\\bibitem", marked):
         fails.append("bibliography entries are highlighted; they should be held constant")
     print(f"   rounding-only corrections in the markup: {len(set(leaked))}")

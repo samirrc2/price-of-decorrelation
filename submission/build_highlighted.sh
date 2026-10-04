@@ -54,8 +54,12 @@ trap 'rm -rf "$WORK" paper/'"$STEM"'.*' EXIT
 # references.bib rather than an inline thebibliography, so a pdflatex-only loop produces a
 # highlighted PDF with every citation unresolved and no REFERENCES section at all.
 ( cd paper && pdflatex -interaction=nonstopmode "$STEM.tex" >/dev/null 2>&1 || true
-             bibtex "$STEM" >/dev/null 2>&1 || true
-             for i in 2 3; do pdflatex -interaction=nonstopmode "$STEM.tex" >/dev/null 2>&1 || true; done )
+             bibtex "$STEM" >/dev/null 2>&1 || true )
+# A reference added in the revision can never be marked by latexdiff: it diffs main.tex, where
+# the bibliography is one \bibliography line, and the entries appear only after bibtex. Mark the
+# new entries in the generated .bbl, between bibtex and the resolving passes.
+python3 submission/highlight_newrefs.py "paper/$STEM.bbl" "$WORK/old.tex" "$WORK/new.tex"
+( cd paper && for i in 2 3; do pdflatex -interaction=nonstopmode "$STEM.tex" >/dev/null 2>&1 || true; done )
 
 if [ -f "paper/$STEM.pdf" ]; then
     cp "paper/$STEM.pdf" submission/highlighted_pdf.pdf
