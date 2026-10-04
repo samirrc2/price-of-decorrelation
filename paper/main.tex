@@ -60,31 +60,32 @@ configurations with increasing provider diversity on a directional
 financial-analysis task covering 100 equities across 12 dates. Cross-provider
 heterogeneity significantly reduces within-ensemble agreement, with a primary
 reduction of $\Delta\kappa=0.336$ (95\% CI: $0.304$--$0.369$), but increases
-inference cost by approximately $4.4\times$. Because agreement is not by itself a
-measure of dependence between errors, we also report the correlation between
-agents' error indicators, which falls by $\Delta\phi=0.454$ (95\% CI:
-$0.376$--$0.534$) while per-agent accuracy is essentially unchanged: the effect is
-a reduction in error dependence, not a by-product of differing capability. The
-capability-matched analyses suggest that capability differences alone do not
-explain the observed contrast, although provider remains confounded with
-model-specific factors. We also introduce an
-independent-draw measurement protocol that prevents shared sampling conditions
-from inflating estimated agreement. A pre-registered replication on a
-substantially different domain---537 expert clinical-decision items---reproduces
-the effect in direction: agreement falls by a smaller $\Delta\kappa=0.072$
-(95\% CI: $0.040$--$0.104$), as predicted for a task on which agents are far more
-accurate, while error correlation falls by $\Delta\phi=0.393$ (95\% CI:
-$0.325$--$0.459$), close to the financial estimate. Although heterogeneity does not
-produce a reliable improvement in average directional accuracy, exploratory
-results indicate that homogeneous ensembles generate unanimous incorrect decisions
-at $1.84$ times the rate of heterogeneous ensembles (95\% CI: $1.51$--$2.35$).
-These findings show that model diversity provides less-correlated judgments rather
-than guaranteed correctness, and offer a practical agreement--cost framework for
-designing LLM ensemble systems.
+inference cost by approximately $4.4\times$. Because agreement does not by itself
+measure dependence between errors, we additionally estimate the correlation
+between agents' binary error indicators. Error correlation decreases by
+$\Delta\phi = 0.454$ (95\% CI: $0.376$ to $0.534$), while mean per-agent accuracy
+remains essentially unchanged. This indicates that the observed change reflects
+lower error dependence rather than differences in average correctness.
+Capability-matched analyses further show that capability differences alone do not
+explain the observed contrast, although provider remains confounded with other
+model-specific characteristics.
+We also introduce an independent-draw measurement protocol designed to prevent
+shared sampling conditions from inflating estimated agreement. A pre-registered
+replication on a substantially different task involving 537 expert
+clinical-decision items reproduces the directional pattern. Agreement decreases by
+$\Delta\kappa = 0.072$ (95\% CI: $0.040$ to $0.104$), while error correlation
+decreases by $\Delta\phi = 0.393$ (95\% CI: $0.325$ to $0.459$). Although
+heterogeneity does not produce a statistically reliable improvement in average
+directional accuracy, exploratory analysis shows that homogeneous ensembles
+generate unanimous incorrect decisions at $1.84$ times the rate of fully
+heterogeneous ensembles (95\% CI: $1.51$ to $2.35$). Taken together, the results
+show that heterogeneous model composition can reduce error dependence without
+guaranteeing greater predictive accuracy, while imposing a measurable inference
+cost premium.
 \end{abstract}
 
 \begin{keywords}
-Large language models, multi-agent systems, model heterogeneity, inter-rater
+Large language models, multi-agent systems, model heterogeneity, interrater
 agreement, algorithmic monoculture.
 \end{keywords}
 
@@ -358,21 +359,24 @@ primary hypothesis is considered supported when
 $\Delta\kappa_{\mathrm{HOM-HET}}>0$ and its 95\% confidence interval excludes
 zero.
 
-The equity is the pre-registered resampling unit because it is the level at which
-repeated observations are nested: each security is evaluated on twelve analysis
-dates, and responses for the same security share company-specific context. Dates
-are a second, crossed source of dependence, since all securities on a given date
-share market conditions. We therefore report the primary contrast under three
-resampling schemes: clustering on equities (100 clusters), on dates (12 clusters),
-and a two-way scheme in which equities and dates are resampled independently and
-the intersection is retained. Results appear in
-Table~\ref{tab:clustering}. The point estimate is unchanged by construction; the
-two-way interval is the widest, as expected when two crossed dependence
-structures are admitted simultaneously, and still excludes zero. We note that the
-date margin has only twelve clusters, a regime in which cluster-robust inference
-is known to under-cover, so the equity-clustered interval remains the
-pre-registered primary and the date and two-way intervals are reported as
-sensitivity analyses rather than as replacements.
+Equity is the pre-registered resampling unit because repeated observations are
+nested within securities. Each equity is evaluated on 12 analysis dates, and
+observations for the same security share company-specific context. Analysis dates
+constitute a second crossed source of dependence because all securities evaluated
+on a given date share common market conditions.
+
+We therefore assess the primary contrast under three resampling schemes: equity
+clustering with 100 clusters, date clustering with 12 clusters, and a two-way
+procedure in which equities and dates are resampled independently and their
+intersections are retained. Results appear in Table~\ref{tab:clustering}. The
+point estimate is unchanged across schemes. The two-way interval is the widest, as
+expected when both dependence structures are admitted, and it continues to exclude
+zero.
+
+Because the date dimension contains only 12 clusters, inference based on that
+margin may be imprecise. The pre-registered equity-clustered interval therefore
+remains the primary analysis, while the date-clustered and two-way results are
+reported as sensitivity analyses.
 
 \section{Experimental Design}
 \subsection{Task and grid}
@@ -664,14 +668,15 @@ the $\phi$ contrast reported here rather than the $\kappa$ contrast.
 \subsection{The agreement--cost frontier}
 \label{subsec:frontier}
 The reduction in agreement is accompanied by higher inference cost. Cost per
-ensemble decision is computed from metered token counts: for every call the
-prompt and completion tokens returned by the provider are priced at the
-per-million rates in Table~\ref{tab:models}, summed over the five agents in a
-cell, and averaged over all cells in a configuration. Prices are those in force
-during collection and are held fixed across configurations, so the ratio between
-configurations reflects token usage and model mix rather than price movement. No
-discount, batching, or caching rate is assumed, and failed calls are excluded
-because they return no billable completion. The observed
+ensemble decision is calculated from metered prompt and completion tokens. For
+each call, provider-reported token counts are priced using the per-million token
+rates reported in Table~\ref{tab:models}. Costs are summed across the five agents
+within a cell and then averaged across cells within each configuration.
+
+Prices are fixed at those applicable during data collection, so differences across
+configurations reflect token usage and model composition rather than later price
+changes. No discount, batching, or caching adjustment is applied. Failed requests
+that return no billable completion are excluded. The observed
 cost per five-agent ensemble decision increases from approximately
 $\$6.5\times 10^{-4}$ for HOM to $\$1.5\times 10^{-3}$ for HET-LITE and
 $\$2.8\times 10^{-3}$ for HET. Moving from the homogeneous to the fully
@@ -768,17 +773,9 @@ HET & 0.215 & 0.289 & $-0.074$ \\
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\columnwidth]{fig2_protocol.png}
-\caption{Shared-seed dependence inflates measured agreement. Both bars are the
-same estimand, the pilot's primary contrast $\Delta\kappa_{\mathrm{HOM-HET}}$,
-measured on the same 8-equity pilot grid and the same Claude-family model set,
-and differing only in the seeding protocol: a single seed shared by all five
-agents in a cell ($0.485$) against an independent seed per agent ($0.113$). Under
-shared seeding the five agents returned byte-identical completions, so
-$\kappa_{\mathrm{HOM}}$ was exactly $1.0$ and the ensemble measured one draw five
-times. The confirmatory study's within-minus-cross-run $\kappa$ diagnostic is a
-different quantity and is reported in Table~\ref{tab:nondet}; the
-confirmatory study's own HOM$-$HET contrast is $0.336$ and is reported under
-``Heterogeneity de-correlates ensembles''.}
+\caption{Effect of seeding protocol on the pilot HOM$-$HET agreement contrast.
+The contrast is $0.485$ under a shared seed and $0.113$ under distinct per-agent
+seeds. Both estimates use the same pilot grid and model set.}
 \label{fig:trap}
 \end{figure}
 
@@ -814,17 +811,22 @@ supplied by the same provider therefore agree more frequently than agents
 supplied by different providers under identical prompt and information
 conditions.
 
-This is a configuration-specific observational finding. Provider is not
-experimentally separable from model identity, parameter count, training corpus,
-architecture, or alignment procedure in this design, because each provider
-contributes one model. The comparison therefore identifies the effect of
-substituting one named model for another, and ``provider'' should be read
-throughout as shorthand for that bundle rather than as an isolated causal factor.
-Section~\ref{subsec:crossdomain} reports a capability-matched version of this
-comparison on a second domain, in which the two members of each pairing have
-near-identical accuracy; provider continues to order the result there. A design
-that varied model identity within provider, and provider within capability tier,
-would be required to decompose the bundle further, and is not attempted here.
+This comparison should be interpreted as a configuration-specific observational
+finding rather than as an isolated provider effect. In the present design,
+provider is not experimentally separable from model identity, parameter count,
+training corpus, architecture, or alignment procedure because each provider
+contributes one model. The observed contrast therefore reflects substitution among
+the specific model and provider combinations evaluated here. The term ``provider''
+should be understood as shorthand for that bundle of characteristics rather than
+as an independently identified causal factor.
+
+Section~\ref{subsec:crossdomain} provides an additional capability-matched
+comparison on a second domain, in which one same-provider pair and one
+cross-provider pair have nearly identical member accuracy. The
+provider-associated ordering persists under that comparison, but provider remains
+inseparable from other model-specific characteristics. A design that varied model
+identity within provider and provider within capability tier would be required to
+separate these effects further.
 
 \begin{figure}[!t]
 \centering
@@ -900,36 +902,31 @@ more than twice as frequently as fully heterogeneous ensembles. The proportion
 of decisions that are unanimous, directional, and incorrect is 0.058 for HOM,
 0.030 for HET-LITE, and 0.032 for HET. The homogeneous ensemble therefore
 produces this form of collective error at approximately $1.84\times$ the rate of
-the fully heterogeneous ensemble; the equity-clustered bootstrap gives a 95\%
-confidence interval of $[1.51,\,2.35]$ for that ratio, which excludes unity.
-HET-LITE achieves a reduction comparable to HET at an approximately
-$2.3\times$, rather than $4.4\times$, cost premium.
+the fully heterogeneous ensemble. The equity-clustered bootstrap gives a 95\%
+confidence interval of $[1.51,\,2.35]$ for this ratio, which excludes unity.
+HET-LITE exhibits a similar reduction in unanimous directional errors at an
+approximately $2.3\times$ cost premium, compared with $4.4\times$ for HET.
 
-These quantities are exploratory in the sense defined above. They were not
-pre-registered, the configuration compared and the statistic reported were both
-chosen after inspecting the data, and several such comparisons are available
-within this section; no multiplicity adjustment is applied and none of the
-intervals in this subsection should be read as confirmatory evidence. We
-therefore do not offer HET-LITE as a design recommendation. The observation that
-it attains a comparable reduction at roughly half the cost premium is recorded as
-a hypothesis for a future confirmatory study, not as guidance for deployment.
+These results are exploratory. Neither the configuration comparison nor the
+reported statistic was pre-registered, multiple related comparisons were available
+within this analysis, and no multiplicity adjustment is applied. The corresponding
+intervals should therefore not be interpreted as confirmatory evidence. We do not
+present HET-LITE as a recommended ensemble design. Its apparent cost efficiency is
+instead treated as a hypothesis for prospective evaluation in a confirmatory
+study.
 
 Conditional on an incorrect majority vote, the proportion of agents endorsing
 the incorrect majority decreases from 0.824 for HOM to 0.761 for HET-LITE and
-0.636 for HET. A paired equity-clustered bootstrap over the same 100 equities
-(2{,}000 draws, the resampling scheme used for the primary endpoint) gives a
-HOM$-$HET difference of $0.189$ (95\% CI $[0.160,\,0.216]$), so the gap is
-distinguishable from zero at the equity level. Admitting date dependence as well,
-under the same two-way scheme applied to the primary endpoint, widens the
-interval to $[0.140,\,0.232]$ and the gap still excludes zero. Errors in the heterogeneous
-ensembles therefore contain more
-within-committee dissent, which may provide an observable signal for escalation,
-abstention, or further review. These findings suggest that heterogeneity may
-affect the concentration of collective errors even when it does not produce a
-detectable improvement in mean directional accuracy. However, they do not
-establish a reduction in financial tail risk, because the analysis measures
-decision-error structure rather than the distribution of realized monetary
-losses.
+0.636 for HET. A paired equity-clustered bootstrap over the same 100 equities,
+using 2{,}000 draws and the resampling scheme of the primary endpoint, gives a
+HOM$-$HET difference of $0.189$ with a 95\% confidence interval of
+$[0.160,\,0.216]$. When dependence across analysis dates is also included using
+the same two-way resampling procedure applied to the primary endpoint, the
+interval widens to $[0.140,\,0.232]$ and remains above zero. Thus, within the
+evaluated data, incorrect majority decisions in heterogeneous ensembles are
+accompanied by more within-committee dissent than in the homogeneous
+configuration. This result remains exploratory and does not by itself establish a
+reduction in downstream decision risk.
 
 Self-reported conviction does not exhibit a reliable positive relationship with
 per-agent directional accuracy in any configuration (Fig.~\ref{fig:cal}).
@@ -1056,10 +1053,11 @@ $\kappa_{\mathrm{HET\text{-}SameTier}}=0.236$. The resulting contrast is
 which excludes zero. This capability-matched estimate is approximately 94\% of
 the primary HOM-to-HET contrast. The result indicates that the observed
 de-correlation is largely preserved when model tier is held approximately
-constant, so capability differences alone do not explain the primary effect.
-Provider nonetheless remains confounded with other model-specific
-characteristics and cannot be isolated causally. The control substantially reduces the capability-tier concern but does
-not eliminate it completely, because matching is approximate and covers only two
+constant, indicating that capability differences alone do not account for the
+primary contrast. Provider nevertheless remains confounded with other
+model-specific characteristics and is not identified as an independent causal
+factor. The capability-matched control therefore reduces, but does not eliminate,
+the capability-tier confound, because matching is approximate and covers only two
 providers. (The reproduction of $\kappa_{\mathrm{HOM}}=0.552$ to four decimals
 across two independently collected datasets also re-confirms determinism of the
 homogeneous baseline.)
@@ -1175,9 +1173,11 @@ should evaluate whether the resulting diversity improves a task-relevant
 objective, such as calibration, robustness, abstention quality, or the frequency
 of concentrated collective errors. In the exploratory analysis, HET-LITE
 achieves a reduction in unanimous directional errors comparable to HET at an
-approximately $2.3\times$, rather than $4.4\times$, cost premium. This post hoc pattern motivates prospective evaluation of the
-HET-LITE configuration; it is hypothesis-generating and is not deployment
-guidance.
+approximately $2.3\times$ cost premium, compared with $4.4\times$ for HET. Because
+this pattern was identified post hoc, it should be interpreted as
+hypothesis-generating rather than as deployment guidance. It motivates
+prospective evaluation of HET-LITE in a confirmatory design specifically powered
+to assess the tradeoff between collective error structure and inference cost.
 
 The shared-seed pilot also has a methodological implication for empirical
 studies of LLM ensembles. When repeated model instances receive the same seed or
@@ -1233,19 +1233,23 @@ was unavailable, and differences in training data, architecture, alignment
 procedures, and effective capability cannot be completely separated from
 provider identity.
 
-\textbf{Limited domain coverage.}
-The primary experiment evaluates one directional financial-analysis task using a
-single prompt template and a three-class BUY/HOLD/SELL output space, and
-Section~\ref{subsec:crossdomain} adds a pre-registered replication on 537 expert
-clinical-decision items. The ordering reproduces across the two domains, so the
-effect is not confined to the financial setting; its magnitude is not portable,
-being roughly a fifth as large in the clinical replication. Coverage nonetheless
-remains limited along dimensions the design holds fixed: prompt format, ensemble
-size, the majority-vote aggregation rule, and the particular model mixtures
-evaluated. Tasks involving factual retrieval, open-ended generation, numerical
-reasoning, or multi-turn interaction may exhibit different within-provider and
-cross-provider dependence, and varying the aggregation rule or ensemble size
-could change the agreement-cost trade-off independently of provider mixture.
+\textbf{Scope and generalizability.}
+The primary experiment evaluates a directional financial-analysis task with a
+three-class BUY, HOLD, and SELL output space, while
+Section~\ref{subsec:crossdomain} provides a pre-registered replication on 537
+expert clinical-decision items with a four-option response structure. The ordering
+reproduces across these two substantially different tasks, indicating that the
+result is not confined to the original financial setting. Its magnitude, however,
+differs materially across domains, with the agreement contrast in the clinical
+replication approximately one fifth of that observed in finance.
+
+Several design dimensions remain fixed across the study, including prompt format,
+five-agent ensemble size, majority-vote aggregation, and the particular model and
+provider mixtures evaluated. Other task classes, model combinations, ensemble
+sizes, prompting strategies, or aggregation rules may produce different levels of
+agreement, error dependence, and cost. The present results therefore support
+replication of the observed ordering across the two tested domains without
+implying that its magnitude is invariant across settings.
 
 \textbf{Model-version pinning.}
 Proprietary model endpoints may be updated by their providers without preserving
@@ -1293,9 +1297,10 @@ contrast of $\Delta\kappa=0.336$ (95\% CI: $[0.304, 0.369]$). This reduction is
 accompanied by an approximately $4.4\times$ increase in inference cost,
 producing an explicit agreement--cost frontier for the evaluated
 configurations. A capability-matched control preserves approximately 94\% of the
-primary effect, so capability differences alone do not explain the contrast;
-provider remains confounded with other model-specific characteristics and is not
-isolated causally. We
+primary effect, indicating that capability differences alone do not account for
+the observed contrast. Provider nevertheless remains confounded with other
+model-specific characteristics and is not identified as an independent causal
+factor. We
 also introduce an independent-draw measurement protocol that controls dependence
 caused by shared sampling seeds. In a controlled pilot, shared per-run seeding
 inflated the estimated de-correlation effect by approximately fourfold,
