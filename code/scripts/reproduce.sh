@@ -354,7 +354,7 @@ _run_gates() {
   # whatever a past run happened to leave behind. All three are keys-free functions of
   # frozen inputs; regenerating them is what locks those manuscript values.
   echo "[gate] supporting analyses (control arm, temperature sweep, reviewer hardening)"
-  for _s in control_kappa temp_analyze reviewer_analysis; do
+  for _s in analyze_pilot control_kappa temp_analyze reviewer_analysis; do
     if [[ -f "$CODE_ROOT/src/$_s.py" ]]; then
       _gate "$_s" "$PY" "$CODE_ROOT/src/$_s.py" || return 1
     fi
@@ -370,6 +370,12 @@ _run_gates() {
   # capability-matched passage -- existing only in the manuscript, with no generating code.
   echo "[gate] manuscript provenance (every number traced to a claim or declared non-result)"
   _gate coverage "$PY" "$CODE_ROOT/src/check_coverage.py" || return 1
+  # Both gates above are set-membership tests: they ask whether a number appears on the other
+  # side, not whether it appears in the right PLACE. Swapping kappa_HOM and kappa_HET in the
+  # text -- which inverts the paper's finding -- passes both. This one binds each number to the
+  # single claim it must equal, and to the phrase it must follow.
+  echo "[gate] manuscript binding (every number equals the one claim it is bound to)"
+  _gate binding "$PY" "$CODE_ROOT/src/check_binding.py" || return 1
   echo "[gate] unit tests"
   if [[ -d "$CODE_ROOT/tests" ]]; then
     if "$PY" -c "import pytest" >/dev/null 2>&1; then
@@ -383,12 +389,18 @@ _run_gates() {
 }
 
 if [[ "$MODE" == "analyze" ]]; then
+    # The protocol-collapse figure used to carry four hardcoded pilot constants. They are
+    # derived from data/pilot/ now, so this must run before analyze.py reads them.
+    echo "Running: $PY src/analyze_pilot.py"
+    (cd "$CODE_ROOT" && "$PY" src/analyze_pilot.py)
     echo "Running: $PY src/analyze.py"
     (cd "$CODE_ROOT" && "$PY" src/analyze.py)
     _point_latest
     _run_gates || exit 1
     echo "Done. Open results/latest/ (figures/, tables/, metrics_summary.md)."
 elif [[ "$MODE" == "replication" ]]; then
+    echo "Running: $PY src/analyze_pilot.py"
+    (cd "$CODE_ROOT" && "$PY" src/analyze_pilot.py)
     echo "Running: $PY src/replication_check.py"
     unset POD_OUT_DIR
     (cd "$CODE_ROOT" && "$PY" src/replication_check.py)

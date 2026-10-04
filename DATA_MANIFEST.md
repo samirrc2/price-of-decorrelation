@@ -9,7 +9,7 @@ re-run differed.
 python code/src/make_manifest.py --verify
 ```
 
-1752 files, 94.2 MB total.
+1754 files, 94.6 MB total.
 
 ## primary capture; 54k live model calls
 
@@ -34,6 +34,18 @@ python code/src/make_manifest.py --verify
 | File | Bytes | SHA-256 |
 |---|---:|---|
 | `data/minipilot/20260703/runs.csv` | 414,460 | `96cdf3f318d1ca35f76bc31aa5c7c99aa09983a135047b5fd7e7475951f35e57` |
+
+## archived pilot, independent per-agent seeding; the manuscript's 0.113 and Fig. 2
+
+| File | Bytes | SHA-256 |
+|---|---:|---|
+| `data/pilot/clean/runs.csv` | 231,738 | `344f16602268250c1f74fdfb6040dd222d638037ecf4bac71e605b4c5c52f0f3` |
+
+## archived pilot, shared per-run seeding; the manuscript's 0.485 and Fig. 2
+
+| File | Bytes | SHA-256 |
+|---|---:|---|
+| `data/pilot/broken/runs.csv` | 221,620 | `f30b9648e5ddf554ea33bcc0cf2b2c8a48245902fc7de178d7fdaf20edfca056` |
 
 ## temperature-robustness subgrid
 

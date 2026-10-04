@@ -12,6 +12,7 @@ Writes temp_sweep_result.md and temp_sweep_table.tex under results/latest
 Usage: python temp_analyze.py
 """
 from __future__ import annotations
+import json
 import csv
 
 import io_paths
@@ -56,6 +57,7 @@ def main():
           "Delta-kappa(HOM-HET) | 95% CI | Delta-kappa(HOM-HET-LITE) |",
           "|---|---|---|---|---|---|---|"]
     tex_rows = []
+    full = {}
     for T in present:
         rows = rows_by_T[T]
         ks = {c: M.kappa_per_run_avg(rows, c)[0] for c in CONFIGS}
@@ -63,6 +65,10 @@ def main():
             rows, tickers, [("HOM", "HET"), ("HOM", "HET-LITE")], draws, bseed)
         bh = boot[("HOM", "HET")]
         bl = boot[("HOM", "HET-LITE")]
+        full[str(T)] = {"kappa_hom": ks["HOM"], "kappa_het_lite": ks["HET-LITE"],
+                        "kappa_het": ks["HET"], "dk_hom_het": bh["point"],
+                        "ci_low": bh["ci_low"], "ci_high": bh["ci_high"],
+                        "dk_hom_hetlite": bl["point"]}
         md.append(
             f"| {T} | {fmt(ks['HOM'])} | {fmt(ks['HET-LITE'])} | {fmt(ks['HET'])} | "
             f"{fmt(bh['point'])} | [{fmt(bh['ci_low'])}, {fmt(bh['ci_high'])}] | "
@@ -101,6 +107,12 @@ def main():
                   f"temperature-stable._")
 
     (out / "temp_sweep_result.md").write_text("\n".join(md) + "\n")
+
+    # Full precision alongside the 3dp markdown. make_claims.py harvested the markdown, so
+    # the claim for kappa_HET-LITE at T=1.0 was the already-rounded 0.275 -- and the paper
+    # prints 0.27 (correctly: the underlying value is just below 0.275). Re-rounding a
+    # rounded claim cannot verify a 2dp manuscript figure, so the claim must carry the float.
+    (out / "temp_sweep.json").write_text(json.dumps(full, indent=2, sort_keys=True) + "\n")
 
     tex = [r"\begin{table}[t]", r"\centering",
            r"\caption{Temperature-sensitivity robustness (8$\times$2 subgrid, 3 runs "

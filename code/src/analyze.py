@@ -6,6 +6,7 @@ byte-stable for the same inputs.
 """
 from __future__ import annotations
 import csv
+import json
 import math
 import sys
 from collections import defaultdict, Counter
@@ -19,9 +20,18 @@ import stats as S
 import io_paths
 
 _HERE = io_paths.repo_root()
-# Archived Δκ(HOM−HET) and HOM within−cross κ gaps for the protocol-collapse figure.
-PILOT_BROKEN = {"dkappa": 0.485, "hom_within_minus_cross": 0.377}   # archive/pilot_v1_broken_perRunSeed
-PILOT_CLEAN = {"dkappa": 0.113, "hom_within_minus_cross": 0.018}    # archive/pilot_v1
+# Δκ(HOM−HET) and the HOM within−cross κ gap for each pilot arm, for the protocol-collapse
+# figure. These were hardcoded here as 0.485/0.377 and 0.113/0.018, and the manuscript's
+# 0.485 and 0.113 were excused in check_coverage.NON_RESULTS as un-derivable "pilot-dataset
+# values". Both captures ship in data/pilot/, so analyze_pilot.py recomputes all four and
+# this reads them -- the figure and the manuscript sentence now have one source, and the
+# numbers are gated instead of trusted.
+def _pilot():
+    p = io_paths.results_root() / "latest" / "pilot_collapse.json"
+    if not p.exists():
+        raise SystemExit("analyze.py needs results/latest/pilot_collapse.json for fig2 -- "
+                         "run: python code/src/analyze_pilot.py")
+    return json.loads(p.read_text())
 
 # Set in main(); all writers use this.
 OUT: Path = io_paths.results_root() / "latest"
@@ -244,8 +254,10 @@ def _make_figures(cfg, kappa, cost, hlevel, primary, sec1, sec2, wc, provs, pmat
     fig.tight_layout(); save(fig, "fig1_frontier", svg=True)
 
     # fig2: protocol collapse (HOM within−cross gap)
-    stages = ["broken pilot\n(Δκ=0.485)", "clean pilot\n(Δκ=0.113)", "full study"]
-    gaps = [PILOT_BROKEN["hom_within_minus_cross"], PILOT_CLEAN["hom_within_minus_cross"],
+    pil = _pilot()
+    stages = [f"broken pilot\n(Δκ={pil['broken']['dkappa']:.3f})",
+              f"clean pilot\n(Δκ={pil['clean']['dkappa']:.3f})", "full study"]
+    gaps = [pil["broken"]["hom_within_minus_cross"], pil["clean"]["hom_within_minus_cross"],
             wc["HOM"]["gap"] if wc["HOM"]["gap"] is not None else 0.0]
     fig, ax = plt.subplots(figsize=(6, 4.2))
     ax.bar(stages, gaps, color=["#b44", "#c93", "#484"])
@@ -375,7 +387,8 @@ def _write_docs(cfg, verdict, primary, sec1, sec2, kappa, cost, config_names, hl
         f"(95% CI [{fmt(lo,3)}, {fmt(hi,3)}]) at ≈{fmt(ratio,1) if ratio else 'n/a'}× "
         f"the inference cost per decision.\n\n"
         f"Cross-provider vs Claude-family pilot: the pilot (within-family) gave "
-        f"Δκ≈0.113; if this cross-provider estimate is materially larger, that gap is "
+        f"Δκ≈{_pilot()['clean']['dkappa']:.3f}; if this cross-provider estimate is "
+        f"materially larger, that gap is "
         f"itself a finding (within-family vs cross-family correlation), not a "
         f"discrepancy. Verdict: **{verdict}**.\n")
     # protocol_exhibit.md
@@ -386,14 +399,18 @@ def _write_docs(cfg, verdict, primary, sec1, sec2, kappa, cost, config_names, hl
         "context — the same seed, or a cached completion replayed across slots — they "
         "return byte-identical outputs, and any agreement statistic (Fleiss' κ, "
         "majority-vote concentration) reads a spurious 1.0. In our own pipeline this "
-        "inflated the homogeneous within-run κ by ~0.38 and the headline Δκ(HOM−HET) "
-        "from 0.113 to 0.485 — a 4× overstatement produced entirely by the measurement "
+        f"inflated the homogeneous within-run κ by "
+        f"~{_pilot()['broken']['hom_within_minus_cross']:.2f} and the headline Δκ(HOM−HET) "
+        f"from {_pilot()['clean']['dkappa']:.3f} to {_pilot()['broken']['dkappa']:.3f} — a "
+        f"{_pilot()['broken']['dkappa'] / _pilot()['clean']['dkappa']:.0f}× overstatement "
+        "produced entirely by the measurement "
         "apparatus, not the models. The fix is to treat *independent draws* as the "
         "estimand: a unique seed per agent per call (or no seed at all), the response "
         "cache bypassed for unseeded draws, and an explicit post-hoc check that "
         "same-model agents within a cell produced differing raw completions (abort "
         "otherwise). Only after that correction does κ measure agreement between agents "
-        "rather than agreement between copies. We report the collapse (0.485 → 0.113 "
+        f"rather than agreement between copies. We report the collapse "
+        f"({_pilot()['broken']['dkappa']:.3f} → {_pilot()['clean']['dkappa']:.3f} "
         "clean pilot → full study) as fig. 2. Note the model set changed between pilot "
         "(Claude family) and full study (OpenAI/Google/xAI): the protocol point is "
         "invariant to model choice, but the numeric Δκ is not, and we never blur the two.\n")

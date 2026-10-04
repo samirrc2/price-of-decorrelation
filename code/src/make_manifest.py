@@ -26,6 +26,10 @@ PATTERNS = [
     ("data/control/*/runs.csv", "control-arm capture"),
     ("data/mmlu/*/runs.csv", "cross-domain replication capture"),
     ("data/minipilot/*/runs.csv", "gating pilot capture"),
+    ("data/pilot/clean/runs.csv", "archived pilot, independent per-agent seeding; the "
+                                 "manuscript's 0.113 and Fig. 2"),
+    ("data/pilot/broken/runs.csv", "archived pilot, shared per-run seeding; the "
+                                   "manuscript's 0.485 and Fig. 2"),
     ("data/appendix/*/runs.csv", "appendix capture"),
     # The temperature-robustness subgrid backs Table 8 and the T=0.0/0.7/1.0 contrasts in
     # the text. It was tracked in git but absent from this manifest, so those manuscript
@@ -82,6 +86,8 @@ CAPSULE_REQUIRED = [
     ("data/configs/config.yaml", "frozen protocol"),
     ("data/datacache/forward_returns.json", "offline price cache (else a network fallback)"),
     ("data/inputs", "serialized model inputs"),
+    ("data/pilot/clean/runs.csv", "pilot arm Fig. 2 and two manuscript numbers derive from"),
+    ("data/pilot/broken/runs.csv", "pilot arm Fig. 2 and two manuscript numbers derive from"),
 ]
 
 

@@ -237,6 +237,16 @@ def from_supporting(res: Path) -> dict:
                                       "dk_hom_het", "ci_low", "ci_high", "dk_hom_hetlite"), start=2):
                 c[f"temp_T{T}_{name}"] = float(row.group(i))
 
+    # The markdown above is 3dp. temp_sweep.json carries the floats, and the manuscript
+    # quotes this table at 2dp -- re-rounding 0.275 gives 0.28 while the true 0.27499... gives
+    # the 0.27 the paper prints. Prefer the float wherever it is available.
+    fj = res / "temp_sweep.json"
+    if fj.exists():
+        for T, d in json.loads(fj.read_text()).items():
+            for name, v in d.items():
+                if v is not None:
+                    c[f"temp_T{T.replace('.', '')}_{name}"] = float(v)
+
     f = res / "reviewer_metrics.md"
     if f.exists():
         t = f.read_text()
@@ -279,6 +289,55 @@ def from_supporting(res: Path) -> dict:
     return c
 
 
+def from_pilot(res: Path) -> dict:
+    """The two archived pilot arms, from analyze_pilot.py.
+
+    These four numbers used to be literals in analyze.py, and the manuscript's 0.485 and
+    0.113 were excused in check_coverage.NON_RESULTS as "pilot-dataset value" -- i.e. the
+    two numbers the paper uses to make its central methodological point were the two it
+    could not reproduce. Both captures ship in data/pilot/, so they are claims like any
+    other.
+    """
+    p = res / "pilot_collapse.json"
+    if not p.exists():
+        return {}
+    d = json.loads(p.read_text())
+    c = {}
+    for arm in ("broken", "clean"):
+        if arm not in d:
+            continue
+        a = d[arm]
+        c[f"pilot_{arm}_delta_kappa"] = a["dkappa"]
+        c[f"pilot_{arm}_kappa_hom"] = a["kappa_hom"]
+        c[f"pilot_{arm}_kappa_het"] = a["kappa_het"]
+        c[f"pilot_{arm}_hom_within_minus_cross"] = a["hom_within_minus_cross"]
+        c[f"pilot_{arm}_n_rows"] = a["n_rows"]
+    if "pilot_broken_delta_kappa" in c and c.get("pilot_clean_delta_kappa"):
+        c["pilot_seeding_inflation_ratio"] = (c["pilot_broken_delta_kappa"]
+                                              / c["pilot_clean_delta_kappa"])
+    return c
+
+
+def derived_ratios(c: dict) -> dict:
+    """Ratios the manuscript states in words, as named claims.
+
+    The manuscript says the heterogeneous configuration costs "approximately 4.4x" and the
+    lite one "approximately 2.3x". No claim held either, so check_coverage.py excused them by
+    generating every pairwise quotient of every cost claim -- 365x365 candidate ratios, which
+    explains any number at all and therefore gates nothing. Naming the two the paper actually
+    asserts replaces that with an equality.
+    """
+    out = {}
+    base = c.get("frontier_hom_cost")
+    if not base:
+        return out
+    for arm in ("het", "het_lite"):
+        v = c.get(f"frontier_{arm}_cost")
+        if v:
+            out[f"cost_ratio_{arm}_over_hom"] = v / base
+    return out
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--results", default=None,
@@ -302,9 +361,11 @@ def main() -> int:
                      ("headline_check.md", "hc"), ("protocol_exhibit.md", "pe")):
         claims.update(harvest_tables(res / fn, pref))
     claims.update(from_revision(ROOT))
+    claims.update(from_pilot(res))
     import os as _os
     _rc = _os.environ.get("POD_RUNS_CSV") or str(ROOT / "data/confirmatory/latest/runs.csv")
     claims.update(from_capture(Path(_rc)))
+    claims.update(derived_ratios(claims))
     if "primary_delta_kappa" not in claims:
         print("[claims] refusing to write: the PRIMARY endpoint did not parse out of "
               "metrics_summary.md -- a claims file without it would gate nothing",

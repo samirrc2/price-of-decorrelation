@@ -38,13 +38,10 @@ NON_RESULTS = {
     "0.85": "\\includegraphics width fraction",
     "10.24433": "Code Ocean DOI prefix",
     "10.1109": "IEEE DOI prefix",
-    "0.485": "pilot-dataset value, cited for contrast with the confirmatory run",
-    "0.113": "pilot-dataset value, cited for contrast with the confirmatory run",
     "0.63": "rounded endpoint of a descriptive agreement RANGE (0.43-0.63)",
     "0.43": "rounded endpoint of a descriptive agreement RANGE (0.43-0.63)",
     "0000": "IEEE template placeholder in \\history{xxxx 00, 0000}",
     "256": "algorithm name SHA-256, not a quantity",
-    "480": "design arithmetic stated in the text: 16 cells x 2 configs x 3 runs x 5 agents",
 }
 
 
@@ -75,14 +72,10 @@ def claim_forms(claims: dict) -> dict[str, list[str]]:
                 q = Decimal(str(av * mult)).quantize(Decimal(1).scaleb(-nd),
                                                      rounding=ROUND_HALF_UP)
                 add(f"{q}", f"{k} {why}")
-    # pairwise ratios of the cost frontier (the "4.4x the cost" style claims)
-    costs = {k: v for k, v in claims.items() if k.endswith("_cost")}
-    for a, va in costs.items():
-        for b, vb in costs.items():
-            if a != b and vb:
-                r = va / vb
-                for nd in (1, 2):
-                    forms.setdefault(f"{r:.{nd}f}", []).append(f"{a}/{b}")
+    # The "4.4x the cost" claims used to be explained here by generating every pairwise
+    # quotient of every cost claim -- 365x365 candidate ratios, which can explain almost any
+    # number and therefore explained nothing. cost_ratio_het_over_hom and
+    # cost_ratio_het_lite_over_hom are now claims, so the quotients are no longer invented.
     return forms
 
 
