@@ -286,8 +286,13 @@ def point_latest_symlink(target: Path) -> None:
         link_target = str(rel)
     except ValueError:
         link_target = str(target.resolve())
-    if latest.is_symlink() or latest.exists():
+    # Robust to any prior 'latest': symlink, file, OR a real directory (a
+    # committed results/latest would otherwise raise IsADirectoryError on unlink).
+    if latest.is_symlink() or latest.is_file():
         latest.unlink()
+    elif latest.is_dir():
+        import shutil
+        shutil.rmtree(latest)
     latest.symlink_to(link_target)
 
 

@@ -103,8 +103,15 @@ def load_or_build_snippet(ticker: str, analysis_date: str, inputs_dir: Path) -> 
         d = json.loads(f.read_text())
         asof = d.get("asof") or _day_before(analysis_date)
         _assert_no_lookahead(asof, analysis_date, ticker)
-        text = f"Headline: {d.get('headline','').strip()}\n" \
-               f"Fundamentals: {d.get('fundamentals','').strip()}"
+        # A "text" field carries a pre-rendered item verbatim. The cross-domain arm
+        # uses it: a clinical question has no headline or fundamentals, and forcing
+        # one into those labels would put "Headline:" in front of a medical vignette.
+        # Finance inputs carry no "text" key, so their prompt is unchanged.
+        if d.get("text"):
+            text = str(d["text"]).strip()
+        else:
+            text = f"Headline: {d.get('headline','').strip()}\n" \
+                   f"Fundamentals: {d.get('fundamentals','').strip()}"
         return Snippet(text=text.strip(), asof=asof, source="inputs_file")
 
     # Fallback: neutral placeholder. Deliberately information-free so it does not

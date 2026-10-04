@@ -1,0 +1,11 @@
+{
+  "phase": "full",
+  "timestamp_utc": "2026-09-29T16:18:40.492579+00:00",
+  "runs_csv": "/Users/samirchincholikar/Desktop/NIW/Paper 1/data/mmlu/20260929/runs.csv",
+  "slots_completed_this_session": 24165,
+  "attempt_failures_this_session": 24,
+  "deferred_this_session": 0,
+  "models_exhausted_daily_quota": [],
+  "spend_usd_this_session": 6.787153,
+  "spend_cap_usd": 40.0
+}

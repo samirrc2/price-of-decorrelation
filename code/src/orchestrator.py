@@ -267,6 +267,11 @@ def main() -> int:
             return "control"
         if "temp" in cfg_name:
             return "temperature_robustness_small"
+        # Cross-domain replication arm. Without this the name falls through to
+        # "confirmatory" and the medical run would be written into the frozen
+        # finance collection directory.
+        if "mmlu" in cfg_name:
+            return "mmlu"
         if phase == "minipilot":
             return "minipilot"
         return "confirmatory"
