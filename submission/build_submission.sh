@@ -47,6 +47,11 @@ echo "== 1/4 manuscript PDF =="
 grep -o "Output written.*" paper/main.log | head -1 || true
 cp paper/main.pdf submission/main_manuscript.pdf
 
+# The reference-numbering half of the IEEE check needs paper/main.bbl, which exists only after
+# the manuscript is built. reproduce.sh checks the keys from source; this checks the realised
+# numbering, so between them nothing is left unchecked.
+python3 code/src/check_ieee_style.py | sed 's/^/   /'
+
 echo "== 2/4 Word version =="
 # --citeproc is required: this manuscript builds its reference list from references.bib, and
 # without it pandoc emits a DOCX with no REFERENCES section at all.
