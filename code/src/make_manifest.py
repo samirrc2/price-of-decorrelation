@@ -88,6 +88,17 @@ CAPSULE_REQUIRED = [
     ("data/inputs", "serialized model inputs"),
     ("data/pilot/clean/runs.csv", "pilot arm Fig. 2 and two manuscript numbers derive from"),
     ("data/pilot/broken/runs.csv", "pilot arm Fig. 2 and two manuscript numbers derive from"),
+    # The revision added four arms, and this list did not grow with them. A capsule missing any
+    # of these is internally consistent, passes hash verification, and cannot produce the
+    # cross-domain replication, the capability-matched control, the temperature sweep or the
+    # pre-registration gate -- which is the exact failure this gate exists to catch.
+    ("data/mmlu", "cross-domain clinical replication capture (R1.3, R3.6)"),
+    ("data/mmlu_ground_truth.json", "correct answers the clinical replication is scored against"),
+    ("data/inputs_mmlu", "serialized clinical model inputs"),
+    ("data/control/latest/runs.csv", "Het-SameTier capability-matched control (R3.1)"),
+    ("data/temperature_robustness_small", "temperature sensitivity arm"),
+    ("data/minipilot/latest/runs.csv", "pre-registered pilot gate"),
+    ("data/appendix/grid.csv", "frozen experimental grid"),
 ]
 
 

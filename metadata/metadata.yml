@@ -2,11 +2,19 @@ metadata_version: 1
 name: "The Price of De-correlation"
 description: >
   Reproducibility artifact for the IEEE Access article "The Price of
-  De-correlation: Quantifying the Agreement–Cost Trade-off in Heterogeneous
-  Large Language Model Ensembles." Regenerates Fleiss' kappa, Delta-kappa
-  contrasts with cluster-bootstrap confidence intervals, the agreement–cost
-  frontier, the capability-matched control, the temperature-sensitivity check,
-  and all publication figures/tables from the frozen 54,000-call dataset.
+  De-correlation: Quantifying the Agreement-Cost Trade-off in Heterogeneous
+  Large Language Model Ensembles." Regenerates every number, table and figure
+  in the article from the frozen 54,000-call dataset: Fleiss' kappa and the
+  pre-registered Delta-kappa contrasts with equity-clustered, date-clustered
+  and two-way cluster-bootstrap confidence intervals; phi error correlation
+  between paired binary error indicators under both treatments of HOLD; the
+  agreement-cost frontier; the selective-prediction risk-coverage analysis and
+  AURC contrasts; the exploratory consensus-error outcomes; the Het-SameTier
+  capability-matched control; the temperature-sensitivity arm; the shared-seed
+  measurement pilot; and the pre-registered cross-domain replication on 537
+  MMLU professional-medicine and clinical-knowledge items. The run verifies
+  every frozen input against data/MANIFEST.sha256 first, requires no API keys,
+  makes no network calls, and costs nothing.
 authors:
   - name: "Samir Chincholikar"
   - name: "Robin Chawla"

@@ -32,3 +32,6 @@ paper/*.toc
 paper/generated_tables/
 paper/pdf_extract.txt
 submission/missfont.log
+
+# capsule staging area, assembled by code/scripts/build_capsule.sh
+build/

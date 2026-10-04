@@ -1,8 +1,46 @@
 # Code Ocean Submission Audit — "The Price of De-correlation"
 
-**Verdict: SUBMISSION-READY.** The capsule reproduces the paper's confirmatory results
-byte-for-byte from frozen data, offline, with no secrets and a fixed deterministic seed path.
-Audited on 2026-08-07.
+**Verdict: the 2026-08-07 audit below is SUPERSEDED. Read this section first.**
+
+That audit was accurate for the capsule as originally submitted, and it is retained as a record
+of it. It does not describe the revised article. The reviewer revision added four analysis arms
+that the audited capsule contains no code for at all — error correlation (phi) under both
+treatments of HOLD, the two-way crossed cluster bootstrap, selective prediction with AURC, and
+the pre-registered cross-domain replication on 537 MMLU items — along with every verification
+gate. Nothing in the audited capsule can produce those numbers.
+
+Current state, audited 2026-10-04 at the commit that carries this file:
+
+- The capsule is assembled by `code/scripts/build_capsule.sh`, from `git archive HEAD` rather
+  than from the working tree, and the script runs the capsule's own entry point and diffs the
+  claims it produces against the committed `claims.json` key by key. A capsule that is not
+  proven to run does not get built.
+- `make_manifest.py --capsule` pins the inputs a `/code` + `/data` mount must carry. That list
+  was six entries stale after the revision and is now 13, covering the clinical replication, its
+  ground truth and serialized inputs, the capability-matched control, the temperature arm, the
+  pilot gate and the frozen grid. Each addition was fault-injected: hiding any one of them fails
+  the gate.
+- Twelve gates guard the article and the response letter: every number in both bound to one
+  claim, every section and float pointer resolved, every change claim checked against the
+  `as-submitted` tag, the reference numbering, the figures against the analysis output, and the
+  freeze timestamps against the receipts.
+- The document gates cannot run inside a capsule — there is no manuscript and no git history —
+  and they exit 2, "not checkable", never 0.
+- `cache/` and `data/raw/` are absent from the capsule by construction: both are gitignored, the
+  analysis is a function of the frozen `runs.csv` files, and every one of them is verified
+  against `data/MANIFEST.sha256` before anything is computed.
+
+The published capsule at DOI `10.24433/CO.9524962.v1` is the audited August state. It must be
+replaced with a new version built from the current commit before the revision is resubmitted, and
+the DOI in `paper/main.tex` updated to match.
+
+---
+
+# Original audit, 2026-08-07 (superseded, retained as a record)
+
+**Verdict at that time: SUBMISSION-READY.** The capsule reproduced the paper's confirmatory
+results byte-for-byte from frozen data, offline, with no secrets and a fixed deterministic seed
+path.
 
 ## 1. Reproducibility (the headline)
 - Entry point `code/run` → `code/scripts/reproduce.sh --data data/confirmatory/20260704`
