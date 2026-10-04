@@ -74,6 +74,7 @@ cp paper/main.pdf submission/main_manuscript.pdf
 "$PY" code/src/check_response_consistency.py | sed 's/^/   /'
 "$PY" code/src/check_freeze_timestamps.py | sed 's/^/   /'
 "$PY" code/src/check_freeze_receipt.py | sed 's/^/   /'
+"$PY" code/src/check_highlight_coverage.py | sed 's/^/   /'
 
 echo "== 2/4 Word version =="
 # --citeproc is required: this manuscript builds its reference list from references.bib, and

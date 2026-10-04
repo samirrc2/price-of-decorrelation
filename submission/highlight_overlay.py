@@ -1,120 +1,55 @@
 #!/usr/bin/env python3
 """Paint the revision's changes onto the manuscript PDF itself.
 
-Why this exists. The previous build compiled a SECOND document in which every changed run was
-wrapped in soul's \\texthl. soul cannot hyphenate inside a highlight, so highlighted paragraphs
-broke their lines differently -- "we eval-/uate" became "we/evaluate" -- and four of fourteen
-pages started one line out from the manuscript. A reviewer holding the two PDFs side by side
-could not read across them. Compiling with zero-width \\pdfsavepos markers instead fails the same
-way: a whatsit suppresses hyphenation of the word after it, and that build came out a page longer.
+Two decisions define this script, and both were arrived at the hard way.
 
-So nothing is compiled twice. main_manuscript.pdf is built once, and this script draws the
-highlights onto that exact file. Line breaks, page breaks and every coordinate are the
-manuscript's own, because it IS the manuscript.
+1. Nothing is compiled twice for the highlighting. main_manuscript.pdf is built once and the
+   marks are drawn onto that exact file, so the two deliverables agree line for line and page for
+   page -- which is the point of a highlighted copy, since a reviewer reads them side by side.
+   Compiling a second document with soul's \\texthl cannot do that (soul will not hyphenate inside
+   a highlight, so four of fourteen pages started a line out), and neither can compiling with
+   zero-width \\pdfsavepos markers (a whatsit suppresses hyphenation of the word after it).
 
-What it highlights. latexdiff still produces the markup, so the definition of "changed" is
-unchanged: every \\DIFadd and \\DIFaddFL run, plus any \\bibitem new in this revision.
+2. What changed is decided by diffing the two RENDERED documents, not by parsing latexdiff's
+   markup. The earlier version reduced \\DIFadd runs to tokens and searched for them in the page,
+   and every defect found in review came from that reduction: inline maths became a wildcard and
+   so was never painted, leaving "giving" yellow and "DeltaKappa = 0.072 (95% CI" plain; a run
+   boundary inside "54{,}000" needed prefix matching; \\begin{tabular} leaked the word "tabular"
+   into a table's context; float contents could not be placed at all, because a float is printed
+   where the page has room and not where it sits in the source. Diffing the printed words has
+   none of those problems: maths, numbers and table cells are just words on both sides.
 
-How it finds them, in two stages. First the whole diff is reduced to the token sequence of the
-NEW document, each token carrying a changed/unchanged flag, and that sequence is aligned against
-the PDF's own word stream with difflib. One global alignment places about 95% of the changed
-tokens and is immune to the problem that defeats per-run searching: a short run such as a single
-word "statistically" or a table cell "0.3363" is not unique on its own, but it is unambiguous in
-its position. Second, any run that the alignment placed nowhere -- in practice the contents of
-floats, whose source order differs from their printed order -- is located by its own head and
-tail. A run still unplaced after both stages fails the build.
+The baseline is the manuscript as submitted, compiled from the `as-submitted` tag. Words that are
+inserted or replaced relative to it are the changes, with one refinement: a block of four or more
+words that appears verbatim in the baseline has MOVED rather than changed -- a float printed on a
+different page -- and is not marked.
 
-Where it refuses. A run that cannot be located is a change that would ship unmarked, which is
-worse than a reflowed page, so an unlocated run FAILS the build and is named. The one legitimate
-exception is declared in UNLOCATABLE with the reason.
-
-Matching notes, each earned:
-  * hyphenation -- "capability-" at a line end is joined to "tier" on the next, across block
-    boundaries, because pdflatex puts a caption and its paragraph in different blocks;
-  * inline math, \\ref, \\cite and \\url become wildcards: the rendered form ("III-D", "0.336")
-    is not recoverable from the source, so the matcher accepts one to six words there;
-  * 54{,}000 is normalised to 54000 to match the rendered "54,000", and a run boundary that
-    falls inside such a number is matched by prefix or suffix on the first and last token.
+Exit 1 if the baseline cannot be built, because a highlighted PDF that silently marks nothing, or
+everything, is worse than none.
 """
 from __future__ import annotations
 
 import difflib
 import re
+import subprocess
 import sys
 from pathlib import Path
 
-WILD = "\x00"
 YELLOW = (1.0, 0.94, 0.30)
 
-# Runs that are genuinely not in the PDF's text layer, with the reason. Anything else that fails
-# to match stops the build.
-UNLOCATABLE: dict[str, str] = {}
+# The running header and the VOLUME footer are page furniture, not text. A change that spans a
+# page boundary would otherwise swallow them, and "Chincholikar et al.: The Price of
+# De-correlation ..." was once highlighted on three pages that way.
+FURNITURE = re.compile(r"(Chincholikar\s+et\s+al\.|VOLUME\s+\d+,\s+\d{4})")
+MOVED_BLOCK = 4
 
 
 def norm(w: str) -> str:
     return re.sub(r"[^a-z0-9%]", "", w.lower())
 
 
-def run_bodies(tex: str, macro: str) -> list[str]:
-    out, i = [], 0
-    while True:
-        j = tex.find(macro, i)
-        if j < 0:
-            return out
-        k = j + len(macro)
-        depth, m = 1, k
-        while m < len(tex) and depth:
-            if tex[m] == "{":
-                depth += 1
-            elif tex[m] == "}":
-                depth -= 1
-            m += 1
-        out.append(tex[k:m - 1])
-        i = m
-
-
-def tokens(tex: str) -> list[str]:
-    t = re.sub(r"(\d)\{,\}(\d)", r"\1\2", tex)
-    t = re.sub(r"\\(?:begin|end)\{[^{}]*\}", " ", t)   # environment names are not printed text
-    t = re.sub(r"\\label\{[^{}]*\}", " ", t)
-    t = re.sub(r"\\(?:ref|eqref|cite[a-z]*|url|doi)\{[^{}]*\}", f" {WILD} ", t)
-    t = re.sub(r"\\mbox\{", "{", t)
-    t = re.sub(r"\\(?:emph|textit|textbf|texttt|text|mathrm|mathit)\{", "{", t)
-    t = re.sub(r"\$[^$]*\$", f" {WILD} ", t)
-    t = re.sub(r"\\[a-zA-Z]+\*?", " ", t)
-    t = (t.replace("{", " ").replace("}", " ").replace("~", " ")
-          .replace(r"\%", "%").replace(r"\&", "&").replace(r"\_", "_"))
-    out = []
-    for x in t.split():
-        if WILD in x:
-            out.append(WILD)
-            continue
-        n = norm(x)
-        if n:
-            out.append(n)
-    # Collapse runs of wildcards but KEEP them. A \DIFadd run that is pure math -- a confidence
-    # interval in a table cell -- otherwise contributes no token at all, and the context around
-    # its neighbours then has a hole where the printed table has two numbers, so the surrounding
-    # cells of that row can never be matched.
-    collapsed = []
-    for t in out:
-        if t == WILD and collapsed and collapsed[-1] == WILD:
-            continue
-        collapsed.append(t)
-    return collapsed
-
-
-# The running header and the page footer are page furniture, not text. They must be kept out of
-# the stream: a run whose span crosses a page boundary would otherwise swallow them, and the
-# author's name in "Chincholikar et al.: The Price of De-correlation ..." was painted on three
-# pages that way.
-FURNITURE = re.compile(r"(Chincholikar\s+et\s+al\.|VOLUME\s+\d+,\s+\d{4})")
-
-
 def word_stream(doc):
-    """Every word in reading order, hyphenation repaired, with the rects that drew it.
-
-    Header and footer lines are dropped."""
+    """Every word in reading order, hyphenation repaired, with the rects that drew it."""
     stream = []
     for pno, page in enumerate(doc):
         skip = set()
@@ -122,200 +57,130 @@ def word_stream(doc):
             if blk.get("type") != 0:
                 continue
             for ln in blk["lines"]:
-                txt = "".join(sp["text"] for sp in ln["spans"])
-                if FURNITURE.search(txt):
+                if FURNITURE.search("".join(sp["text"] for sp in ln["spans"])):
                     skip.add(round(ln["bbox"][1], 1))
-        ws = [w for w in page.get_text("words") if round(w[1], 1) not in skip]
-        ws = sorted(ws, key=lambda w: (w[5], w[6], w[7]))
+        sizes = {}
+        for blk in page.get_text("dict")["blocks"]:
+            if blk.get("type") != 0:
+                continue
+            for ln in blk["lines"]:
+                for sp in ln["spans"]:
+                    # key on the integer top edge: a word's y0 and its line's bbox top differ by
+                    # a fraction, and a 0.1 key missed, leaving every size 0 and the guard inert
+                    sizes[int(round(ln["bbox"][1]))] = round(sp["size"])
+        ws = sorted((w for w in page.get_text("words") if round(w[1], 1) not in skip),
+                    key=lambda w: (w[5], w[6], w[7]))
         i = 0
         while i < len(ws):
             w = ws[i]
             txt, rects = w[4], [(pno, w[:4])]
             # a line-final hyphen continues into the next word, which pdflatex may place in
-            # another block (a caption and its paragraph are separate blocks)
+            # another block: a caption and its paragraph are separate blocks
             if txt.endswith("-") and i + 1 < len(ws) and ws[i + 1][1] > w[1] + 2:
                 txt = txt[:-1] + ws[i + 1][4]
                 rects.append((pno, ws[i + 1][:4]))
                 i += 1
             n = norm(txt)
             if n:
-                stream.append((n, rects))
+                stream.append((n, rects, sizes.get(int(round(w[1])), 0)))
             i += 1
     return stream
 
 
-def match_at(words, start, seq):
-    i, j = start, 0
-    while j < len(seq):
-        if i >= len(words):
-            return None
-        tok, last = seq[j], j == len(seq) - 1
-        if tok == WILD:
-            if last:
-                return i + 1
-            nxt = seq[j + 1]
-            for take in range(1, 7):
-                if i + take < len(words) and (words[i + take] == nxt
-                                              or words[i + take].startswith(nxt)):
-                    i += take
-                    j += 1
-                    break
-            else:
-                return None
-            continue
-        w = words[i]
-        if w == tok or (j == 0 and w.endswith(tok)) or (last and w.startswith(tok)):
-            i += 1
-            j += 1
-            continue
-        # A source token can span two PDF words. "capability-tier" is one word in main.tex and
-        # extracts as "capability-" + "tier" when the line breaks at its hyphen, and the repair
-        # in word_stream only fires when the continuation is on the next line -- which it is not
-        # when the break falls at a real hyphen mid-column. Accept the concatenation.
-        if i + 1 < len(words) and words[i] + words[i + 1] == tok:
-            i += 2
-            j += 1
-            continue
+def build_baseline(root: Path, ref: str, work: Path) -> Path | None:
+    """Compile the manuscript as submitted, from the tag, in a scratch directory."""
+    work.mkdir(parents=True, exist_ok=True)
+    pdf = work / "paper" / "main.pdf"
+    if pdf.exists():
+        return pdf
+    tar = subprocess.run(["git", "-C", str(root), "archive", ref, "paper"],
+                         capture_output=True)
+    if tar.returncode != 0:
         return None
-    return i
+    subprocess.run(["tar", "-x", "-C", str(work)], input=tar.stdout, capture_output=True)
+    env = {"PATH": f"{Path.home()}/Library/TinyTeX/bin/universal-darwin:"
+                   f"{subprocess.os.environ.get('PATH', '')}"}
+    for cmd in (["pdflatex", "-interaction=nonstopmode", "main.tex"],
+                ["bibtex", "main"],
+                ["pdflatex", "-interaction=nonstopmode", "main.tex"],
+                ["pdflatex", "-interaction=nonstopmode", "main.tex"]):
+        subprocess.run(cmd, cwd=work / "paper", capture_output=True,
+                       env={**subprocess.os.environ, **env})
+    return pdf if pdf.exists() else None
 
 
-def match_trace(words, start, seq):
-    """Like match_at, but returns the PDF index span each source token consumed.
-
-    The context probe needs this. It used to assume the run sat `pad` words into the match, which
-    is only true when every token maps to exactly one word -- and a table row's context is full of
-    wildcards that swallow two or three. Table 5's "Two-way" cell was placed one word short of
-    itself for exactly that reason, so the cell stayed unmarked while the rest of its row was
-    highlighted.
-    """
-    i, j, trace = start, 0, []
-    while j < len(seq):
-        if i >= len(words):
-            return None
-        tok, last = seq[j], j == len(seq) - 1
-        if tok == WILD:
-            if last:
-                trace.append((i, i + 1))
-                return trace
-            nxt = seq[j + 1]
-            for take in range(1, 7):
-                if i + take < len(words) and (words[i + take] == nxt
-                                              or words[i + take].startswith(nxt)):
-                    trace.append((i, i + take))
-                    i += take
-                    j += 1
-                    break
-            else:
-                return None
-            continue
-        w = words[i]
-        if w == tok or (j == 0 and w.endswith(tok)) or (last and w.startswith(tok)):
-            trace.append((i, i + 1))
-            i += 1
-            j += 1
-            continue
-        if i + 1 < len(words) and words[i] + words[i + 1] == tok:
-            trace.append((i, i + 2))
-            i += 2
-            j += 1
-            continue
-        return None
-    return trace
-
-
-def locate(words, seq):
-    for s0 in range(len(words)):
-        t = seq[0]
-        if t != WILD and not (words[s0] == t or words[s0].endswith(t)):
-            continue
-        e = match_at(words, s0, seq)
-        if e:
-            return s0, e
-    return None
-
-
-def new_bibitems(bbl: Path, old_tex: str, new_tex: str) -> list[str]:
-    """The reference-list text of every \\bibitem cited in the revision but not before."""
-    if not bbl.exists():
-        return []
-    # Split the comma-separated groups BEFORE differencing. Differencing the raw groups treats
-    # "\cite{a,b}" as one key, so a group that merely gained a member looked entirely new and an
-    # already-cited reference was reported as added.
-    def cited(s):
-        return {k.strip() for grp in re.findall(r"\\cite[a-z]*\{([^}]*)\}", s)
-                for k in grp.split(",") if k.strip()}
-    added = cited(new_tex) - cited(old_tex)
-    out = []
-    entries = re.split(r"\\bibitem", bbl.read_text(errors="replace"))
-    for e in entries[1:]:
-        m = re.match(r"(?:\[[^\]]*\])?\{([^}]*)\}(.*)", e, re.S)
-        if m and m.group(1) in added:
-            out.append(m.group(2))
-    return out
-
-
-NEW_DOC_MACROS = (r"\DIFadd{", r"\DIFaddFL{")
-DEL_MACROS = (r"\DIFdel{", r"\DIFdelFL{")
-
-
-def _skip_arg(s: str, k: int) -> int:
-    depth = 1
-    while k < len(s) and depth:
-        if s[k] == "{":
-            depth += 1
-        elif s[k] == "}":
-            depth -= 1
-        k += 1
-    return k
-
-
-def flagged_segments(src: str):
-    """The NEW document as (text, changed, in_float) segments: deletions dropped, additions
-    flagged, and \DIFaddFL marked as float content.
-
-    The distinction matters for placement. A float is typeset where the page has room, not where
-    it sits in the source, so the whole-document alignment -- which is monotonic by construction
-    -- cannot place its contents correctly. Table 5's "Two-way" row is written in the source
-    before the text of Section V-C and printed at the top of the page after it, and the
-    alignment duly anchored that cell to the word "two-way" in the prose instead."""
-    segs, i = [], 0
-    while i < len(src):
-        if any(src.startswith(m, i) for m in DEL_MACROS):
-            m = next(m for m in DEL_MACROS if src.startswith(m, i))
-            i = _skip_arg(src, i + len(m))
-            continue
-        if any(src.startswith(m, i) for m in NEW_DOC_MACROS):
-            m = next(m for m in NEW_DOC_MACROS if src.startswith(m, i))
-            j = _skip_arg(src, i + len(m))
-            segs.append((src[i + len(m):j - 1], True, m.endswith("FL{")))
-            i = j
-            continue
-        j = i
-        while j < len(src) and not any(src.startswith(m, j) for m in DEL_MACROS + NEW_DOC_MACROS):
-            j += 1
-        segs.append((src[i:j], False, False))
-        i = j
-    return segs
+def changed_words(old_words, new_words):
+    """Indices into new_words that are inserted or replaced relative to the baseline."""
+    sm = difflib.SequenceMatcher(a=old_words, b=new_words, autojunk=False)
+    changed = set()
+    for tag, _i1, _i2, j1, j2 in sm.get_opcodes():
+        if tag in ("insert", "replace"):
+            changed.update(range(j1, j2))
+    # A stretch that appears verbatim in the baseline has moved, not changed. Floats are printed
+    # where the page has room, so a table or caption can land in a different place in the two
+    # documents and look inserted to a monotonic diff.
+    joined = " ".join(old_words)
+    runs, cur = [], []
+    for i in sorted(changed):
+        if cur and i == cur[-1] + 1:
+            cur.append(i)
+        else:
+            if cur:
+                runs.append(cur)
+            cur = [i]
+    if cur:
+        runs.append(cur)
+    moved = 0
+    for r in runs:
+        if len(r) >= MOVED_BLOCK and " ".join(new_words[r[0]:r[-1] + 1]) in joined:
+            changed.difference_update(r)
+            moved += len(r)
+    return changed, moved
 
 
 def paint(doc, stream, indices, pymupdf):
-    """One rectangle per (page, line) the given word indices touch."""
-    by_line = {}
+    """One rectangle per CONTIGUOUS run of marked words on a line.
+
+    Merging every marked word on a line into a single box was wrong: the title block puts the
+    author names and the e-mail address on the same text line, so marking the ORCIDs added to the
+    address drew one box from the ORCID back across "ROBIN CHAWLA". Boxes now follow runs of
+    consecutive words, so an unmarked word breaks the box.
+    """
+    boxes = []
+    run = []
     for idx in indices:
-        for pno, (x0, y0, x1, y1) in stream[idx][1]:
-            key = (pno, round(y0, 1))
-            b = by_line.get(key)
-            by_line[key] = ((min(b[0], x0), min(b[1], y0), max(b[2], x1), max(b[3], y1))
-                            if b else (x0, y0, x1, y1))
-    for (pno, _), (x0, y0, x1, y1) in by_line.items():
+        if run and idx == run[-1] + 1:
+            run.append(idx)
+        else:
+            if run:
+                boxes.extend(_boxes_for(stream, run))
+            run = [idx]
+    if run:
+        boxes.extend(_boxes_for(stream, run))
+    for pno, (x0, y0, x1, y1) in boxes:
         doc[pno].draw_rect(pymupdf.Rect(x0 - 0.6, y0 - 0.5, x1 + 0.6, y1 + 0.5),
                            color=None, fill=YELLOW, overlay=False)
-    return len(by_line)
+    return len(boxes)
+
+
+def _boxes_for(stream, run):
+    by_line = {}
+    order = []
+    for idx in run:
+        for pno, (x0, y0, x1, y1) in stream[idx][1]:
+            key = (pno, round(y0, 1))
+            if key not in by_line:
+                by_line[key] = [x0, y0, x1, y1]
+                order.append(key)
+            else:
+                b = by_line[key]
+                b[0], b[1] = min(b[0], x0), min(b[1], y0)
+                b[2], b[3] = max(b[2], x1), max(b[3], y1)
+    return [(k[0], tuple(by_line[k])) for k in order]
 
 
 def main() -> int:
-    if len(sys.argv) < 4:
+    if len(sys.argv) < 3:
         print(__doc__)
         return 2
     try:
@@ -323,175 +188,58 @@ def main() -> int:
     except ImportError:
         print("highlight_overlay: pymupdf is required", file=sys.stderr)
         return 2
-    clean, diff_tex, out_pdf = Path(sys.argv[1]), Path(sys.argv[2]), Path(sys.argv[3])
-    old_tex = Path(sys.argv[4]).read_text(errors="replace") if len(sys.argv) > 4 else ""
-    new_tex = Path(sys.argv[5]).read_text(errors="replace") if len(sys.argv) > 5 else ""
-    bbl = Path(sys.argv[6]) if len(sys.argv) > 6 else None
+    clean, out_pdf = Path(sys.argv[1]), Path(sys.argv[2])
+    ref = sys.argv[3] if len(sys.argv) > 3 else "as-submitted"
+    root = Path(__file__).resolve().parents[1]
+    work = Path(sys.argv[4]) if len(sys.argv) > 4 else root / ".baseline_build"
 
-    src = diff_tex.read_text(errors="replace")
-    doc = pymupdf.open(clean)
-    stream = word_stream(doc)
-    words = [w for w, _ in stream]
-
-    # ---- stage 1: global alignment of the new document against the PDF
-    segs = flagged_segments(src)
-    toks = [(t, flag) for body, flag, _fl in segs for t in tokens(body)]
-    src_words = [t for t, _ in toks]
-    changed_src = {i for i, (_, f) in enumerate(toks) if f}
-    sm = difflib.SequenceMatcher(a=src_words, b=words, autojunk=False)
-    placed = set()
-    src_to_pdf = {}
-    # Only a matching block of three or more consecutive tokens is evidence. difflib will match
-    # a lone "at" or "to" anywhere in the document, and near the end -- at the biographies and
-    # the reference list, where the source order and the printed order genuinely diverge -- such
-    # an isolated match put a changed word on the author's name. Runs left unplaced by this
-    # restriction are picked up by the per-run search below, which needs real context.
-    MIN_BLOCK = 3
-    for blk in sm.get_matching_blocks():
-        if blk.size < MIN_BLOCK:
-            continue
-        for k in range(blk.size):
-            src_to_pdf[blk.a + k] = blk.b + k
-    # Paint each run as a CONTIGUOUS SPAN, not as the set of tokens that happened to align.
-    # Inline math is reduced to a wildcard and so has no source token to align: marking only the
-    # aligned tokens left every formula, number and bracketed interval inside a changed sentence
-    # unhighlighted -- "giving" was yellow while "DeltaKappa_HOM-HET = 0.072 (95% CI" beside it
-    # was not. The words between a run's first and last aligned token belong to that run, so the
-    # whole span is painted.
-    stage1 = 0
-
-    # ---- stage 2: per-run fallback for anything the alignment placed nowhere
-    # Runs are taken from the SAME segment list the alignment used, so run i and span i are the
-    # same object by construction. Collecting them separately -- all \DIFadd then all \DIFaddFL
-    # -- put them in a different order from the spans and silently mismatched the two.
-    runs, spans, is_float, cur = [], [], [], 0
-    for body, flag, fl in segs:
-        n = len(tokens(body))
-        if flag:
-            runs.append(("changed run", body))
-            spans.append((cur, cur + n))
-            is_float.append(fl)
-        cur += n
-    refs = new_bibitems(bbl, old_tex, new_tex) if bbl else []
-    runs += [("bibitem", b) for b in refs]
-    is_float += [False] * len(refs)
-    fails, recovered = [], 0
-    for ri, (kind, body) in enumerate(runs):
-        seq = tokens(body)
-        while seq and seq[0] == WILD:
-            seq.pop(0)
-        while seq and seq[-1] == WILD:
-            seq.pop()
-        if not seq or body.strip() in ("#1", "#2", "#3"):
-            continue        # a macro parameter in a redefined command, not printed text
-        if ri < len(spans):
-            a, b = spans[ri]
-            hits = [src_to_pdf[i] for i in range(a, b) if i in src_to_pdf]
-            if hits and not is_float[ri]:
-                # A one-word run is accepted from the alignment only if its surroundings agree.
-                # "Two-way" in Table 5 was being placed on the word "two-way" in the prose, so
-                # that table cell shipped unmarked while the rest of its row was highlighted.
-                if b - a == 1:
-                    at = hits[0]
-                    before = [t for t in src_words[max(0, a - 2):a] if t != WILD]
-                    after = [t for t in src_words[b:b + 2] if t != WILD]
-                    ok = all(t in words[max(0, at - 4):at] for t in before) and \
-                         all(t in words[at + 1:at + 5] for t in after)
-                    if ok:
-                        placed.add(at)
-                        stage1 += 1
-                        continue
-                else:
-                    # extend the span over the wildcards the run contains, so the maths inside it
-                    # is painted with the words around it
-                    lo_w, hi_w = min(hits), max(hits) + 1
-                    tr = match_trace(words, lo_w, src_words[a:b])
-                    if tr:
-                        lo_w, hi_w = tr[0][0], tr[-1][1]
-                    placed.update(range(lo_w, hi_w))
-                    stage1 += 1
-                    continue
-        probe = seq[:8] if len(seq) >= 2 else seq
-        hit = locate(words, probe) if len(probe) >= 2 else None
-        if hit is None and len(seq) >= 2:
-            hit = locate(words, seq[:4])
-        if hit is None and ri < len(spans):
-            # A one-word change -- "statistically", a table cell "same" -- is not unique on its
-            # own but is unambiguous in context. Rebuild the probe from the surrounding
-            # UNCHANGED tokens of the new document and keep only the run's own words.
-            a, b = spans[ri]
-            # Symmetric context fails where the run sits at a float boundary: the words after it
-            # belong to a caption that the PDF prints elsewhere. One-sided windows are tried too.
-            windows = [(p, p) for p in (4, 7, 10, 3, 2)] + [(8, 0), (0, 8), (12, 0), (0, 12)]
-            for pad_l, pad_r in windows:
-                lo, hi = max(0, a - pad_l), min(len(src_words), b + pad_r)
-                ctx = [t for t in src_words[lo:hi]]
-                if len(ctx) < 2:
-                    continue
-                ch = locate(words, ctx)
-                if ch:
-                    tr = match_trace(words, ch[0], ctx)
-                    if tr is None:
-                        continue
-                    off = a - lo                     # index of the run's first token in ctx
-                    span = tr[off:off + max(1, b - a)]
-                    if not span:
-                        continue
-                    placed.update(range(span[0][0], span[-1][1]))
-                    recovered += 1
-                    break
-            else:
-                ch = None
-            if ch:
-                continue
-        if hit is None:
-            fails.append(f"{kind}: could not locate: {' '.join(seq[:12])}")
-            continue
-        s0 = hit[0]
-        end = None
-        for probe in (seq[-8:], seq[-5:], seq[-3:]):
-            probe = [t for t in probe if t != WILD] or probe
-            if len(probe) < 2:
-                continue
-            for s1 in range(s0, min(len(words), s0 + len(seq) + 40)):
-                e1 = match_at(words, s1, probe)
-                if e1:
-                    end = e1
-                    break
-            if end:
-                break
-        end = end if end and end > s0 else min(len(words), s0 + len(seq))
-        placed.update(range(s0, end))
-        recovered += 1
-
-    if fails:
-        for f in fails:
-            print("  " + f, file=sys.stderr)
-        print(f"highlight_overlay: {len(fails)} change(s) could not be located and would ship "
-              f"unmarked", file=sys.stderr)
+    base = build_baseline(root, ref, work)
+    if base is None:
+        print(f"highlight_overlay: could not build the {ref} baseline, so there is nothing to "
+              f"diff against", file=sys.stderr)
         return 1
 
-    # Fill single-word holes. Inline maths carries no source token, so a formula sitting between
-    # two highlighted words -- "giving DeltaKappa = 0.072 (95% CI" -- could be left unpainted
-    # even when the sentence around it is marked. A word is filled only when BOTH its immediate
-    # neighbours are highlighted and all three sit on the same line, which cannot reach into
-    # unchanged text: the neighbours bound it on both sides.
-    filled = 0
-    for i in range(1, len(stream) - 1):
-        if i in placed or i - 1 not in placed or i + 1 not in placed:
-            continue
-        pa, ra = stream[i - 1][1][0]
-        pb, rb = stream[i][1][0]
-        pc, rc = stream[i + 1][1][0]
-        if pa == pb == pc and abs(ra[1] - rb[1]) < 2 and abs(rb[1] - rc[1]) < 2:
-            placed.add(i)
-            filled += 1
+    old = word_stream(pymupdf.open(base))
+    doc = pymupdf.open(clean)
+    new = word_stream(doc)
+    ow = [t[0] for t in old]
+    nw = [t[0] for t in new]
+    changed, moved = changed_words(ow, nw)
 
-    boxes = paint(doc, stream, sorted(placed), pymupdf)
+    # Close short holes inside a marked passage. A word-level diff keeps whatever words a
+    # rewritten sentence happens to reuse, so "a three-class BUY/HOLD/SELL output space" becoming
+    # "a three-class BUY, HOLD, and SELL label set" leaves "three-class" unmarked in the middle
+    # of the change -- speckled, and it reads as a mistake rather than as information. A gap of
+    # up to GAP words bounded by marked words on both sides, on the same page, is closed. The
+    # bound on both sides is what keeps this from reaching into text that genuinely did not
+    # change: an unchanged paragraph has no marked word to anchor against.
+    GAP = 10
+    filled = 0
+    marks = sorted(changed)
+    for a, b in zip(marks, marks[1:]):
+        if not (1 < b - a <= GAP + 1):
+            continue
+        if new[a][1][0][0] != new[b][1][0][0]:
+            continue                      # different pages
+        # and never across a change of type size. The author names are set far larger than the
+        # address line beneath them; without this the ORCIDs added to that address reached up and
+        # highlighted the authors' own names in the title block.
+        size = new[a][2]
+        # An unknown size (0) blocks the gap too. The author names in the title block come back
+        # with no size, and treating unknown as "same" let the ORCIDs added to the address line
+        # below reach up and highlight the authors' own names.
+        if size == 0 or new[b][2] != size or any(new[i][2] != size for i in range(a + 1, b)):
+            continue
+        for i in range(a + 1, b):
+            if i not in changed:
+                changed.add(i)
+                filled += 1
+
+    boxes = paint(doc, new, sorted(changed), pymupdf)
     doc.save(out_pdf, garbage=3, deflate=True)
-    print(f"   {len(placed)} changed word(s) highlighted on the manuscript's own pages in "
-          f"{boxes} runs: {stage1} placed by whole-document alignment, {recovered} run(s) "
-          f"recovered individually ({len(refs)} new reference(s)), {filled} interior gap(s) "
+    pct = 100.0 * len(changed) / max(1, len(nw))
+    print(f"   {len(changed)} of {len(nw)} words changed against {ref} ({pct:.1f}%) highlighted "
+          f"in {boxes} runs; {moved} word(s) moved rather than changed, {filled} interior gap(s) "
           f"filled; {len(doc)} pages")
     return 0
 

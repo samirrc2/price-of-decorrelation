@@ -33,3 +33,4 @@ paper/generated_tables/
 paper/pdf_extract.txt
 submission/missfont.log
 
+.baseline_build/
