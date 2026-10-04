@@ -633,43 +633,48 @@ Two-way & 1200 & 0.3363 & $[0.2786,\,0.3877]$ \\
 \end{tabular}
 \end{table}
 
-\subsection{Agreement, error correlation, and what ``decorrelation'' denotes}
+\subsection{Agreement, error correlation, and decorrelation}
 \label{subsec:errcorr}
-Fleiss' $\kappa$ measures agreement among categorical outputs without regard to
-whether those outputs are correct. It therefore does not directly measure
-dependence between model errors. Because this article uses the term
-decorrelation, we distinguish five related concepts:
+Agreement and error dependence capture different properties of an ensemble. We
+therefore distinguish five concepts used throughout the analysis:
 
 \begin{enumerate}
 \item \emph{Output agreement}: the extent to which agents return the same
-categorical label. This is measured by $\kappa$ and constitutes the primary
-endpoint.
+categorical label. This is measured by Fleiss' $\kappa$ and constitutes the
+primary agreement endpoint.
 \item \emph{Error correlation}: dependence between agents' mistakes. This is
-measured using $\phi$.
+measured using $\phi$ computed from binary error indicators.
 \item \emph{Sampling independence}: whether repeated responses share elements of
-the sampling process, such as a random seed or decoding trajectory. This is a
-property of the measurement procedure rather than of the models.
+the sampling process, such as a random seed or decoding trajectory.
 \item \emph{Model diversity}: differences in model weights, architecture,
-training data, or related characteristics.
+training data, or related model characteristics.
 \item \emph{Provider diversity}: whether agents are supplied by different
-organizations. The experimental configurations vary provider composition,
-although provider remains bundled with other model-specific characteristics.
+organizations. The ensemble configurations vary provider composition, although
+provider remains bundled with other model-specific characteristics.
 \end{enumerate}
 
-To determine whether heterogeneity reduces error dependence rather than only
-output agreement, we compute $\phi$ between binary error indicators for every
-pair of agents within an ensemble cell. Error correlation decreases from
-$\phi = 0.984$ for HOM to $0.742$ for HET-LITE and $0.530$ for HET, giving
-$\Delta\phi_{\mathrm{HOM-HET}} = 0.454$ (95\% CI $[0.376,\,0.534]$).
+In this study, decorrelation denotes a reduction in error correlation, measured
+by $\phi$. The agreement measure $\kappa$ captures a related but distinct change
+in categorical consensus. Accordingly, the ``price of decorrelation'' in the
+title refers to the additional inference cost associated with ensemble
+configurations that exhibit lower error dependence.
+
+For each pair of agents within an ensemble cell, we compute $\phi$ between binary
+error indicators defined relative to the realized forward-return sign. Error
+correlation decreases from $\phi = 0.984$ for HOM to $0.742$ for HET-LITE and
+$0.530$ for HET, giving $\Delta\phi_{\mathrm{HOM-HET}} = 0.454$
+(95\% CI $[0.376,\,0.534]$).
 
 Because treating HOLD as an abstention changes the scoreable subset, we repeat
 the analysis with HOLD counted as an error. The corresponding values are $0.586$,
 $0.359$, and $0.277$, with $\Delta\phi_{\mathrm{HOM-HET}} = 0.309$
-(95\% CI $[0.262,\,0.354]$). The ordering is therefore preserved under both
-treatments of HOLD. Mean error rates remain similar across configurations, so the
-decline reflects lower error dependence rather than differences in average
-correctness. Throughout this article, decorrelation refers specifically to the
-reduction in error dependence measured by $\phi$.
+(95\% CI $[0.262,\,0.354]$). The ordering is preserved under both treatments of
+HOLD.
+
+Mean per-agent error rates are similar across configurations, indicating that the
+decline in $\phi$ reflects lower error dependence rather than differences in
+average correctness. The reduction is partial rather than complete, as
+heterogeneous agents continue to make correlated errors.
 
 \subsection{The agreement--cost frontier}
 \label{subsec:frontier}

@@ -209,7 +209,7 @@ R = [
     (r"0\.2989 0\.3656 two-way 1200 0\.3363 0\.2786$", "0.3877",
      "revision_r3_2_clustering_two_way_ci_high", 4),
     # ---------------------------------------------------------------------- error correlation
-    (r"ensemble cell\. error correlation decreases from$", "0.984",
+    (r"forward-return sign\. error correlation decreases from$", "0.984",
      "revision_r3_3_error_correlation_scored_phi_hom", 3),
     (r"decreases from 0\.984 for hom to$", "0.742",
      "revision_r3_3_error_correlation_scored_phi_het_lite", 3),
