@@ -1,0 +1,655 @@
+# =============================================================================
+# CROSS-DOMAIN REPLICATION — MMLU medical decisions (reviewer-requested)
+# Same five agents, same three configurations, same independent-draw protocol
+# as the confirmatory finance study. Only the domain changes, so any change in
+# the endpoint is attributable to domain rather than to a redesign.
+#   source : cais/mmlu (MIT), professional_medicine + clinical_knowledge
+#   items  : 537, choice order shuffled deterministically (build_mmlu_inputs.py)
+#   labels : A/B/C/D — four categories, not the finance triple
+# =============================================================================
+seed_master: 20260703
+bootstrap_seed: 42
+seed_mode: per_agent
+temperature: 0.7
+runs: 3
+seeds:
+- 101
+- 202
+- 303
+configs:
+  HOM:
+  - model: gpt-5.4-nano
+  - model: gpt-5.4-nano
+  - model: gpt-5.4-nano
+  - model: gpt-5.4-nano
+  - model: gpt-5.4-nano
+  HET-LITE:
+  - model: gpt-5.4-nano
+  - model: gpt-5.4-nano
+  - model: gpt-5.4-nano
+  - model: gpt-5.4-nano
+  - model: gemini-3.5-flash
+  HET:
+  - model: gpt-5.4-nano
+  - model: gpt-5.4-nano
+  - model: gemini-3.5-flash
+  - model: gemini-3.5-flash
+  - model: grok-4.3
+heterogeneity_level:
+  HOM: 0
+  HET-LITE: 1
+  HET: 3
+models:
+  gpt-5.5:
+    provider: openai
+    api_model: gpt-5.5
+    knowledge_cutoff: '2025-08-01'
+    price_in: 5.0
+    price_out: 30.0
+    max_tokens: 3000
+  gpt-5.4-nano:
+    provider: openai
+    api_model: gpt-5.4-nano
+    knowledge_cutoff: '2025-08-01'
+    price_in: 0.2
+    price_out: 1.25
+    max_tokens: 256
+  gemini-3.5-flash:
+    provider: google
+    api_model: gemini-3.5-flash
+    knowledge_cutoff: '2025-01-01'
+    price_in: 1.5
+    price_out: 9.0
+    max_tokens: 256
+  grok-4.3:
+    provider: xai
+    api_model: grok-4.3
+    knowledge_cutoff: '2025-06-01'
+    price_in: 1.25
+    price_out: 2.5
+    max_tokens: 256
+    reasoning_effort: low
+max_retries: 5
+concurrency: 24
+rpm_limits:
+  openai: 450
+  google: 250
+  xai: 300
+daily_limits:
+  gemini-3.5-flash: 10000
+bootstrap_draws: 2000
+minipilot:
+  tickers:
+  - AAPL
+  - MSFT
+  - JPM
+  - XOM
+  - UNH
+  - CAT
+  - GOOGL
+  - PG
+  dates:
+  - '2026-04-17'
+  - '2026-05-15'
+  runs: 3
+  spend_cap_usd: 8.0
+  gate:
+    max_cells: 1200
+    max_cost_usd: 75.0
+  paths:
+    runs_csv: data/minipilot/latest/runs.csv
+    spend_ledger: data/minipilot/latest/spend_ledger.json
+midrun_report_at: 0.5
+stop_margin_usd: 1.0
+tickers:
+- CLIN0001
+- CLIN0002
+- CLIN0003
+- CLIN0004
+- CLIN0005
+- CLIN0006
+- CLIN0007
+- CLIN0008
+- CLIN0009
+- CLIN0010
+- CLIN0011
+- CLIN0012
+- CLIN0013
+- CLIN0014
+- CLIN0015
+- CLIN0016
+- CLIN0017
+- CLIN0018
+- CLIN0019
+- CLIN0020
+- CLIN0021
+- CLIN0022
+- CLIN0023
+- CLIN0024
+- CLIN0025
+- CLIN0026
+- CLIN0027
+- CLIN0028
+- CLIN0029
+- CLIN0030
+- CLIN0031
+- CLIN0032
+- CLIN0033
+- CLIN0034
+- CLIN0035
+- CLIN0036
+- CLIN0037
+- CLIN0038
+- CLIN0039
+- CLIN0040
+- CLIN0041
+- CLIN0042
+- CLIN0043
+- CLIN0044
+- CLIN0045
+- CLIN0046
+- CLIN0047
+- CLIN0048
+- CLIN0049
+- CLIN0050
+- CLIN0051
+- CLIN0052
+- CLIN0053
+- CLIN0054
+- CLIN0055
+- CLIN0056
+- CLIN0057
+- CLIN0058
+- CLIN0059
+- CLIN0060
+- CLIN0061
+- CLIN0062
+- CLIN0063
+- CLIN0064
+- CLIN0065
+- CLIN0066
+- CLIN0067
+- CLIN0068
+- CLIN0069
+- CLIN0070
+- CLIN0071
+- CLIN0072
+- CLIN0073
+- CLIN0074
+- CLIN0075
+- CLIN0076
+- CLIN0077
+- CLIN0078
+- CLIN0079
+- CLIN0080
+- CLIN0081
+- CLIN0082
+- CLIN0083
+- CLIN0084
+- CLIN0085
+- CLIN0086
+- CLIN0087
+- CLIN0088
+- CLIN0089
+- CLIN0090
+- CLIN0091
+- CLIN0092
+- CLIN0093
+- CLIN0094
+- CLIN0095
+- CLIN0096
+- CLIN0097
+- CLIN0098
+- CLIN0099
+- CLIN0100
+- CLIN0101
+- CLIN0102
+- CLIN0103
+- CLIN0104
+- CLIN0105
+- CLIN0106
+- CLIN0107
+- CLIN0108
+- CLIN0109
+- CLIN0110
+- CLIN0111
+- CLIN0112
+- CLIN0113
+- CLIN0114
+- CLIN0115
+- CLIN0116
+- CLIN0117
+- CLIN0118
+- CLIN0119
+- CLIN0120
+- CLIN0121
+- CLIN0122
+- CLIN0123
+- CLIN0124
+- CLIN0125
+- CLIN0126
+- CLIN0127
+- CLIN0128
+- CLIN0129
+- CLIN0130
+- CLIN0131
+- CLIN0132
+- CLIN0133
+- CLIN0134
+- CLIN0135
+- CLIN0136
+- CLIN0137
+- CLIN0138
+- CLIN0139
+- CLIN0140
+- CLIN0141
+- CLIN0142
+- CLIN0143
+- CLIN0144
+- CLIN0145
+- CLIN0146
+- CLIN0147
+- CLIN0148
+- CLIN0149
+- CLIN0150
+- CLIN0151
+- CLIN0152
+- CLIN0153
+- CLIN0154
+- CLIN0155
+- CLIN0156
+- CLIN0157
+- CLIN0158
+- CLIN0159
+- CLIN0160
+- CLIN0161
+- CLIN0162
+- CLIN0163
+- CLIN0164
+- CLIN0165
+- CLIN0166
+- CLIN0167
+- CLIN0168
+- CLIN0169
+- CLIN0170
+- CLIN0171
+- CLIN0172
+- CLIN0173
+- CLIN0174
+- CLIN0175
+- CLIN0176
+- CLIN0177
+- CLIN0178
+- CLIN0179
+- CLIN0180
+- CLIN0181
+- CLIN0182
+- CLIN0183
+- CLIN0184
+- CLIN0185
+- CLIN0186
+- CLIN0187
+- CLIN0188
+- CLIN0189
+- CLIN0190
+- CLIN0191
+- CLIN0192
+- CLIN0193
+- CLIN0194
+- CLIN0195
+- CLIN0196
+- CLIN0197
+- CLIN0198
+- CLIN0199
+- CLIN0200
+- CLIN0201
+- CLIN0202
+- CLIN0203
+- CLIN0204
+- CLIN0205
+- CLIN0206
+- CLIN0207
+- CLIN0208
+- CLIN0209
+- CLIN0210
+- CLIN0211
+- CLIN0212
+- CLIN0213
+- CLIN0214
+- CLIN0215
+- CLIN0216
+- CLIN0217
+- CLIN0218
+- CLIN0219
+- CLIN0220
+- CLIN0221
+- CLIN0222
+- CLIN0223
+- CLIN0224
+- CLIN0225
+- CLIN0226
+- CLIN0227
+- CLIN0228
+- CLIN0229
+- CLIN0230
+- CLIN0231
+- CLIN0232
+- CLIN0233
+- CLIN0234
+- CLIN0235
+- CLIN0236
+- CLIN0237
+- CLIN0238
+- CLIN0239
+- CLIN0240
+- CLIN0241
+- CLIN0242
+- CLIN0243
+- CLIN0244
+- CLIN0245
+- CLIN0246
+- CLIN0247
+- CLIN0248
+- CLIN0249
+- CLIN0250
+- CLIN0251
+- CLIN0252
+- CLIN0253
+- CLIN0254
+- CLIN0255
+- CLIN0256
+- CLIN0257
+- CLIN0258
+- CLIN0259
+- CLIN0260
+- CLIN0261
+- CLIN0262
+- CLIN0263
+- CLIN0264
+- CLIN0265
+- MED0001
+- MED0002
+- MED0003
+- MED0004
+- MED0005
+- MED0006
+- MED0007
+- MED0008
+- MED0009
+- MED0010
+- MED0011
+- MED0012
+- MED0013
+- MED0014
+- MED0015
+- MED0016
+- MED0017
+- MED0018
+- MED0019
+- MED0020
+- MED0021
+- MED0022
+- MED0023
+- MED0024
+- MED0025
+- MED0026
+- MED0027
+- MED0028
+- MED0029
+- MED0030
+- MED0031
+- MED0032
+- MED0033
+- MED0034
+- MED0035
+- MED0036
+- MED0037
+- MED0038
+- MED0039
+- MED0040
+- MED0041
+- MED0042
+- MED0043
+- MED0044
+- MED0045
+- MED0046
+- MED0047
+- MED0048
+- MED0049
+- MED0050
+- MED0051
+- MED0052
+- MED0053
+- MED0054
+- MED0055
+- MED0056
+- MED0057
+- MED0058
+- MED0059
+- MED0060
+- MED0061
+- MED0062
+- MED0063
+- MED0064
+- MED0065
+- MED0066
+- MED0067
+- MED0068
+- MED0069
+- MED0070
+- MED0071
+- MED0072
+- MED0073
+- MED0074
+- MED0075
+- MED0076
+- MED0077
+- MED0078
+- MED0079
+- MED0080
+- MED0081
+- MED0082
+- MED0083
+- MED0084
+- MED0085
+- MED0086
+- MED0087
+- MED0088
+- MED0089
+- MED0090
+- MED0091
+- MED0092
+- MED0093
+- MED0094
+- MED0095
+- MED0096
+- MED0097
+- MED0098
+- MED0099
+- MED0100
+- MED0101
+- MED0102
+- MED0103
+- MED0104
+- MED0105
+- MED0106
+- MED0107
+- MED0108
+- MED0109
+- MED0110
+- MED0111
+- MED0112
+- MED0113
+- MED0114
+- MED0115
+- MED0116
+- MED0117
+- MED0118
+- MED0119
+- MED0120
+- MED0121
+- MED0122
+- MED0123
+- MED0124
+- MED0125
+- MED0126
+- MED0127
+- MED0128
+- MED0129
+- MED0130
+- MED0131
+- MED0132
+- MED0133
+- MED0134
+- MED0135
+- MED0136
+- MED0137
+- MED0138
+- MED0139
+- MED0140
+- MED0141
+- MED0142
+- MED0143
+- MED0144
+- MED0145
+- MED0146
+- MED0147
+- MED0148
+- MED0149
+- MED0150
+- MED0151
+- MED0152
+- MED0153
+- MED0154
+- MED0155
+- MED0156
+- MED0157
+- MED0158
+- MED0159
+- MED0160
+- MED0161
+- MED0162
+- MED0163
+- MED0164
+- MED0165
+- MED0166
+- MED0167
+- MED0168
+- MED0169
+- MED0170
+- MED0171
+- MED0172
+- MED0173
+- MED0174
+- MED0175
+- MED0176
+- MED0177
+- MED0178
+- MED0179
+- MED0180
+- MED0181
+- MED0182
+- MED0183
+- MED0184
+- MED0185
+- MED0186
+- MED0187
+- MED0188
+- MED0189
+- MED0190
+- MED0191
+- MED0192
+- MED0193
+- MED0194
+- MED0195
+- MED0196
+- MED0197
+- MED0198
+- MED0199
+- MED0200
+- MED0201
+- MED0202
+- MED0203
+- MED0204
+- MED0205
+- MED0206
+- MED0207
+- MED0208
+- MED0209
+- MED0210
+- MED0211
+- MED0212
+- MED0213
+- MED0214
+- MED0215
+- MED0216
+- MED0217
+- MED0218
+- MED0219
+- MED0220
+- MED0221
+- MED0222
+- MED0223
+- MED0224
+- MED0225
+- MED0226
+- MED0227
+- MED0228
+- MED0229
+- MED0230
+- MED0231
+- MED0232
+- MED0233
+- MED0234
+- MED0235
+- MED0236
+- MED0237
+- MED0238
+- MED0239
+- MED0240
+- MED0241
+- MED0242
+- MED0243
+- MED0244
+- MED0245
+- MED0246
+- MED0247
+- MED0248
+- MED0249
+- MED0250
+- MED0251
+- MED0252
+- MED0253
+- MED0254
+- MED0255
+- MED0256
+- MED0257
+- MED0258
+- MED0259
+- MED0260
+- MED0261
+- MED0262
+- MED0263
+- MED0264
+- MED0265
+- MED0266
+- MED0267
+- MED0268
+- MED0269
+- MED0270
+- MED0271
+- MED0272
+dates:
+- '2026-01-01'
+forward_return_days: 0
+labels:
+- A
+- B
+- C
+- D
+prompt_file: prompt_mmlu.txt
+spend_cap_usd: 40.0
+paths:
+  inputs_dir: inputs_mmlu
+  runs_csv: data/mmlu/latest/runs.csv
+  spend_ledger: data/mmlu/latest/spend_ledger.json

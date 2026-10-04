@@ -1,0 +1,25 @@
+{
+ "n_items": 537,
+ "per_subject": {
+  "professional_medicine": 272,
+  "clinical_knowledge": 265
+ },
+ "date": "2026-01-01",
+ "asof": "2025-12-31",
+ "labels": [
+  "A",
+  "B",
+  "C",
+  "D"
+ ],
+ "answer_distribution": {
+  "A": 126,
+  "B": 128,
+  "C": 145,
+  "D": 138
+ },
+ "inputs_sha256": "8bc7e76d928bc263d015941a6559154c7cffe85e9cff554c157acf8731b85ed5",
+ "ground_truth_sha256": "4c2ca4321d139c9785694fcc22fd86ee949ffdc2bcd1d00f1386973766173a03",
+ "source": "cais/mmlu (MIT); subsets professional_medicine, clinical_knowledge",
+ "note": "choice order shuffled deterministically per item; see build_mmlu_inputs.py"
+}

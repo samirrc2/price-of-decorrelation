@@ -1,0 +1,2150 @@
+{
+ "CLIN0001": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0002": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0003": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0004": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0005": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0006": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0007": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0008": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0009": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0010": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0011": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0012": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0013": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0014": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0015": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0016": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0017": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0018": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0019": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0020": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0021": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0022": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0023": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0024": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0025": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0026": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0027": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0028": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0029": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0030": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0031": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0032": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0033": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0034": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0035": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0036": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0037": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0038": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0039": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0040": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0041": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0042": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0043": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0044": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0045": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0046": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0047": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0048": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0049": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0050": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0051": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0052": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0053": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0054": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0055": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0056": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0057": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0058": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0059": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0060": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0061": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0062": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0063": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0064": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0065": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0066": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0067": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0068": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0069": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0070": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0071": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0072": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0073": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0074": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0075": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0076": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0077": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0078": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0079": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0080": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0081": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0082": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0083": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0084": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0085": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0086": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0087": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0088": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0089": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0090": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0091": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0092": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0093": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0094": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0095": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0096": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0097": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0098": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0099": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0100": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0101": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0102": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0103": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0104": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0105": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0106": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0107": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0108": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0109": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0110": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0111": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0112": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0113": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0114": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0115": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0116": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0117": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0118": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0119": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0120": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0121": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0122": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0123": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0124": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0125": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0126": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0127": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0128": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0129": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0130": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0131": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0132": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0133": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0134": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0135": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0136": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0137": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0138": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0139": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0140": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0141": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0142": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0143": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0144": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0145": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0146": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0147": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0148": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0149": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0150": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0151": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0152": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0153": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0154": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0155": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0156": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0157": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0158": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0159": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0160": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0161": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0162": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0163": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0164": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0165": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0166": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0167": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0168": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0169": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0170": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0171": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0172": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0173": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0174": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0175": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0176": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0177": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0178": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0179": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0180": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0181": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0182": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0183": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0184": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0185": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0186": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0187": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0188": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0189": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0190": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0191": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0192": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0193": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0194": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0195": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0196": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0197": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0198": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0199": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0200": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0201": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0202": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0203": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0204": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0205": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0206": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0207": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0208": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0209": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0210": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0211": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0212": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0213": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0214": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0215": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0216": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0217": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0218": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0219": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0220": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0221": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0222": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0223": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0224": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0225": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0226": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0227": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0228": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0229": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0230": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0231": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0232": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0233": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0234": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0235": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0236": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0237": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0238": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0239": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0240": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0241": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0242": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0243": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0244": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0245": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0246": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0247": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0248": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0249": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0250": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0251": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0252": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0253": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0254": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0255": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0256": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0257": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0258": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0259": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0260": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0261": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0262": {
+  "answer": "C",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0263": {
+  "answer": "A",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0264": {
+  "answer": "D",
+  "subject": "clinical_knowledge"
+ },
+ "CLIN0265": {
+  "answer": "B",
+  "subject": "clinical_knowledge"
+ },
+ "MED0001": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0002": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0003": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0004": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0005": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0006": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0007": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0008": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0009": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0010": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0011": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0012": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0013": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0014": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0015": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0016": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0017": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0018": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0019": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0020": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0021": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0022": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0023": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0024": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0025": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0026": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0027": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0028": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0029": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0030": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0031": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0032": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0033": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0034": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0035": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0036": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0037": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0038": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0039": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0040": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0041": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0042": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0043": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0044": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0045": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0046": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0047": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0048": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0049": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0050": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0051": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0052": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0053": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0054": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0055": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0056": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0057": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0058": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0059": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0060": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0061": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0062": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0063": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0064": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0065": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0066": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0067": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0068": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0069": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0070": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0071": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0072": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0073": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0074": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0075": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0076": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0077": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0078": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0079": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0080": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0081": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0082": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0083": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0084": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0085": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0086": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0087": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0088": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0089": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0090": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0091": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0092": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0093": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0094": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0095": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0096": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0097": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0098": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0099": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0100": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0101": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0102": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0103": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0104": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0105": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0106": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0107": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0108": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0109": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0110": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0111": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0112": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0113": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0114": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0115": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0116": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0117": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0118": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0119": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0120": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0121": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0122": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0123": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0124": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0125": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0126": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0127": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0128": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0129": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0130": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0131": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0132": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0133": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0134": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0135": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0136": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0137": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0138": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0139": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0140": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0141": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0142": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0143": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0144": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0145": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0146": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0147": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0148": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0149": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0150": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0151": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0152": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0153": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0154": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0155": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0156": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0157": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0158": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0159": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0160": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0161": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0162": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0163": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0164": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0165": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0166": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0167": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0168": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0169": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0170": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0171": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0172": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0173": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0174": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0175": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0176": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0177": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0178": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0179": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0180": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0181": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0182": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0183": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0184": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0185": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0186": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0187": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0188": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0189": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0190": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0191": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0192": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0193": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0194": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0195": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0196": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0197": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0198": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0199": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0200": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0201": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0202": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0203": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0204": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0205": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0206": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0207": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0208": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0209": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0210": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0211": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0212": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0213": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0214": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0215": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0216": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0217": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0218": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0219": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0220": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0221": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0222": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0223": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0224": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0225": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0226": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0227": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0228": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0229": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0230": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0231": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0232": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0233": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0234": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0235": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0236": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0237": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0238": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0239": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0240": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0241": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0242": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0243": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0244": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0245": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0246": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0247": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0248": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0249": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0250": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0251": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0252": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0253": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0254": {
+  "answer": "A",
+  "subject": "professional_medicine"
+ },
+ "MED0255": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0256": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0257": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0258": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0259": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0260": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0261": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0262": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0263": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0264": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0265": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0266": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0267": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0268": {
+  "answer": "B",
+  "subject": "professional_medicine"
+ },
+ "MED0269": {
+  "answer": "C",
+  "subject": "professional_medicine"
+ },
+ "MED0270": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0271": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ },
+ "MED0272": {
+  "answer": "D",
+  "subject": "professional_medicine"
+ }
+}

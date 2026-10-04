@@ -14,6 +14,7 @@ from dataclasses import dataclass, asdict
 from datetime import date
 from pathlib import Path
 
+import os
 import io_paths
 from typing import Any
 
@@ -54,13 +55,23 @@ import secrets as secretstore  # local secrets.py (loads keys.env)
 
 _HERE = io_paths.repo_root()
 
-VALID_DIRECTIONS = {"BUY", "HOLD", "SELL"}
+# The confirmatory study's label set and prompt are the defaults. The cross-domain
+# replication arm (MMLU medical decisions) needs a different label vocabulary and
+# prompt, so both are overridable by environment variable. Left unset, every value
+# below is exactly what the frozen finance run used, so that path is byte-identical.
+#
+# Reusing BUY/HOLD/SELL for a clinical task was rejected deliberately: those tokens
+# carry financial semantics that could leak into a medical judgement and confound
+# the very comparison the replication is meant to make.
+VALID_DIRECTIONS = set(
+    os.environ.get("POD_LABELS", "BUY,HOLD,SELL").split(","))
+PROMPT_FILE = os.environ.get("POD_PROMPT_FILE", "prompt_template.txt")
 
 
 def _load_prompt_template():
-    """Load the FROZEN prompt from prompt_template.txt (hashed at Phase-1 freeze).
+    """Load the FROZEN prompt (hashed at Phase-1 freeze).
     Sections are delimited by [SYSTEM] and [USER]."""
-    txt = (io_paths.data_root() / "configs" / "prompt_template.txt").read_text()
+    txt = (io_paths.data_root() / "configs" / PROMPT_FILE).read_text()
     sys_part = txt.split("[SYSTEM]", 1)[1].split("[USER]", 1)[0].strip()
     usr_part = txt.split("[USER]", 1)[1].strip()
     return sys_part, usr_part

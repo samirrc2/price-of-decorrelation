@@ -8,9 +8,14 @@ import math
 from collections import defaultdict, Counter
 from typing import Iterable
 
+import os
 import io_paths
 
-DIRECTIONS = ["BUY", "HOLD", "SELL"]
+# Category set for the agreement estimators. Overridable for the cross-domain arm
+# (see agent.py); unset means the confirmatory study's labels, so κ on the frozen
+# finance data is unchanged. Order matters: it fixes the counts-matrix column order
+# and the deterministic majority-vote tie-break.
+DIRECTIONS = [d for d in os.environ.get("POD_LABELS", "BUY,HOLD,SELL").split(",") if d]
 _DIR_IDX = {d: i for i, d in enumerate(DIRECTIONS)}
 
 
