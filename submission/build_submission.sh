@@ -27,6 +27,19 @@ if [ "${1:-}" = "--check" ]; then
     exit "$rc"
 fi
 
+# Sync the figures first. This script compiles paper/ directly, so without this it uses
+# whatever PNGs happen to be sitting there -- and it shipped a two-month-old Fig. 2 showing
+# three bars while the text, the caption and the analysis all described two.
+echo "== 0/4 figures =="
+for f in results/latest/figures/*.png; do
+    [ -f "$f" ] || continue
+    b=$(basename "$f")
+    if [ -f "paper/figures/$b" ] && ! cmp -s "$f" "paper/figures/$b"; then
+        cp -f "$f" "paper/figures/$b"; echo "   refreshed paper/figures/$b"
+    fi
+done
+python3 code/src/check_figures.py | sed 's/^/   /'
+
 echo "== 1/4 manuscript PDF =="
 ( cd paper && pdflatex -interaction=nonstopmode main.tex >/dev/null 2>&1 || true
              bibtex main >/dev/null 2>&1 || true

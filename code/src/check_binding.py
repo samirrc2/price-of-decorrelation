@@ -464,6 +464,11 @@ R = [
      "revision_r3_4_paired_cluster_contrasts_aurc_delta_hom_het", 3),
     (r"bootstrap is -0\.001 95 ci -$", "0.059", "revision_r3_4_paired_cluster_contrasts_aurc_ci_low", 3),
     (r"bootstrap is -0\.001 95 ci -0\.059$", "0.060", "revision_r3_4_paired_cluster_contrasts_aurc_ci_high", 3),
+    (r"primary endpoint widens the interval to$", "0.140", "revision_r3_4_paired_cluster_contrasts_pile_on_two_way_ci_low", 3),
+    (r"endpoint widens the interval to 0\.140$", "0.232", "revision_r3_4_paired_cluster_contrasts_pile_on_two_way_ci_high", 3),
+    (r"two configurations\. the two-way interval -$", "0.113", "revision_r3_4_paired_cluster_contrasts_aurc_two_way_ci_low", 3),
+    (r"two configurations\. the two-way interval -0\.113$", "0.115",
+     "revision_r3_4_paired_cluster_contrasts_aurc_two_way_ci_high", 3),
     # ---------------------------------------------------------------------------- discussion
     (r"inference cost\. within-ensemble agreement decreases from$", "0.552",
      "kappa_hom", 3),

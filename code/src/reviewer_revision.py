@@ -282,7 +282,7 @@ def independence(rows):
 
 # ------------------------------------------- R1.1 / R3.4 selective prediction
 def selective_scored(rows, signs, configs=("HOM", "HET-LITE", "HET")):
-    """Per config, the scored decisions in majority-vote order: (ticker, conviction, erred).
+    """Per config, the scored decisions in majority-vote order: (ticker, date, conviction, erred).
 
     Factored out of selective() so the R3.4 bootstrap can reweight the SAME list in the SAME
     order. AURC sorts on conviction alone, and convictions tie often, so the pre-sort order
@@ -302,7 +302,7 @@ def selective_scored(rows, signs, configs=("HOM", "HET-LITE", "HET")):
             s = signs.get((t, d))
             if s is None or s == 0 or direction == "HOLD": continue
             c = sum(conv[(t, d)]) / len(conv[(t, d)]) if conv[(t, d)] else 0
-            sc.append((t, c, int((1 if direction == "BUY" else -1) != s)))
+            sc.append((t, d, c, int((1 if direction == "BUY" else -1) != s)))
         out[cfg] = sc
     return out
 
@@ -326,7 +326,7 @@ def selective(rows, signs):
     out = {}
     for cfg, sc in selective_scored(rows, signs).items():
         if not sc: continue
-        scored = [(c, e) for _t, c, e in sc]
+        scored = [(c, e) for _t, _d, c, e in sc]
         scored.sort(key=lambda x: -x[0])
         pts, err = [], 0
         for i, (_c, e) in enumerate(scored, 1):
@@ -420,8 +420,8 @@ def paired_cluster_contrasts(rows, signs, tick):
                 continue
             if (1 if maj == "BUY" else -1) == sg:
                 continue                  # majority was right; pile-on conditions on being wrong
-            pile[cfg][t][0] += collections.Counter(dirs)[maj] / 5.0
-            pile[cfg][t][1] += 1
+            pile[cfg][(t, d)][0] += collections.Counter(dirs)[maj] / 5.0
+            pile[cfg][(t, d)][1] += 1
 
     # AURC: reuse selective_scored so the list -- and therefore the tie order -- is the one
     # the published AURC was computed from.
@@ -429,8 +429,8 @@ def paired_cluster_contrasts(rows, signs, tick):
 
     def pileon(cfg, w):
         num = den = 0.0
-        for t, (fs, n) in pile[cfg].items():
-            k = w(t)
+        for (t, d), (fs, n) in pile[cfg].items():
+            k = w(t, d)
             if k:
                 num += k * fs
                 den += k * n
@@ -438,8 +438,8 @@ def paired_cluster_contrasts(rows, signs, tick):
 
     def aurc(cfg, w):
         pts = []
-        for t, c, e in sc[cfg]:
-            k = w(t)
+        for t, d, c, e in sc[cfg]:
+            k = w(t, d)
             if k:
                 pts.extend([(c, e)] * int(k))
         return _aurc_from(pts)[0]
@@ -451,9 +451,11 @@ def paired_cluster_contrasts(rows, signs, tick):
                        for c in ("HOM", "HET")},
            "aurc": {c: ref_sel[c]["aurc"] for c in ("HOM", "HET")}}
 
+    dates = sorted({d for cfg in ("HOM", "HET") for (_t, d) in pile[cfg]})
+
     out = {}
     for name, fn_ in (("pile_on", pileon), ("aurc", aurc)):
-        one = lambda t: 1
+        one = lambda t, d: 1
         a, b = fn_("HOM", one), fn_("HET", one)
         for cfgn, got in (("HOM", a), ("HET", b)):
             want = ref[name][cfgn]
@@ -463,21 +465,38 @@ def paired_cluster_contrasts(rows, signs, tick):
                     f"published analysis gives {want}. The bootstrap must wrap the SAME "
                     f"statistic the paper reports, not a re-derivation of it.")
         point = None if (a is None or b is None) else a - b
-        rng = random.Random(SEED)
-        ds = []
-        for _ in range(DRAWS):
-            ct = collections.Counter(tick[rng.randrange(len(tick))] for _ in tick)
-            w = lambda t: ct.get(t, 0)
-            x, y = fn_("HOM", w), fn_("HET", w)
-            if x is not None and y is not None:
-                ds.append(x - y)
-        ds.sort()
-        lo = hi = None
-        if len(ds) >= 20:
-            lo, hi = ds[int(.025 * len(ds))], ds[int(.975 * len(ds)) - 1]
+        # R3.2 asked for equity AND date dependence to be reflected. The equity-clustered
+        # interval is the pre-registered one and remains primary for these exploratory
+        # quantities; the two-way interval is reported alongside it as a sensitivity, resampling
+        # both margins independently so a cell's weight is the product of its two
+        # multiplicities. It is wider, as it must be, and is not a second headline.
+        def boot(mode):
+            rng = random.Random(SEED)
+            ds = []
+            for _ in range(DRAWS):
+                ct = collections.Counter(tick[rng.randrange(len(tick))] for _ in tick)
+                if mode == "equity":
+                    w = lambda t, d: ct.get(t, 0)
+                else:
+                    cd = collections.Counter(dates[rng.randrange(len(dates))] for _ in dates)
+                    w = lambda t, d: ct.get(t, 0) * cd.get(d, 0)
+                x, y = fn_("HOM", w), fn_("HET", w)
+                if x is not None and y is not None:
+                    ds.append(x - y)
+            ds.sort()
+            if len(ds) < 20:
+                return None, None, len(ds)
+            return ds[int(.025 * len(ds))], ds[int(.975 * len(ds)) - 1], len(ds)
+
+        lo, hi, n = boot("equity")
+        tlo, thi, tn = boot("two_way")
         out[name] = {"hom": a, "het": b, "delta_hom_het": point, "ci": [lo, hi],
-                     "draws_used": len(ds), "n_clusters": len(tick),
-                     "excludes_zero": None if (lo is None or hi is None) else (lo > 0 or hi < 0)}
+                     "draws_used": n, "n_clusters": len(tick),
+                     "excludes_zero": None if (lo is None or hi is None) else (lo > 0 or hi < 0),
+                     "two_way_ci": [tlo, thi], "two_way_draws_used": tn,
+                     "two_way_n_clusters": len(tick) * len(dates),
+                     "two_way_excludes_zero": None if (tlo is None or thi is None)
+                     else (tlo > 0 or thi < 0)}
     return out
 
 

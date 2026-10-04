@@ -380,6 +380,11 @@ _run_gates() {
   # claims are named by no rule, and fault injection showed one of those could be bent to 0.4242
   # with no gate noticing. claims.lock.json pins every value as reviewed, so a code change that
   # moves a number nobody is watching shows up here and in the commit diff.
+  # A figure is a reported result, and no text gate can see it. build_submission.sh compiles
+  # paper/ directly without syncing, so a stale PNG there ships in every deliverable -- which it
+  # did, for two months, with a superseded Fig. 2.
+  echo "[gate] manuscript figures vs the analysis output"
+  _gate figures "$PY" "$CODE_ROOT/src/check_figures.py" || return 1
   echo "[gate] claim values vs the reviewed lock"
   _gate claims-lock "$PY" "$CODE_ROOT/src/check_claims_bound.py" || return 1
   echo "[gate] unit tests"

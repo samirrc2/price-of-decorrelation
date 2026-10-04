@@ -919,7 +919,9 @@ the incorrect majority decreases from 0.824 for HOM to 0.761 for HET-LITE and
 0.636 for HET. A paired equity-clustered bootstrap over the same 100 equities
 (2{,}000 draws, the resampling scheme used for the primary endpoint) gives a
 HOM$-$HET difference of $0.189$ (95\% CI $[0.160,\,0.216]$), so the gap is
-distinguishable from zero at the equity level. Errors in the heterogeneous
+distinguishable from zero at the equity level. Admitting date dependence as well,
+under the same two-way scheme applied to the primary endpoint, widens the
+interval to $[0.140,\,0.232]$ and the gap still excludes zero. Errors in the heterogeneous
 ensembles therefore contain more
 within-committee dissent, which may provide an observable signal for escalation,
 abstention, or further review. These findings suggest that heterogeneity may
@@ -1004,7 +1006,9 @@ cross-provider pairing have near-identical member accuracy
 is $0.954$ within a provider and $0.607$ across providers, a difference of
 $0.347$ (95\% CI $[0.207,\,0.507]$). Every same-provider pairing shows
 higher error correlation than every cross-provider pairing, at both accuracy
-levels present in the ensemble. Provider, not capability, orders the result.
+levels present in the ensemble. The provider-associated ordering therefore
+persists after approximate capability matching, although provider cannot be
+isolated causally from other model-specific characteristics.
 
 This arm is a replication of the mechanism on a second domain; it is not a claim
 that heterogeneity improves accuracy. Per-agent accuracy is unchanged by
@@ -1023,7 +1027,8 @@ area under it (AURC, lower is better), the three configurations are
 0.553 for HOM, 0.568 for HET-LITE, and 0.554 for HET. The HOM$-$HET difference
 in AURC, from the same paired equity-clustered bootstrap, is $-0.001$ (95\% CI
 $[-0.059,\,0.060]$): the interval contains zero, so these data do not establish
-a difference in selective-prediction quality between the two configurations.
+a difference in selective-prediction quality between the two configurations. The
+two-way interval, $[-0.113,\,0.115]$, is wider and likewise contains zero.
 These values stand against
 full-coverage risks of 0.562, 0.537, and 0.512. Restricting to the most
 confident half of decisions does not materially reduce selective risk in any
@@ -1051,8 +1056,9 @@ $\kappa_{\mathrm{HET\text{-}SameTier}}=0.236$. The resulting contrast is
 which excludes zero. This capability-matched estimate is approximately 94\% of
 the primary HOM-to-HET contrast. The result indicates that the observed
 de-correlation is largely preserved when model tier is held approximately
-constant, supporting provider identity as a major contributor to the primary
-effect. The control substantially reduces the capability-tier concern but does
+constant, so capability differences alone do not explain the primary effect.
+Provider nonetheless remains confounded with other model-specific
+characteristics and cannot be isolated causally. The control substantially reduces the capability-tier concern but does
 not eliminate it completely, because matching is approximate and covers only two
 providers. (The reproduction of $\kappa_{\mathrm{HOM}}=0.552$ to four decimals
 across two independently collected datasets also re-confirms determinism of the
@@ -1287,8 +1293,9 @@ contrast of $\Delta\kappa=0.336$ (95\% CI: $[0.304, 0.369]$). This reduction is
 accompanied by an approximately $4.4\times$ increase in inference cost,
 producing an explicit agreement--cost frontier for the evaluated
 configurations. A capability-matched control preserves approximately 94\% of the
-primary effect, supporting provider identity as a major contributor to ensemble
-de-correlation while not fully eliminating capability-related confounding. We
+primary effect, so capability differences alone do not explain the contrast;
+provider remains confounded with other model-specific characteristics and is not
+isolated causally. We
 also introduce an independent-draw measurement protocol that controls dependence
 caused by shared sampling seeds. In a controlled pilot, shared per-run seeding
 inflated the estimated de-correlation effect by approximately fourfold,

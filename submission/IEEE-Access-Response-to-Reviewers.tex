@@ -109,7 +109,7 @@ Robin Chawla
 
 \item Added the capability-matched provider contrast to the cross-domain section.
 
-\item Stated in that section that provider, not capability, orders the result.
+\item Stated in that section that the provider-associated ordering persists after approximate capability matching, while provider remains confounded with other model-specific characteristics and is not isolated causally.
 
 \end{itemize}
 
@@ -337,6 +337,8 @@ Robin Chawla
 
 \item We note that the date margin has only twelve clusters, a regime in which cluster-robust inference is known to under-cover. The equity-clustered interval therefore remains the pre-registered primary and the other two are reported as sensitivity analyses.
 
+\item On scope, the reviewer asked that all main and exploratory intervals account for equity and date dependence. The two-way scheme is applied to the primary endpoint and, in this revision, to the two exploratory contrasts that carry an inferential claim: the pile-on contrast widens from [0.160, 0.216] to [0.140, 0.232] and still excludes zero, and the AURC contrast widens from [-0.059, 0.060] to [-0.113, 0.115] and still contains zero. Neither conclusion changes. The remaining exploratory quantities are reported as descriptive statistics without an inferential claim attached, and retain the pre-registered paired equity-clustered bootstrap; they are interpreted as exploratory throughout and we do not draw conclusions from them that a wider interval could overturn.
+
 \end{itemize}
 
 \textbf{Author action:}
@@ -440,9 +442,11 @@ Robin Chawla
 
 \item Request parameters, prompt text, per-row prompt hashes, model snapshot identifiers, prices and cutoffs are all released, and every attempt including failures is in the log with its error string.
 
-\item On Figure 3 the reviewer is correct and we had conflated two quantities. The first two bars are the pilot's HOM-HET contrast under shared and independent seeding on the same grid and model set. The third was the confirmatory study's within-minus-cross-run difference for HOM, which is a residual-dependence diagnostic and not a HOM-HET contrast at all.
+\item On Figure 3 the reviewer is correct and we had conflated two quantities. Two of the bars were the pilot's HOM-HET contrast under shared and independent seeding on the same grid and model set. The third was the confirmatory study's within-minus-cross-run difference for HOM, which is a residual-dependence diagnostic and not a HOM-HET contrast at all.
 
-\item We have not forced the three bars into one estimand, because the first two and the third answer different questions. We have instead labelled each for what it is, so the like-for-like comparison establishing the artifact is the first two bars and the third is identified as a diagnostic.
+\item We have done exactly what the reviewer asked. Figure 3 now contains only the two like-for-like pilot quantities, so every bar in it measures the same estimand: Delta-kappa(HOM-HET) on the same 8-equity pilot grid and the same model set, differing only in whether the five agents in a cell share one seed (0.485) or draw independent seeds (0.113). The full-study within-minus-cross-run diagnostic has been removed from the figure and is reported separately in Table 6, where it is identified as a diagnostic rather than a contrast.
+
+\item An earlier revision kept all three bars and relabelled them instead. That was not what the reviewer requested and we have not retained it.
 
 \end{itemize}
 
@@ -452,7 +456,7 @@ Robin Chawla
 
 \item Added ``Collection provenance and retry accounting'', reporting attempted versus successful calls, the failure breakdown and the fixed request parameters.
 
-\item Rewrote the Figure 3 caption to identify each quantity separately.
+\item Reduced Figure 3 to the two like-for-like pilot bars and moved the full-study within-minus-cross-run diagnostic to Table 6; rewrote the caption accordingly.
 
 \end{itemize}
 
