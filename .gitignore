@@ -1,65 +1,16 @@
-# ============================================================================
-# Secrets — never commit
-# ============================================================================
-keys.env
+# secrets / keys
+*.env
+*.env.*
 keys.env.txt
-keys.txt
-*.key
+*.pem
+**/API Keys/
 
-# ============================================================================
-# Raw data & run artifacts (regenerate by running the pipeline)
-# ============================================================================
-runs.csv
-spend_ledger.json
-*_ledger.json
-run_manifest.json
-inputs/*.json
-results/
-cache/
-control/
-minipilot/
-temp_sweep/
-datacache/forward_returns.json
-
-# ============================================================================
-# Generated outputs (figures, tables, and result summaries)
-# ============================================================================
-figures/
-tables/
-metrics_summary.md
-headline_check.md
-protocol_exhibit.md
-threats_to_validity.md
-archive_manifest.md
-replication_check.md
-minipilot_verdict.md
-control_result.md
-reviewer_metrics.md
-temp_sweep_result.md
-model_probe_raw.json
-appendix/data_availability.md
-
-# ============================================================================
-# Manuscript / document build (kept out of the code repo)
-# ============================================================================
-*.tex
-*.pdf
-_preview_build.*
-_pgimg/
-_scan.*
-
-# ============================================================================
-# Python / environment / OS
-# ============================================================================
-__pycache__/
-*.pyc
+# python virtualenv + caches (installed deps, not source)
 .venv/
 venv/
-.DS_Store
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
 
-# ----------------------------------------------------------------------------
-# Committed on purpose (seed data & frozen records):
-#   datacache/prices.json, datacache/news_cache.json, appendix/grid.csv,
-#   docs/preregistration.md, docs/model_manifest.md, docs/freeze_receipt.md,
-#   configs/prompt_template.txt
-# ----------------------------------------------------------------------------
+# OS / editor cruft
+.DS_Store

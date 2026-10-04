@@ -1,0 +1,5 @@
+{
+  "raw": "{\n  \"direction\": \"SELL\",\n  \"conviction\": 4,\n  \"rationale\": \"Extreme short-term momentum with 53% gains in three months and 44% annualized volatility suggests an overextended position prone to a mean-reverting pullback from recent highs.\"\n}",
+  "in_tok": 285,
+  "out_tok": 65
+}

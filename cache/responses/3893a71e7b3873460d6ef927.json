@@ -1,0 +1,5 @@
+{
+  "raw": "{\"direction\": \"SELL\", \"conviction\": 2, \"rationale\": \"mock deterministic offline response\"}",
+  "in_tok": 223,
+  "out_tok": 22
+}

@@ -1,0 +1,5 @@
+{
+  "raw": "{\n  \"direction\": \"SELL\",\n  \"conviction\": 4,\n  \"rationale\": \"AMD is extremely overbought, up 74% in a month and 118% in three months, with annualized volatility near 97% indicating an imminent, sharp mean-reversion risk.\"\n}",
+  "in_tok": 287,
+  "out_tok": 70
+}

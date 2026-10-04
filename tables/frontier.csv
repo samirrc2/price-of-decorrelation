@@ -1,0 +1,4 @@
+config,heterogeneity_level,kappa,cost_per_decision_usd
+HOM,0,0.5517,0.000648
+HET-LITE,1,0.3023,0.001515
+HET,3,0.2154,0.002835

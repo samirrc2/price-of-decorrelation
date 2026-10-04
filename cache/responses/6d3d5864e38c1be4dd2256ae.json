@@ -1,0 +1,5 @@
+{
+  "raw": "{\n  \"direction\": \"HOLD\",\n  \"conviction\": 2,\n  \"rationale\": \"Stock has corrected 10% in the last month, hovering near its 63-day low, suggesting short-term weakness despite a positive 3-month return.\"\n}",
+  "in_tok": 281,
+  "out_tok": 63
+}
