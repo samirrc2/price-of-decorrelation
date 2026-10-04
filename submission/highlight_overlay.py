@@ -104,11 +104,29 @@ def tokens(tex: str) -> list[str]:
     return collapsed
 
 
+# The running header and the page footer are page furniture, not text. They must be kept out of
+# the stream: a run whose span crosses a page boundary would otherwise swallow them, and the
+# author's name in "Chincholikar et al.: The Price of De-correlation ..." was painted on three
+# pages that way.
+FURNITURE = re.compile(r"(Chincholikar\s+et\s+al\.|VOLUME\s+\d+,\s+\d{4})")
+
+
 def word_stream(doc):
-    """Every word in reading order, hyphenation repaired, with the rects that drew it."""
+    """Every word in reading order, hyphenation repaired, with the rects that drew it.
+
+    Header and footer lines are dropped."""
     stream = []
     for pno, page in enumerate(doc):
-        ws = sorted(page.get_text("words"), key=lambda w: (w[5], w[6], w[7]))
+        skip = set()
+        for blk in page.get_text("dict")["blocks"]:
+            if blk.get("type") != 0:
+                continue
+            for ln in blk["lines"]:
+                txt = "".join(sp["text"] for sp in ln["spans"])
+                if FURNITURE.search(txt):
+                    skip.add(round(ln["bbox"][1], 1))
+        ws = [w for w in page.get_text("words") if round(w[1], 1) not in skip]
+        ws = sorted(ws, key=lambda w: (w[5], w[6], w[7]))
         i = 0
         while i < len(ws):
             w = ws[i]
@@ -334,10 +352,13 @@ def main() -> int:
             continue
         for k in range(blk.size):
             src_to_pdf[blk.a + k] = blk.b + k
-    for i in sorted(changed_src):
-        if i in src_to_pdf:
-            placed.add(src_to_pdf[i])
-    stage1 = len(placed)
+    # Paint each run as a CONTIGUOUS SPAN, not as the set of tokens that happened to align.
+    # Inline math is reduced to a wildcard and so has no source token to align: marking only the
+    # aligned tokens left every formula, number and bracketed interval inside a changed sentence
+    # unhighlighted -- "giving" was yellow while "DeltaKappa_HOM-HET = 0.072 (95% CI" beside it
+    # was not. The words between a run's first and last aligned token belong to that run, so the
+    # whole span is painted.
+    stage1 = 0
 
     # ---- stage 2: per-run fallback for anything the alignment placed nowhere
     # Runs are taken from the SAME segment list the alignment used, so run i and span i are the
@@ -365,22 +386,31 @@ def main() -> int:
             continue        # a macro parameter in a redefined command, not printed text
         if ri < len(spans):
             a, b = spans[ri]
-            if any(i in src_to_pdf for i in range(a, b)) and not is_float[ri]:
+            hits = [src_to_pdf[i] for i in range(a, b) if i in src_to_pdf]
+            if hits and not is_float[ri]:
                 # A one-word run is accepted from the alignment only if its surroundings agree.
                 # "Two-way" in Table 5 was being placed on the word "two-way" in the prose, so
                 # that table cell shipped unmarked while the rest of its row was highlighted.
                 if b - a == 1:
-                    at = next(src_to_pdf[i] for i in range(a, b) if i in src_to_pdf)
+                    at = hits[0]
                     before = [t for t in src_words[max(0, a - 2):a] if t != WILD]
                     after = [t for t in src_words[b:b + 2] if t != WILD]
                     ok = all(t in words[max(0, at - 4):at] for t in before) and \
                          all(t in words[at + 1:at + 5] for t in after)
-                    if not ok:
-                        placed.discard(at)
-                    else:
+                    if ok:
+                        placed.add(at)
+                        stage1 += 1
                         continue
                 else:
-                    continue                   # stage 1 already placed it
+                    # extend the span over the wildcards the run contains, so the maths inside it
+                    # is painted with the words around it
+                    lo_w, hi_w = min(hits), max(hits) + 1
+                    tr = match_trace(words, lo_w, src_words[a:b])
+                    if tr:
+                        lo_w, hi_w = tr[0][0], tr[-1][1]
+                    placed.update(range(lo_w, hi_w))
+                    stage1 += 1
+                    continue
         probe = seq[:8] if len(seq) >= 2 else seq
         hit = locate(words, probe) if len(probe) >= 2 else None
         if hit is None and len(seq) >= 2:
@@ -441,11 +471,28 @@ def main() -> int:
               f"unmarked", file=sys.stderr)
         return 1
 
+    # Fill single-word holes. Inline maths carries no source token, so a formula sitting between
+    # two highlighted words -- "giving DeltaKappa = 0.072 (95% CI" -- could be left unpainted
+    # even when the sentence around it is marked. A word is filled only when BOTH its immediate
+    # neighbours are highlighted and all three sit on the same line, which cannot reach into
+    # unchanged text: the neighbours bound it on both sides.
+    filled = 0
+    for i in range(1, len(stream) - 1):
+        if i in placed or i - 1 not in placed or i + 1 not in placed:
+            continue
+        pa, ra = stream[i - 1][1][0]
+        pb, rb = stream[i][1][0]
+        pc, rc = stream[i + 1][1][0]
+        if pa == pb == pc and abs(ra[1] - rb[1]) < 2 and abs(rb[1] - rc[1]) < 2:
+            placed.add(i)
+            filled += 1
+
     boxes = paint(doc, stream, sorted(placed), pymupdf)
     doc.save(out_pdf, garbage=3, deflate=True)
     print(f"   {len(placed)} changed word(s) highlighted on the manuscript's own pages in "
           f"{boxes} runs: {stage1} placed by whole-document alignment, {recovered} run(s) "
-          f"recovered individually ({len(refs)} new reference(s)); {len(doc)} pages")
+          f"recovered individually ({len(refs)} new reference(s)), {filled} interior gap(s) "
+          f"filled; {len(doc)} pages")
     return 0
 
 
