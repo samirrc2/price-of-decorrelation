@@ -1,284 +1,261 @@
-% ============================================================================
-% RECONSTRUCTED from paper_ieee_access.pdf (text extraction), July 2026.
-% This is NOT the authors' original lost .tex source. Content and structure
-% follow the PDF; wording may differ slightly from the camera-ready file.
-% Authors filled from the repository README (PDF had placeholder names).
-% Figure files: fig1_frontier, fig2_protocol (= PDF Fig.~3 trap),
-% fig3_provider_heatmap (= PDF Fig.~4), fig5_calibration (= PDF Fig.~5).
-% PDF Fig.~2 (seed fix) is rendered as a code box.
-% ============================================================================
-\documentclass[journal]{IEEEtran}
-
+\documentclass{ieeeaccess}
+\usepackage{cite}
 \usepackage{amsmath,amssymb,amsfonts}
+% \usepackage{algorithmic} % not used in this article
 \usepackage{graphicx}
+\usepackage{textcomp}
 \usepackage{booktabs}
 \usepackage{multirow}
-\usepackage{cite}
 \usepackage{url}
-\usepackage{hyperref}
-\usepackage{xcolor}
 \usepackage{listings}
 
-\graphicspath{{figures/}{../results/latest/figures/}{../figures/}}
+\usepackage{bm}
+\makeatletter
+\AtBeginDocument{\DeclareMathVersion{bold}
+\SetSymbolFont{operators}{bold}{T1}{times}{b}{n}
+\SetSymbolFont{NewLetters}{bold}{T1}{times}{b}{it}
+\SetMathAlphabet{\mathrm}{bold}{T1}{times}{b}{n}
+\SetMathAlphabet{\mathit}{bold}{T1}{times}{b}{it}
+\SetMathAlphabet{\mathbf}{bold}{T1}{times}{b}{n}
+\SetMathAlphabet{\mathtt}{bold}{OT1}{pcr}{b}{n}
+\SetSymbolFont{symbols}{bold}{OMS}{cmsy}{b}{n}
+\renewcommand\boldmath{\@nomath\boldmath\mathversion{bold}}}
+\makeatother
 
-\lstset{
-  basicstyle=\ttfamily\footnotesize,
-  breaklines=true,
-  frame=single,
-  columns=fullflexible,
-  keepspaces=true
-}
+\graphicspath{{./}{figures/}}
+\lstset{basicstyle=\ttfamily\footnotesize,breaklines=true,frame=single,
+columns=fullflexible,keepspaces=true}
 
 \begin{document}
+\history{Date of publication xxxx 00, 0000, date of current version xxxx 00, 0000.}
+\doi{10.1109/ACCESS.2026.0000000}
 
 \title{The Price of De-correlation: Quantifying the Agreement--Cost Trade-off
 in Heterogeneous Large Language Model Ensembles}
 
-\author{
-\IEEEauthorblockN{Samir Chincholikar\IEEEauthorrefmark{1},
-Robin Chawla\IEEEauthorrefmark{1}}
-\IEEEauthorblockA{\IEEEauthorrefmark{1}Independent researchers\\
-Email: samir.chincholikar@gmail.com;
-robin.chawla.cse14@iitbhu.ac.in}
-}
+\author{\uppercase{Samir Chincholikar}\authorrefmark{1},
+\uppercase{Robin Chawla}\authorrefmark{1}}
+
+\address[1]{Independent Researcher (e-mail: samir.chincholikar@gmail.com;
+robin.chawla.cse14@iitbhu.ac.in)}
+\tfootnote{Manuscript submitted August 3, 2026.}
+
+\markboth
+{Chincholikar \headeretal: The Price of De-correlation in Heterogeneous LLM Ensembles}
+{Chincholikar \headeretal: The Price of De-correlation in Heterogeneous LLM Ensembles}
+
+\corresp{Corresponding author: Samir Chincholikar (e-mail: samir.chincholikar@gmail.com).}
+
+\begin{abstract}
+Large language model (LLM) ensembles are increasingly used as decision-making
+committees under the assumption that aggregating multiple agents improves
+reliability. However, ensembles composed of repeated instances of the same model
+may produce correlated judgments and create an appearance of consensus without
+genuine independence. This study quantifies the relationship between
+cross-provider model heterogeneity, ensemble agreement, and inference cost. In a
+54{,}000-call primary experiment, we evaluate three five-agent ensemble
+configurations with increasing provider diversity on a directional
+financial-analysis task covering 100 equities across 12 dates. Cross-provider
+heterogeneity significantly reduces within-ensemble agreement, with a primary
+reduction of $\Delta\kappa=0.336$ (95\% CI: $0.304$--$0.369$), but increases
+inference cost by approximately $4.4\times$. A capability-matched control
+indicates that the effect is driven primarily by provider diversity rather than
+model capability differences. We also introduce an independent-draw measurement
+protocol that prevents shared sampling conditions from inflating estimated
+agreement. Although heterogeneity does not produce a reliable improvement in
+average directional accuracy, exploratory results indicate that homogeneous
+ensembles generate unanimous incorrect decisions at $1.84$ times the rate of
+heterogeneous ensembles. These findings show that model diversity provides
+less-correlated judgments rather than guaranteed correctness, and offer a
+practical agreement--cost framework for designing LLM ensemble systems.
+\end{abstract}
+
+\begin{keywords}
+Large language models, multi-agent systems, ensemble learning, model
+heterogeneity, inter-rater agreement, algorithmic monoculture, inference cost,
+reliable artificial intelligence.
+\end{keywords}
+
+\titlepgskip=-21pt
 
 \maketitle
 
-\begin{abstract}
-Ensembles of large language model (LLM) ``agents'' are increasingly deployed in
-multi-agent systems as committees that vote on decisions, on the premise that
-aggregating multiple opinions reduces error. This premise implicitly assumes the agents are
-independent; yet a homogeneous ensemble---several instances of one model---may
-behave as a near-echo-chamber whose members merely restate a shared prior. We
-ask, and quantify, a concrete question: how much does introducing
-cross-provider model heterogeneity reduce within-ensemble agreement, and at
-what inference-cost premium? Using a pre-registered design, we run 54{,}000
-independent LLM calls across three five-agent ensemble configurations spanning
-heterogeneity levels $\{0, 1, 3\}$ (measured by the number of non-primary
-providers), evaluated on a directional financial-analysis task over 100 equities
-$\times$ 12 dates. Agreement is measured by Fleiss' $\kappa$ on per-cell
-directional calls, with cluster-bootstrap confidence intervals resampling
-equities. We report three findings. First, heterogeneity de-correlates ensembles
-substantially and monotonically: within-ensemble agreement falls from
-$\kappa=0.552$ (homogeneous) to $0.302$ (one heterogeneous agent) to $0.215$
-(three), a primary effect of $\Delta\kappa=0.336$ (95\% CI $[0.304, 0.369]$).
-Second, this de-correlation carries a $\sim$4.4$\times$ inference-cost premium
-per ensemble decision, yielding an explicit agreement--cost frontier; a
-capability-matched control (efficient-tier models across providers) reproduces
-the effect ($\Delta\kappa=0.315$, 95\% CI $[0.288, 0.341]$, $\approx$94\% of the
-full effect), indicating it is driven by provider identity, not capability tier.
-Third, and as a methodological contribution, we show that a common measurement
-artifact---sampling non-determinism under a shared sampling context---inflates
-the apparent effect by roughly $4\times$ ($\Delta\kappa$ drops from $0.485$ to
-$0.113$ in a controlled pilot once each agent is given an independent draw); we
-provide an \emph{independent-draw protocol} that removes it. We find no reliable improvement in
-directional accuracy from heterogeneity at this scale, consistent with recent
-``algorithmic monoculture'' cautions: diversity reduces surface agreement
-without, in our setting, purchasing average correctness. An exploratory analysis
-nonetheless finds that homogeneous ensembles produce confident, unanimous, and
-wrong directional calls at roughly $1.8\times$ the heterogeneous rate,
-suggesting the de-correlation buys tail-risk reduction even where it buys no
-gain in mean accuracy. All artifacts (frozen dataset, seeded deterministic
-analysis) are released for reproduction.
-\end{abstract}
-
-\begin{IEEEkeywords}
-Large language models, multi-agent systems, ensemble methods, inter-rater
-agreement, Fleiss' kappa, model diversity, algorithmic monoculture,
-reproducibility, computational finance.
-\end{IEEEkeywords}
 
 \section{Introduction}
-Multi-agent LLM systems increasingly aggregate several model ``agents'' into a
-committee that debates or votes, on the wisdom-of-crowds premise that combining
-opinions cancels individual error~\cite{du2023debate,wang2024moa}. That premise
-is load-bearing on independence: crowd aggregation only helps to the extent that
-members err differently. A homogeneous ensemble---$k$ instances of a single model
-queried independently---risks being a costly echo chamber, its members restating
-one shared prior. The natural remedy is heterogeneity: mixing models from
-different providers. But heterogeneity is not free, and its benefit is not
-guaranteed: recent work shows LLM errors are often strongly correlated even
-across providers and architectures, an ``algorithmic monoculture'' that limits
-the value of naive diversity~\cite{kim2025correlated}.
+\label{sec:introduction}
+\PARstart{M}{ulti-agent} large language model systems increasingly aggregate multiple agents
+through voting, debate, or other consensus
+mechanisms~\cite{du2023debate,wang2024moa}. These approaches are commonly
+motivated by the wisdom-of-crowds principle, under which combining multiple
+judgments can reduce individual errors. Their effectiveness, however, depends on
+the extent to which the participating agents produce independent errors. An
+ensemble comprising repeated instances of the same model may exhibit substantial
+output correlation, thereby providing less effective diversity than its number
+of agents suggests. Cross-provider model heterogeneity offers a potential
+remedy, but it also introduces additional inference cost, and its ability to
+reduce correlated behavior has not been established quantitatively. Recent
+evidence that LLMs may exhibit correlated errors even across providers and
+architectures further raises concerns about algorithmic
+monoculture~\cite{kim2025correlated}.
 
-The magnitude of that de-correlation is not a foregone conclusion; it is the
-subject of two competing predictions in the current literature. The
-naive-diversity view---implicit in the popularity of ``mixture-of-agents''
-designs---holds that mixing models from different providers, trained on different
-data with different architectures, should buy substantial independence. The
-opposing view, argued directly by Kim \textit{et al.}~\cite{kim2025correlated},
-is that LLM errors are strongly correlated even across providers and
-architectures---an ``algorithmic monoculture''---so cross-provider mixing may
-de-correlate outputs only marginally. These predictions are quantitatively far
-apart: \textit{ex ante}, the primary effect could plausibly have ranged from
-$\Delta\kappa\approx 0$ (monoculture dominates; the frontier is flat and
-heterogeneity is a waste of money) to a large positive value (diversity is real
-and priceable). Had provider identity not mattered, the agreement--cost frontier
-would have been flat---so measuring its slope is a genuine test, not a
-restatement of intuition. We resolve it empirically: $\Delta\kappa=0.336$, a
-large and reliably nonzero effect, but one that must be paid for.
+Existing research supports two competing expectations regarding cross-provider
+heterogeneity. Under the diversity hypothesis, models developed by different
+providers, using distinct training procedures, datasets, and architectures,
+should generate less-correlated outputs and therefore contribute more diverse
+judgments. In contrast, the algorithmic-monoculture
+hypothesis~\cite{kim2025correlated} suggests that common training data,
+objectives, and evaluation practices may cause substantial behavioral similarity
+even across model families. These perspectives imply materially different
+agreement--cost relationships. If provider identity contributes little
+additional diversity, increasing heterogeneity will raise inference cost without
+meaningfully reducing agreement. Conversely, a substantial reduction in
+agreement would indicate that cross-provider diversity is measurable and can be
+evaluated against its associated cost. This study tests these alternatives
+empirically.
 
-Despite the popularity of heterogeneous designs, the quantity that governs
-whether they can help---how much heterogeneity actually de-correlates agent
-outputs---is rarely measured with statistical rigor, and its cost is rarely
-priced. Two obstacles recur. (i)~\emph{Estimand ambiguity}: agreement is often
-computed over agents that share a sampling context, so measured ``agreement''
-partly reflects a measurement artifact rather than genuine model similarity.
-(ii)~\emph{No cost accounting}: papers report that diversity ``helps'' without
-quantifying the compute premium it demands. Our contribution is thus the
-magnitude, the price, and the protocol---none of which is derivable from the
-intuition that ``different models disagree.''
+Despite the growing use of heterogeneous LLM ensembles, three related issues
+remain insufficiently examined. First, few studies directly quantify the extent
+to which cross-provider heterogeneity reduces within-ensemble agreement. Second,
+the corresponding inference-cost premium is rarely incorporated into evaluations
+of ensemble design. Third, agreement estimates may be distorted when supposedly
+independent agents share random seeds, sampling trajectories, cached outputs, or
+other elements of the generation context. Consequently, existing evaluations may
+conflate genuine model similarity with artifacts of the measurement procedure.
+We address these limitations by jointly estimating the magnitude of ensemble
+de-correlation, the associated inference cost, and the effect of
+independent-draw measurement controls.
 
-Why quantifying this matters in practice: LLM committees are increasingly
-placed in high-stakes loops (financial, clinical, operational) precisely to gain
-the robustness of a ``second opinion.'' If a homogeneous committee is in fact an
-echo chamber, that robustness is illusory---the redundant calls waste compute
-and, worse, manufacture false confidence by turning one model's opinion into an
-apparent consensus. A practitioner therefore needs to know both how much genuine
-independence heterogeneity buys and what it costs, so that the premium is paid
-only when the added independence is real. This paper supplies both numbers.
+This distinction is practically important because LLM ensembles are increasingly
+considered for financial analysis and other consequential decision-support
+applications in which multiple agents are expected to provide independent second
+opinions. When agents exhibit highly correlated behavior, repeated calls may
+increase computational expenditure while producing an overstated impression of
+evidential consensus. Practitioners therefore require evidence on both the
+degree of independence obtained through model heterogeneity and the cost
+required to obtain it. By estimating these quantities jointly, this study
+provides an empirical basis for selecting ensemble configurations according to
+the reliability and cost requirements of a given application.
 
 \paragraph{Contributions}
 This paper makes the following contributions.
 \begin{enumerate}
-\item A pre-registered, large-scale (54{,}000-call) measurement of how
-cross-provider heterogeneity affects within-ensemble agreement in LLM
-committees, with cluster-bootstrap confidence intervals; we find a substantial,
-monotone de-correlation ($\Delta\kappa=0.336$, 95\% CI $[0.304, 0.369]$).
-\item An explicit agreement--cost frontier: the $\sim$4.4$\times$
-inference-cost premium that buys this de-correlation, giving practitioners a
-concrete trade-off curve rather than a qualitative claim.
-\item A measurement protocol for ensemble agreement that isolates
-independent-draw agreement from sampling non-determinism, and a demonstration
-that ignoring it inflates the effect $\sim$4$\times$.
-\item An exploratory downstream analysis showing that, although average
-directional accuracy does not improve, heterogeneity reshapes the structure of
-consensus: homogeneous committees commit confident, unanimous, directional
-errors at $1.84\times$ the fully heterogeneous rate, suggesting the priced
-independence buys tail-risk reduction in this setting.
-\item A fully reproducible artifact: a frozen, hash-verified dataset and a
-deterministic, seeded analysis pipeline that reproduces every figure and table.
+\item \emph{Pre-registered empirical measurement.} We conduct a pre-registered
+empirical study comprising 54{,}000 model calls to quantify the effect of
+cross-provider heterogeneity on within-ensemble agreement. Agreement decreases
+substantially and monotonically as provider diversity increases, with a primary
+contrast of $\Delta\kappa=0.336$ and a 95\% confidence interval of
+$[0.304, 0.369]$.
+\item \emph{An empirical agreement--cost frontier.} We quantify the
+inference-cost premium associated with cross-provider diversity. Moving from the
+homogeneous to the fully heterogeneous configuration reduces agreement at an
+approximately $4.4\times$ increase in inference cost.
+\item \emph{A reproducible independent-draw measurement protocol.} We separate
+genuine model agreement from agreement induced by shared sampling conditions. In
+a controlled pilot, shared per-run seeding inflated the estimated de-correlation
+effect by approximately fourfold, whereas unique per-agent seeds removed the
+artifact. To support replication, we provide a frozen, hash-verified dataset,
+fixed experimental configurations, and a deterministic seeded analysis pipeline
+that regenerates the reported figures and tables.
+\item \emph{An exploratory analysis of consensus structure.} Although
+heterogeneity does not produce a statistically reliable improvement in average
+directional accuracy, homogeneous ensembles generate unanimous incorrect
+directional decisions at $1.84\times$ the rate of fully heterogeneous ensembles,
+motivating confirmatory evaluation of collective-error risk.
 \end{enumerate}
-We deliberately separate agreement from accuracy and report an honest null on
-the latter for this directional-finance task, positioning the work within the
-monoculture literature.
+We distinguish reduction in ensemble agreement from improvement in predictive
+accuracy. Cross-provider heterogeneity substantially increases observed
+behavioral diversity, but it does not reliably improve average correctness in
+the evaluated directional-finance task. Thus, model diversity should be
+evaluated according to whether the additional diversity improves the downstream
+objective rather than being treated as beneficial by default.
 
 \section{Related Work}
 \subsection{LLM ensembles and mixture-of-agents}
-Aggregating multiple LLM outputs---by voting, debate, or layered
-mixture-of-agents---has become a standard technique for boosting
-reliability~\cite{du2023debate,wang2024moa}. A recurring empirical caveat is
-that naive aggregation yields marginal gains over the strongest single model and
-can amplify systematic error when a strong model is outvoted by correlated
-weaker ones~\cite{kim2025correlated}. Scaling studies further report diminishing
-or negative returns from adding homogeneous agents, while injecting diversity
-yields more sustained gains. This has motivated diversity-optimized ensembles
-that explicitly select or weight members to maximize a diversity
-criterion---e.g.\ the focal-diversity pruning of LLM-TOPLA~\cite{tekin2024topla}
-and the fingerprint-diversity ensemble DFPE~\cite{dfpe2025}---and heterogeneous
-consensus frameworks such as Council Mode~\cite{council2026} that aggregate
-cross-family agents to curb hallucination. These methods presuppose that
-heterogeneity supplies independence and evaluate it through downstream accuracy;
-by contrast, we directly measure how much independence heterogeneity actually
-supplies, quantify its statistical significance, and price it.
+Aggregating multiple LLM outputs through voting, debate, or layered
+mixture-of-agents architectures has been investigated as a means of improving
+response quality and reliability~\cite{du2023debate,wang2024moa,chen2025survey}.
+However, prior studies indicate that naive aggregation may provide only limited
+gains over the strongest individual model and may amplify systematic errors when
+correlated weaker models outvote a stronger model~\cite{kim2025correlated}.
+Related scaling studies also report diminishing or negative returns from
+repeatedly adding homogeneous agents, whereas more diverse ensembles can provide
+more sustained improvements~\cite{li2024moreagents}.
+
+These findings have motivated diversity-aware methods such as the
+focal-diversity pruning strategy used in LLM-TOPLA~\cite{tekin2024topla}, the
+fingerprint-based ensemble selection of DFPE~\cite{dfpe2025}, and heterogeneous
+consensus frameworks such as Council Mode~\cite{council2026}. Such approaches
+generally evaluate diversity through downstream performance. In contrast, the
+present study treats within-ensemble agreement as the primary quantity of
+interest and directly measures how cross-provider heterogeneity affects
+agreement, statistical uncertainty, and inference cost.
 
 \subsection{Correlated errors and algorithmic monoculture}
 Kim \textit{et al.}~\cite{kim2025correlated} document substantial error
-correlation across hundreds of LLMs, including across providers, and connect it
-to systemic risks of ``algorithmic monoculture.'' Their focus is error
-correlation (agreement conditional on being wrong); ours is output agreement on
-a decision task. The two are complementary: we show heterogeneity reduces
-surface agreement, yet---consistent with their caution---without a measurable
-accuracy benefit in our setting. Closely related and concurrent,
-Bugaud~\cite{bugaud2026} shows in the vision-language modality that models of
-the same architectural family share correlated errors that shrink the effective
-number of independent voters, and that family-aware aggregation recovers
-accuracy. Our Fig.~\ref{fig:provider} is the text-LLM, provider-level
-analogue---same-source agents agree far more than cross-source ones---obtained
-here through a pre-registered, statistically powered measurement with an
-attached cost frontier.
+correlation across a large set of LLMs, including models developed by different
+providers, and relate this dependence to the systemic risk of algorithmic
+monoculture. Their analysis concerns error correlation---that is, the tendency
+of models to fail on the same instances---whereas the present study examines
+output agreement across all decisions, regardless of whether those decisions are
+correct.
+
+These quantities are related but not equivalent. Lower output agreement may
+indicate greater behavioral diversity, but it does not necessarily imply
+less-correlated errors or improved predictive performance. In the
+vision-language setting, Bugaud~\cite{bugaud2026} similarly reports that models
+from the same architectural family exhibit correlated errors that reduce the
+effective number of independent voters and shows that family-aware aggregation
+can improve ensemble performance.
+
+The present work extends this line of inquiry to text-based LLM committees by
+measuring provider-level agreement, comparing same-provider and cross-provider
+agent pairs, and incorporating the inference-cost trade-off associated with
+model heterogeneity.
 
 \subsection{Inter-rater agreement and diversity metrics}
-Fleiss' $\kappa$~\cite{fleiss1971} is the standard chance-corrected agreement
-statistic for multiple raters on categorical labels; we adopt it, treating
-agents as interchangeable raters and $(\mathrm{ticker},\mathrm{date})$ cells as
-subjects. Prior ensemble-selection work uses focal-diversity~\cite{tekin2024topla}
-and information-theoretic criteria to prune correlated members; we instead treat
-agreement as the object of measurement and quantify its dependence on provider
-heterogeneity and cost, with cluster-bootstrap confidence intervals.
+Fleiss' $\kappa$~\cite{fleiss1971} is a chance-corrected agreement statistic
+designed for categorical ratings produced by multiple raters. We apply it by
+treating the five LLM agents as interchangeable raters, each
+$(\mathrm{ticker},\mathrm{date})$ pair as a rated subject, and BUY, HOLD, and
+SELL as nominal categories.
+
+Unlike diversity measures used primarily to select, weight, or prune ensemble
+members~\cite{tekin2024topla}, our objective is to estimate agreement itself and
+determine how it varies with provider heterogeneity and inference cost. Because
+Fleiss' $\kappa$ can be sensitive to category prevalence, we additionally assess
+the robustness of the observed configuration ordering using Krippendorff's
+$\alpha$~\cite{krippendorff2019} and Gwet's AC1~\cite{gwet2008}. Statistical
+uncertainty is estimated through cluster-bootstrap resampling at the equity
+level~\cite{efron1993}.
 
 \subsection{Reproducibility and pre-registration}
 Pre-registration and frozen, hash-verified datasets remain uncommon in empirical
-LLM studies. We adopt a confirmatory design---freeze the plan, collect once,
-re-analyze deterministically---to reduce researcher degrees of freedom, and we
-release the artifacts.
+LLM research. We adopt a confirmatory design---specifying the analysis plan in
+advance, collecting data once, and re-analyzing deterministically---to limit
+researcher degrees of freedom, and we release the resulting artifacts. The
+freezing, seeding, and reproducibility procedures are described in detail in
+Section~\ref{sec:prereg}.
 
 \section{Problem Formulation and Metrics}
 \subsection{Ensemble configurations}
-Each ensemble comprises five agents that independently answer the same prompt.
-We define three configurations by heterogeneity level $h$, the count of
-non-primary-provider agents:
-\begin{itemize}
-\item \textbf{HOM} ($h{=}0$): $5\times$ primary model (OpenAI efficient tier);
-\item \textbf{HET-LITE} ($h{=}1$): $4\times$ primary + $1\times$ Google flash;
-\item \textbf{HET} ($h{=}3$): $2\times$ primary + $2\times$ Google flash +
-$1\times$ xAI flagship.
-\end{itemize}
-Exact model strings and pricing appear in Table~\ref{tab:models}.
-
-\subsection{Agreement statistic}
-For a configuration $c$ and cell $s=(\mathrm{ticker},\mathrm{date})$, the five
-agents emit directional labels in $\{\mathrm{BUY},\mathrm{HOLD},\mathrm{SELL}\}$.
-We compute Fleiss' $\kappa$ over cells within each run and average across runs,
-giving $\kappa_c$. The pre-registered primary endpoint is
+Each ensemble contains five agents that independently respond to the same prompt
+through separate application programming interface (API) calls. We designate OpenAI as the primary provider and
+define the heterogeneity level of configuration $c$ as the number of agents
+drawn from a non-primary provider:
 \begin{equation}
-\Delta\kappa = \kappa_{\mathrm{HOM}} - \kappa_{\mathrm{HET}},
-\label{eq:primary}
+h_c=\sum_{i=1}^{5}\mathbb{I}\left(p_i\neq p_{\mathrm{primary}}\right),
 \end{equation}
-with pre-registered secondary contrasts
-$\kappa_{\mathrm{HOM}}-\kappa_{\mathrm{HET\text{-}LITE}}$ and
-$\kappa_{\mathrm{HET\text{-}LITE}}-\kappa_{\mathrm{HET}}$.
-
-\subsection{Independent-draw estimand}
-The quantity of interest is agreement among independent agent draws. We
-therefore issue one fresh application programming interface (API) call per agent
-(no shared context, no cached completions) and assign each agent a unique,
-reproducible seed
-$\mathrm{seed}=\mathrm{SHA\text{-}256}(\mathrm{master},\mathrm{run},c,\mathrm{ticker},\mathrm{date},\mathrm{agent})\bmod 2^{31}$.
-As a diagnostic we compare within-run $\kappa$ (five agents under one sampling
-context) against cross-run $\kappa$ (pooled draws across runs); a large positive
-gap signals that shared-context sampling non-determinism is inflating measured
-agreement (Section~\ref{sec:protocol}).
-
-\subsection{Uncertainty quantification}
-Confidence intervals (CIs) use a cluster bootstrap that resamples equities (the
-clustering unit), 2{,}000 draws, fixed random-number-generator (RNG) seed 42,
-percentile method~\cite{efron1993}. A verdict of \emph{Confirmed} requires
-$\Delta\kappa>0$ with a 95\% CI excluding zero.
-
-\section{Experimental Design}
-\subsection{Task and grid}
-Each agent receives a dated, no-lookahead context snippet for one equity and
-returns strict JavaScript Object Notation (JSON):
-\texttt{\{"direction","conviction","rationale"\}}.
-The grid is 100 large-cap equities stratified across all 11 Global Industry
-Classification Standard (GICS) sectors $\times$ 12 analysis dates in 2026
-$\times$ 3 configurations $\times$ 3 runs $\times$ 5 agents $= 54{,}000$ calls.
-Dates are chosen strictly after each model's knowledge cutoff and early enough
-that a 20 trading-day forward-return window has closed (for the accuracy proxy),
-and are spread across distinct 2026 market regimes.
-
-\subsection{No-lookahead context}
-Context snippets are price-derived: for each cell we compute, from the equity's
-own price history up to the trading day before the analysis date, its trailing
-1-week/1-month/3-month returns, 21-day realized volatility, and position within
-its 63-day range. This uses only public prices, contains no post-date
-information, and is fully reproducible; provenance is logged per call.
-
-\subsection{Models}
-All agents run at temperature $0.7$. Exact model strings are pinned; because
-providers update models, the frozen dataset---not the live endpoints---is the
-object of record (Table~\ref{tab:models}).
+where $p_i$ denotes the provider of agent $i$. We evaluate three
+configurations:
+\begin{itemize}
+\item \textbf{HOM} ($h{=}0$): five agents using the primary-provider model;
+\item \textbf{HET-LITE} ($h{=}1$): four primary-provider agents and one Google
+agent;
+\item \textbf{HET} ($h{=}3$): two primary-provider agents, two Google agents,
+and one xAI agent.
+\end{itemize}
+The exact model identifiers, provider roles, and token prices used during data
+collection are reported in Table~\ref{tab:models}.
 
 \begin{table}[!t]
 \centering
@@ -295,6 +272,168 @@ xAI (het.) & grok-4.3 & 1.25 & 2.50 \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+\subsection{Agreement statistic}
+For each configuration $c$, experimental run $r$, and evaluation cell
+$s=(\mathrm{ticker},\mathrm{date})$, the five agents return one categorical
+direction from $\mathcal{Y}=\{\mathrm{BUY},\mathrm{HOLD},\mathrm{SELL}\}$. We
+treat agents as raters and evaluation cells as rated subjects. Fleiss' $\kappa$
+is computed separately within each run, producing the run-level agreement
+statistic $\kappa_{c,r}$. Configuration-level agreement is then defined as the
+mean across the $R=3$ runs:
+\begin{equation}
+\kappa_c=\frac{1}{R}\sum_{r=1}^{R}\kappa_{c,r}.
+\end{equation}
+The pre-registered primary endpoint is the reduction in agreement between the
+homogeneous and fully heterogeneous configurations:
+\begin{equation}
+\Delta\kappa_{\mathrm{HOM-HET}}=\kappa_{\mathrm{HOM}}-\kappa_{\mathrm{HET}}.
+\label{eq:primary}
+\end{equation}
+The pre-registered secondary contrasts are
+$\Delta\kappa_{\mathrm{HOM-HET\text{-}LITE}}=\kappa_{\mathrm{HOM}}-\kappa_{\mathrm{HET\text{-}LITE}}$
+and
+$\Delta\kappa_{\mathrm{HET\text{-}LITE-HET}}=\kappa_{\mathrm{HET\text{-}LITE}}-\kappa_{\mathrm{HET}}$.
+Positive values indicate that increasing cross-provider heterogeneity reduces
+within-ensemble agreement.
+
+\subsection{Independent-draw estimand}
+\label{sec:estimand}
+The estimand of interest is agreement among independently sampled agent
+responses. Accordingly, every agent response is generated through a separate,
+stateless API request, without shared conversation state, response caching, or
+multi-sample batching, so that no two agents share a sampling trajectory through
+the request structure itself. Each request is additionally assigned a unique,
+reproducible seed:
+\begin{equation}
+\mathrm{seed}_{r,c,s,i}=\mathrm{SHA\text{-}256}(\mathrm{master},r,c,\mathrm{ticker},\mathrm{date},i)\bmod 2^{31},
+\end{equation}
+where $i$ identifies the agent position within the ensemble. Including the
+agent identifier gives repeated instances of the same model distinct seeds---and
+therefore distinct sampling trajectories on endpoints that honor the seed
+parameter---while keeping those calls reproducible. All three provider endpoints
+used in this study accept a seed parameter, and the unique per-agent seed is
+transmitted on every call, masked to a positive 32-bit integer as some endpoints
+require; the model registry and supplementary manifest record the seed sent with
+each call. Because provider seed support is best-effort rather than a
+determinism guarantee, reproducibility ultimately rests on the archived raw
+responses (Section~\ref{sec:prereg}) in addition to re-executable seeding.
+
+As a diagnostic for residual within-run dependence, we compare agreement among
+the five draws generated within a run with agreement estimated from
+independently generated draws across runs. For the homogeneous configuration,
+these quantities should be approximately equal when all five agents are sampled
+independently. A materially positive within-run minus cross-run gap would
+indicate that shared seeds or another common sampling condition is artificially
+increasing measured agreement. For heterogeneous configurations, the cross-run
+calculation also introduces additional same-model replicate pairs and is
+therefore interpreted as a secondary consistency check rather than a direct
+independence test.
+
+\subsection{Uncertainty quantification}
+Uncertainty in the agreement contrasts is estimated using a cluster bootstrap
+with equities as the resampling unit~\cite{efron1993}. Clustering at the equity
+level preserves the dependence among repeated analysis dates for the same
+security while allowing variation across securities to determine the confidence
+interval. For each of 2{,}000 bootstrap replications, equities are sampled with
+replacement, all associated dates and agent responses are retained, and the
+configuration-level agreement statistics and contrasts are recomputed. We use
+the percentile method with a fixed random-number-generator seed of 42 to
+construct 95\% confidence intervals (CIs). Under the pre-registered decision
+rule, the
+primary hypothesis is considered supported when
+$\Delta\kappa_{\mathrm{HOM-HET}}>0$ and its 95\% confidence interval excludes
+zero.
+
+\section{Experimental Design}
+\subsection{Task and grid}
+For each evaluation cell $s=(j,t)$, where $j$ denotes an equity and $t$ denotes
+an analysis date, every agent receives the same dated information set and
+independently returns a response conforming to the following JavaScript Object
+Notation (JSON) schema:
+\begin{lstlisting}
+{
+  "direction":  "BUY | HOLD | SELL",
+  "conviction": <integer 1-5>,
+  "rationale":  "<free-text explanation>"
+}
+\end{lstlisting}
+The \texttt{direction} field constitutes the categorical output used in the
+primary agreement analysis. The \texttt{conviction} field is an integer from 1
+to 5, and the \texttt{conviction} and \texttt{rationale} fields are retained for
+secondary and exploratory analyses. The complete prompt template and response
+schema are frozen and included in the reproducibility package.
+
+Each response is parsed as strict JSON against this schema. A response that
+fails to parse, omits a required field, or returns a direction outside
+$\{\mathrm{BUY},\mathrm{HOLD},\mathrm{SELL}\}$ is treated as invalid and
+reissued with the same per-agent seed, up to a pre-registered maximum of five
+retries, with every attempt logged. Calls interrupted by provider daily-quota
+limits were deferred and re-issued after the quota reset under the same seeds. A
+cell that remained invalid after the retry budget would have been handled under
+the pre-registered exclusion rule; in the confirmatory dataset, all 54{,}000
+grid cells ultimately returned schema-valid responses, so no cells were
+excluded. The complete attempt history, including failed and deferred calls, is
+preserved in the released log.
+
+The experiment covers 100 large-cap equities distributed across all 11 Global
+Industry Classification Standard sectors and 12 analysis dates in 2026. For
+each equity-date pair, responses are generated under three ensemble
+configurations, three independent runs, and five agents per ensemble. The
+complete design therefore contains
+$100\times 12\times 3\times 3\times 5=54{,}000$ individual model calls.
+
+The dates are selected to reduce the possibility that model responses rely on
+memorized post-event information and to ensure that the 20-trading-day
+forward-return window used in the secondary accuracy analysis has fully elapsed.
+They are also chosen to span distinct 2026 market conditions. The equity
+universe, sector allocation, inclusion criteria, and complete ticker list are
+reported in the supplementary materials.
+
+\subsection{No-lookahead context}
+Each agent receives a price-derived information set constructed solely from
+observations available through the trading day immediately preceding the
+corresponding analysis date. For every equity-date cell, the context contains
+the trailing one-week return, the trailing one-month return, the trailing
+three-month return, the 21-trading-day realized volatility, and the security's
+position within its trailing 63-trading-day price range. No observations from
+the analysis date or any subsequent date are included in the agent prompt. The
+same information set is supplied to all agents evaluating a given cell, ensuring
+that differences in responses arise from model behavior rather than differences
+in the available inputs.
+
+For exact replication, the return horizons are defined in trading days. For
+example, the range-position feature is computed as
+\begin{equation}
+\mathrm{RangePos}_{j,t}=\frac{P_{j,t-1}-\min_{\tau\in W_{63}}P_{j,\tau}}
+{\max_{\tau\in W_{63}}P_{j,\tau}-\min_{\tau\in W_{63}}P_{j,\tau}},
+\end{equation}
+where $W_{63}$ denotes the preceding 63-trading-day window. End-of-day prices
+are obtained from a single market-data vendor (Financial Modeling Prep), fetched
+once, and frozen in the released cache; realized volatility is computed over the
+trailing 21-trading-day window, and the treatment of missing observations is
+specified in the supplementary materials. Data provenance and the exact
+information supplied to each model call are recorded in the experimental logs.
+
+\subsection{Models}
+All model calls are executed using a sampling temperature of 0.7. Exact provider
+and model identifiers are fixed for the duration of data collection and reported
+in Table~\ref{tab:models}, together with their roles in each ensemble
+configuration and the input- and output-token prices applicable during the
+experiment. Each agent response is generated through a separate API request
+under the independent-sampling protocol described in
+Section~\ref{sec:estimand}. Apart from the model and provider assignments
+defined by the ensemble configuration, agents evaluating the same cell receive
+identical prompts and inference settings.
+
+Because proprietary model endpoints may be modified or replaced by their
+providers, the archived call-level dataset constitutes the empirical record of
+the experiment. The conclusions therefore apply to the responses generated by
+the specified endpoints during the reported collection period rather than to
+future versions carrying similar product names. To support replication and
+auditability, the experimental log records the model identifier, provider,
+timestamp, seed, prompt hash, token usage, cost, and raw response for every
+call.
 
 \begin{table}[!t]
 \centering
@@ -313,45 +452,85 @@ HET-LITE $-$ HET & 0.087 & $[0.067,\ 0.105]$ \\
 \end{table}
 
 \subsection{Pre-registration, freezing, and reproducibility}
-The design (endpoints, grid, seeds, prompt, decision rule) was frozen and
-SHA-256-hashed before confirmatory data collection. Raw data were collected once
-into an immutable, read-only, hash-stamped \texttt{runs.csv}; the analysis reads
-only that file plus the frozen configuration, with all randomness seeded, and
-reproduces every figure and table byte-for-byte. A power analysis on an
-independent pilot sized the grid.
+\label{sec:prereg}
+Empirical evaluations of LLM systems involve several design choices, including
+model selection, prompt construction, sampling parameters, evaluation endpoints,
+exclusion rules, and statistical procedures. Revising these choices after
+observing the results can increase researcher degrees of freedom and make
+replication more difficult. We therefore adopt a confirmatory workflow that
+separates pre-specified analyses from subsequent exploratory investigations.
+
+Before confirmatory data collection, we froze the hypotheses, ensemble
+configurations, prompt template, experimental grid, random-seed construction,
+primary and secondary endpoints, uncertainty-estimation procedure, and decision
+rule. The resulting pre-registration was assigned a SHA-256 hash to establish
+that the design preceded the collection of the confirmatory dataset. Raw outputs
+were collected once and stored in an immutable, read-only, hash-verified
+dataset. The analysis pipeline reads only the frozen dataset and experimental
+configuration, and all stochastic procedures, including bootstrap resampling,
+use fixed seeds. The pipeline regenerates the reported tables and figures
+deterministically.
+
+Analyses not included in the original pre-registration are identified explicitly
+as exploratory or as documented amendments. This separation prevents post hoc
+results from being presented as confirmatory evidence and allows the primary
+findings to be evaluated against the design specified before data collection.
+The frozen dataset, pre-registration materials, orchestration configuration, and
+analysis code are included in the accompanying reproducibility package.
 
 \section{Results}
-Analysis is over the complete grid ($54{,}000/54{,}000$ cells).
+The analysis includes the complete planned set of 54{,}000 model calls across
+100 equities, 12 analysis dates, three ensemble configurations, three
+independent runs, and five agents per ensemble. Unless otherwise stated,
+agreement statistics are computed separately within each run and then averaged
+across runs.
 
 \subsection{Heterogeneity de-correlates ensembles (primary)}
-Within-ensemble agreement decreases sharply and monotonically with heterogeneity
-(Table~\ref{tab:frontier}, Fig.~\ref{fig:frontier}):
-$\kappa_{\mathrm{HOM}}=0.552$, $\kappa_{\mathrm{HET\text{-}LITE}}=0.302$,
-$\kappa_{\mathrm{HET}}=0.215$. The pre-registered primary effect is
+Within-ensemble agreement decreases monotonically as cross-provider
+heterogeneity increases. Fleiss' $\kappa$ is 0.552 for HOM, 0.302 for HET-LITE,
+and 0.215 for HET, as reported in Table~\ref{tab:frontier} and illustrated in
+Fig.~\ref{fig:frontier}. Using the unrounded configuration-level estimates, the
+pre-registered primary contrast is
 \[
-\Delta\kappa_{\mathrm{HOM-HET}}=0.336,\quad 95\%\ \mathrm{CI}\ [0.304,\ 0.369],
+\Delta\kappa_{\mathrm{HOM-HET}}=\kappa_{\mathrm{HOM}}-\kappa_{\mathrm{HET}}=0.336,
 \]
-whose interval excludes zero: verdict \emph{Confirmed}.
-In Landis--Koch~\cite{landis1977} terms, homogeneous ensembles reach
+with a 95\% cluster-bootstrap confidence interval of $[0.304, 0.369]$. Because
+the confidence interval excludes zero, the pre-registered primary hypothesis
+that cross-provider heterogeneity reduces within-ensemble agreement is
+supported. In Landis--Koch~\cite{landis1977} terms, homogeneous ensembles reach
 ``moderate--substantial'' internal agreement while fully heterogeneous ones fall
-to ``fair,'' i.e.\ markedly more independent.
-Both secondary contrasts are also positive with CIs excluding zero
-(Table~\ref{tab:endpoints}), confirming that each increment of heterogeneity
-contributes de-correlation.
+to ``fair.'' Both pre-registered secondary contrasts are also positive, with
+confidence intervals excluding zero (Table~\ref{tab:endpoints}). Agreement
+therefore decreases at each observed increase in heterogeneity, from HOM to
+HET-LITE and from HET-LITE to HET. These results establish a monotonic
+relationship between provider heterogeneity and within-ensemble de-correlation
+in the evaluated task.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{fig1_frontier.png}
+\caption{Agreement--cost frontier. Within-ensemble Fleiss' $\kappa$ ($y$) versus
+cost per ensemble decision ($x$) at heterogeneity levels $\{0, 1, 3\}$. Lower
+$\kappa$ indicates lower observed within-ensemble agreement; the horizontal
+spread is the cost premium.}
+\label{fig:frontier}
+\end{figure}
 
 \subsection{Robustness of the agreement statistic}
-Fleiss' $\kappa$ is prevalence-sensitive (the well-known ``$\kappa$ paradox''),
-and our BUY/HOLD/SELL marginals do shift with heterogeneity---the HOLD share
-falls from $0.71$ (HOM) to $0.56$ (HET) as agents grow more willing to take
-directional stances (Table~\ref{tab:stats}). To confirm the ordering is not an
-artifact of this prevalence shift, we recompute agreement with two statistics
-that treat chance agreement differently: Krippendorff's $\alpha$ (nominal) and
-Gwet's AC1, which is specifically designed to be robust to the paradox. All
-three rank the configurations identically and monotonically,
-HOM $>$ HET-LITE $>$ HET (Table~\ref{tab:stats}); $\alpha$ tracks $\kappa$ to
-three decimals, and while AC1's absolute values are higher (as expected), it
-preserves the ordering and the large HOM$\to$HET gap. The de-correlation result
-is therefore not an artifact of the chosen agreement statistic.
+The marginal distribution of BUY, HOLD, and SELL responses changes across
+ensemble configurations. In particular, the proportion of HOLD responses
+decreases from 0.71 in HOM to 0.56 in HET. Because Fleiss' $\kappa$ can be
+sensitive to category prevalence (the ``$\kappa$ paradox''), this shift could
+affect its absolute value independently of changes in the underlying level of
+agreement. We therefore recompute agreement using Krippendorff's
+$\alpha$~\cite{krippendorff2019} for nominal outcomes and Gwet's
+AC1~\cite{gwet2008}. All three statistics produce the same monotonic
+configuration ordering: HOM $>$ HET-LITE $>$ HET (Table~\ref{tab:stats}).
+Krippendorff's $\alpha$ closely tracks Fleiss' $\kappa$, while Gwet's AC1
+produces higher absolute values but preserves both the ordering and the
+substantial HOM-to-HET reduction. The primary conclusion is therefore robust to
+alternative treatments of chance agreement and is not attributable solely to
+changes in the category marginals.
 
 \begin{table}[!t]
 \centering
@@ -372,14 +551,6 @@ HET & 0.215 & 0.216 & 0.398 & 0.358 & 0.556 & 0.085 \\
 \end{tabular}
 \end{table}
 
-\subsection{The agreement--cost frontier}
-De-correlation is not free. Cost per ensemble decision rises from
-$\$6.5\times 10^{-4}$ (HOM) to $\$1.5\times 10^{-3}$ (HET-LITE) to
-$\$2.8\times 10^{-3}$ (HET)---a $\sim$4.4$\times$ premium from monoculture to
-full heterogeneity (Table~\ref{tab:frontier}). Fig.~\ref{fig:frontier} plots the
-resulting frontier: agreement (lower is more diverse) against cost, a curve
-practitioners can use to select an operating point.
-
 \begin{table}[!t]
 \centering
 \caption{Frontier: within-ensemble agreement and cost by heterogeneity level.}
@@ -395,43 +566,48 @@ HET & 3 & 0.215 & $2.84\times 10^{-3}$ \\
 \end{tabular}
 \end{table}
 
-\begin{figure}[!t]
-\centering
-\includegraphics[width=\columnwidth]{fig1_frontier.png}
-\caption{Agreement--cost frontier. Within-ensemble Fleiss' $\kappa$ ($y$) versus
-cost per ensemble decision ($x$) at heterogeneity levels $\{0, 1, 3\}$. Lower
-$\kappa$ $=$ more independent agents; the horizontal spread is the cost
-premium.}
-\label{fig:frontier}
-\end{figure}
+\subsection{The agreement--cost frontier}
+The reduction in agreement is accompanied by higher inference cost. The observed
+cost per five-agent ensemble decision increases from approximately
+$\$6.5\times 10^{-4}$ for HOM to $\$1.5\times 10^{-3}$ for HET-LITE and
+$\$2.8\times 10^{-3}$ for HET. Moving from the homogeneous to the fully
+heterogeneous configuration therefore increases inference cost by approximately
+$4.4\times$ (Table~\ref{tab:frontier}). Fig.~\ref{fig:frontier} presents
+within-ensemble agreement against inference cost for the three configurations.
+The resulting frontier quantifies the additional expenditure associated with
+lower agreement and allows ensemble configurations to be compared jointly on
+behavioral diversity and cost. The frontier does not, by itself, establish that
+the additional disagreement improves downstream predictive performance.
 
-\subsection{Measurement protocol: sampling non-determinism inflates $\kappa$}
+\subsection{Shared-seed dependence and measurement validation}
 \label{sec:protocol}
 \paragraph{Exactly what was shared}
-In our first (pilot) implementation the random seed was derived per ensemble
-\emph{run} rather than per agent: every one of the five same-model agents in a
-cell received the identical seed, and therefore the identical sampling
-trajectory, from the provider's decoder. With temperature sampling made
-deterministic by a shared seed, five ``independent'' gpt-5.4-nano calls on the
-same prompt returned near-verbatim outputs, driving $\kappa_{\mathrm{HOM}}$
-artificially toward 1. The fix is one line of seed derivation: give each agent a
-unique, reproducible seed keyed by its position (Fig.~\ref{fig:seed}), so the
-five agents draw independent samples from the same model. We stress that this is
-the only change; the prompt, model, temperature, and grid are identical before
-and after.
+In the initial pilot implementation, the random seed was derived at the
+ensemble-run level rather than at the individual-agent level. Consequently, all
+five same-model agents evaluating a given cell received the same prompt and
+seed. Under this configuration, the calls produced near-verbatim responses,
+indicating that they did not function as independent draws for the purpose of
+measuring homogeneous-model agreement. The confirmatory implementation instead
+assigns every agent a unique, reproducible seed determined by its run,
+configuration, equity, date, and agent position (Fig.~\ref{fig:seed}). The
+prompt, model, temperature, and experimental grid remain unchanged. This
+modification preserves reproducibility while allowing repeated instances of the
+same model to follow distinct sampling trajectories.
 
 \begin{figure}[!t]
 \centering
 \begin{lstlisting}
-# Before (artifact): one seed shared by all agents in a run
+# Before (artifact): one seed shared by
+# all agents in a run
 seed = f(master, run)
 for agent in 1..5:
     call(model, prompt, seed)  # identical draw
 
-# After (fix): unique per-agent seed, independent draws
+# After (fix): unique per-agent seed,
+# independent draws
 seed = SHA256(master, run, config,
               ticker, date, agent) & 0x7FFFFFFF
-call(model, prompt, seed)  # independent draw per agent
+call(model, prompt, seed)  # independent draw
 \end{lstlisting}
 \caption{The one-line fix. The pilot derived the seed per run, so all five
 same-model agents shared a sampling path; the study derives a distinct
@@ -440,36 +616,34 @@ integer-safe seed per agent, restoring independent draws from the same model.}
 \end{figure}
 
 \paragraph{Ruling out adjacent explanations}
-A reader may wonder whether the near-duplicate pilot outputs came instead from
-response caching or request batching. Neither applies: provider- and client-side
-prompt caching was disabled (no cache headers; each call is a fresh completion),
-and every agent call is an independent HTTP request---agents are never batched
-into a single multi-sample call. The duplication was attributable solely to the
-shared seed, which the fix removes.
+The pilot duplication was not attributable to request batching, because every
+agent response was generated through a separate API request. Prompt caching was
+also disabled during collection. Within the controlled pilot setup, the
+disappearance of near-duplicate behavior after introducing per-agent seeds is
+therefore consistent with shared-seed dependence as the source of the inflated
+agreement.
 
-Our within-run vs.\ cross-run diagnostic (Table~\ref{tab:nondet}) verifies the
-fix rather than merely asserting it: after adopting per-agent independent draws,
-the HOM within$-$cross gap is $0.0006\approx 0$, confirming the homogeneous
-agents are genuinely independent rather than copies (a residual gap near 1 would
-have signalled surviving duplication). In a controlled pilot, the artifact was
-severe: the same primary effect measured $\Delta\kappa=0.485$ under a shared
-sampling context but $0.113$ under independent draws---a $\sim$4$\times$
-over-statement produced entirely by the measurement apparatus
-(Fig.~\ref{fig:trap}). We recommend the independent-draw protocol and the
-within/cross diagnostic as a standard check for any LLM-ensemble agreement
-study.
-
-The negative within$-$cross gaps for the heterogeneous configurations
-($-0.048$ and $-0.074$; Table~\ref{tab:nondet}) are expected and benign, and act
-as a further consistency check. Pooling the three runs' draws into a single
-cross-run $\kappa$ re-introduces same-model replicate agreement---a model's
-repeated draws for a cell tend to be mutually similar---which raises the pooled
-$\kappa$ above the single-draw within-run value; the more diverse the ensemble,
-the larger this pooling effect, hence the monotonic ordering of the gaps ($0$ for
-HOM, $-0.048$ for HET-LITE, $-0.074$ for HET). Crucially, our primary endpoint
-uses the conservative within-run (single-draw) estimate, so this pooling cannot
-inflate $\Delta\kappa$; the direction of the gaps merely reconfirms that
-additional same-model draws add correlation.
+\paragraph{Diagnostic verification}
+We evaluate residual within-run dependence by comparing within-run and cross-run
+agreement (Table~\ref{tab:nondet}). After adopting unique per-agent seeds, the
+HOM within-minus-cross difference is approximately 0.001, indicating that
+agreement among the five agents within a run is nearly identical to agreement
+obtained from separately generated draws across runs. In the controlled pilot,
+the estimated primary contrast was 0.485 under shared per-run seeding and 0.113
+under independent per-agent seeding; shared seeding therefore overstated the
+estimated de-correlation effect by approximately fourfold
+(Fig.~\ref{fig:trap}). The pilot grid comprised 8 equities $\times$ 2 analysis
+dates $\times$ 2 configurations (HOM and HET) $\times$ 3 runs $\times$ 5
+agents, i.e.\ 480 calls per seeding arm---far smaller than the confirmatory
+grid---so the pilot contrasts are point estimates whose role is diagnostic,
+demonstrating the artifact and its removal, rather than confirmatory. This
+factor is specific to the pilot configuration and should not be interpreted as
+a universal inflation constant for all LLM ensemble studies. The heterogeneous configurations produce within-minus-cross differences
+of $-0.048$ and $-0.074$. These differences arise because cross-run pooling
+introduces additional repeated draws from the same underlying models, increasing
+pooled agreement relative to the single-draw within-run calculation. The primary
+endpoint uses the within-run estimate and is therefore not increased by this
+pooling effect.
 
 \begin{table}[!t]
 \centering
@@ -490,21 +664,24 @@ HET & 0.215 & 0.289 & $-0.074$ \\
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\columnwidth]{fig2_protocol.png}
-\caption{The measurement trap. Homogeneous within$-$cross $\kappa$ gap
-collapses from a seed-shared pilot ($\Delta\kappa=0.485$) to the
-independent-draw pilot ($\Delta\kappa=0.113$) to $\approx 0$ in the full study,
-showing that shared-context sampling non-determinism, not model similarity,
-produced the inflation.}
+\caption{Shared-seed dependence inflates measured agreement. The homogeneous
+within$-$cross $\kappa$ gap collapses from a seed-shared pilot
+($\Delta\kappa=0.485$) to the independent-draw pilot ($\Delta\kappa=0.113$) to
+$\approx 0$ in the full study, showing that shared-seed dependence in the pilot,
+not model similarity, produced the inflation.}
 \label{fig:trap}
 \end{figure}
 
 \subsection{Provider-pair agreement}
-The pairwise direction-agreement matrix (Fig.~\ref{fig:provider}) shows agents
-from the same provider agree far more than cross-provider pairs: within-provider
-agreement is $0.92$ (Google) and $0.80$ (OpenAI), whereas cross-provider pairs
-range $0.43$--$0.63$. This is the mechanism behind the frontier: provider
-identity, not merely stochasticity, is the dominant axis of agent
-(dis)agreement.
+The pairwise directional-agreement matrix in Fig.~\ref{fig:provider} provides
+additional evidence regarding the source of ensemble de-correlation.
+Same-provider agreement is 0.92 for Google agent pairs and 0.80 for OpenAI agent
+pairs, whereas cross-provider agreement ranges from 0.43 to 0.63. Agents
+supplied by the same provider therefore agree more frequently than agents
+supplied by different providers under identical prompt and information
+conditions. This pattern is consistent with provider identity being an important
+source of behavioral similarity and helps explain the lower overall agreement
+observed in the heterogeneous ensembles.
 
 \begin{figure}[!t]
 \centering
@@ -517,14 +694,32 @@ pair exists.}
 \label{fig:provider}
 \end{figure}
 
-\subsection{Accuracy proxy (secondary; honest null)}
-As a pre-declared secondary, descriptive axis, we score each ensemble's
-majority-vote direction against the sign of the realized 20 trading-day forward
-return (HOLD abstains). Directional hit-rates are $0.438$ (HOM), $0.463$
-(HET-LITE), and $0.488$ (HET), with overlapping 95\% Wilson intervals
-(Table~\ref{tab:acc}). The study is powered for $\kappa$, not for accuracy; we
-therefore draw no conclusion that heterogeneity improves accuracy. The slight
-upward trend is reported for completeness only.
+\subsection{Secondary directional-accuracy analysis}
+As a pre-declared secondary analysis, we compare each ensemble's majority-vote
+direction with the sign of the realized 20-trading-day forward return. HOLD
+decisions are treated as abstentions and excluded from the corresponding
+hit-rate calculation. The estimated directional hit rates are 0.438 for HOM,
+0.463 for HET-LITE, and 0.488 for HET (Table~\ref{tab:acc}). The associated
+Wilson confidence intervals~\cite{wilson1927} are wide and overlapping.
+Moreover, the experiment was powered for the agreement endpoint rather than for
+differences in directional accuracy. The estimates therefore do not provide
+sufficient evidence that cross-provider heterogeneity improves average
+directional accuracy. The numerical upward trend is reported descriptively and
+should not be interpreted as a demonstrated performance improvement.
+
+Hit rates at or modestly below 0.5 are the expected baseline for this task
+rather than a defect of the design: 20-trading-day directional forecasting from
+public price history alone is approximately unpredictable under near-efficient
+prices, and the abstention rule further shifts the effective base rate by
+scoring only the subset of cells on which an ensemble commits to a direction.
+Crucially, the agreement estimand is well-defined independent of task
+difficulty: Fleiss' $\kappa$ and the $\Delta\kappa$ contrasts are functionals of
+the joint distribution of agent outputs, computed without reference to outcome
+labels, so the de-correlation results measure how similarly the agents behave
+regardless of whether the task admits exploitable predictive signal. A
+low-signal task is, if anything, a conservative setting for the primary
+question, because agents cannot inflate measured agreement merely by all being
+correct.
 
 \begin{table}[!t]
 \centering
@@ -542,49 +737,52 @@ HET & 0.488 & 525 & $[0.445,\ 0.530]$ \\
 \end{tabular}
 \end{table}
 
-\subsection{Beyond average accuracy: manufactured consensus and tail risk
-(exploratory)}
-Average directional accuracy is flat (Sec.~5.6), but average
-accuracy is not the only quantity a practitioner cares about: in a decision
-setting, a committee that is confidently and unanimously wrong is more dangerous
-than one whose members hedge. We therefore examine, post hoc and exploratorily
-(no pre-registered hypothesis; no confidence intervals promoted to our headline
-claims), how heterogeneity reshapes the structure of consensus rather than its
-mean correctness. All quantities below are computed on the same frozen grid,
-scoring each five-agent ensemble decision against the realized forward-return
-sign (Table~\ref{tab:consensus}).
+\subsection{Exploratory analysis of consensus errors}
+\label{sec:consensus}
+Average directional accuracy may conceal differences in how errors are
+distributed across committee members. We therefore conduct a post hoc
+exploratory analysis of consensus structure using the same frozen dataset. This
+analysis was not included in the pre-registered hypotheses, and its results are
+treated as hypothesis-generating rather than confirmatory. We examine three
+quantities: the proportion of decisions for which all five agents select the
+same label; the proportion that are unanimous, directional, and incorrect---the
+``manufactured-consensus'' failure that monoculture warnings
+describe~\cite{kim2025correlated}; and, conditional on an incorrect majority
+decision, the proportion of agents endorsing that incorrect majority
+(Table~\ref{tab:consensus}).
 
-Three patterns emerge: two strictly monotone in heterogeneity, while the
-third---confident collective error---saturates from the first heterogeneous
-agent onward. (i)~\emph{Unanimity.} The rate at which all five agents return one
-identical direction falls from $0.591$ (HOM) to $0.315$ (HET-LITE) to $0.267$
-(HET): homogeneous committees manufacture consensus more than twice as often.
-(ii)~\emph{Confident collective error.} The rate of decisions that are
-unanimous, directional, and wrong---the exact ``manufactured-consensus'' failure
-that monoculture warnings describe~\cite{kim2025correlated}---is $0.058$ for HOM
-versus $0.032$ for HET, so the homogeneous ensemble commits confident collective
-blunders at $1.84\times$ the fully heterogeneous rate. Notably, HET-LITE already
-achieves essentially the full reduction ($0.030$ vs.\ $0.032$ for HET) at a
-$\sim$2.3$\times$ rather than $\sim$4.4$\times$ premium: in this setting, a
-single second-provider agent captures nearly all of the tail-risk benefit,
-making HET-LITE the efficient operating point on the frontier.
-(iii)~\emph{Error pile-on.} Conditional on the majority vote being wrong, the
-fraction of agents that nonetheless endorse the wrong call is $0.824$ (HOM),
-$0.761$ (HET-LITE), $0.636$ (HET): when a heterogeneous ensemble errs, its
-members are far more likely to have dissented, leaving a usable disagreement
-signal that a homogeneous ensemble erases. Read together, these indicate that
-the priced de-correlation buys a measurable reduction in \emph{tail risk}---fewer
-confident collective errors---even where it buys no gain in mean accuracy, which
-for a finance application is arguably the more relevant benefit.
+The unanimity rate decreases from 0.591 for HOM to 0.315 for HET-LITE and 0.267
+for HET. Homogeneous ensembles therefore produce identical five-agent decisions
+more than twice as frequently as fully heterogeneous ensembles. The proportion
+of decisions that are unanimous, directional, and incorrect is 0.058 for HOM,
+0.030 for HET-LITE, and 0.032 for HET. The homogeneous ensemble therefore
+produces this form of collective error at approximately $1.84\times$ the rate of
+the fully heterogeneous ensemble. HET-LITE achieves a reduction comparable to
+HET at an approximately $2.3\times$, rather than $4.4\times$, cost premium.
+Within this exploratory analysis, HET-LITE therefore appears to be a candidate
+cost-efficient configuration for reducing unanimous directional errors. This
+conclusion requires confirmatory evaluation before being treated as a general
+design recommendation.
 
-We caution against over-reading conviction as calibrated confidence: per-agent
-directional hit-rate is essentially flat across self-reported conviction buckets
-and never exceeds chance by a reliable margin in any configuration
-(Fig.~\ref{fig:cal}), consistent with the accuracy null. Heterogeneity's benefit
-here is in the structure of collective agreement, not in per-call calibration.
-These exploratory results motivate, but do not establish, a downstream
-advantage; we frame them as hypotheses for a confirmatory, appropriately powered
-follow-up.
+Conditional on an incorrect majority vote, the proportion of agents endorsing
+the incorrect majority decreases from 0.824 for HOM to 0.761 for HET-LITE and
+0.636 for HET. Errors in the heterogeneous ensembles therefore contain more
+within-committee dissent, which may provide an observable signal for escalation,
+abstention, or further review. These findings suggest that heterogeneity may
+affect the concentration of collective errors even when it does not produce a
+detectable improvement in mean directional accuracy. However, they do not
+establish a reduction in financial tail risk, because the analysis measures
+decision-error structure rather than the distribution of realized monetary
+losses.
+
+Self-reported conviction does not exhibit a reliable positive relationship with
+per-agent directional accuracy in any configuration (Fig.~\ref{fig:cal}).
+Higher-conviction responses do not consistently achieve higher hit rates, and no
+conviction category produces a reliably above-chance result. Consequently, the
+exploratory benefit of heterogeneity appears in the structure of collective
+agreement and dissent rather than in the calibration of individual agents'
+reported conviction. These findings motivate a separate, appropriately powered
+evaluation of calibration and collective-error risk.
 
 \begin{table}[!t]
 \centering
@@ -607,55 +805,68 @@ HET & 0.267 & 0.032 & 0.636 \\
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\columnwidth]{fig5_calibration.png}
-\caption{Conviction is not calibrated. Per-agent directional hit-rate by
-self-reported conviction bucket; no configuration rises reliably above chance
-($0.5$, dashed) and higher conviction does not imply higher accuracy, consistent
-with the accuracy null.}
+\caption{Self-reported conviction does not predict directional accuracy.
+Per-agent directional hit-rate by self-reported conviction bucket; no
+configuration rises reliably above chance ($0.5$, dashed), consistent with the
+secondary directional-accuracy analysis.}
 \label{fig:cal}
 \end{figure}
 
 \subsection{Robustness: capability-matched control}
-To separate provider diversity from capability tier---the study's principal
-confound---we ran a pre-registered control that holds capability approximately
-constant while varying provider: Het-SameTier, comprising three gpt-5.4-nano and
-two gemini-3.1-flash-lite agents, i.e.\ the efficient tier of each provider (no
-efficient-tier xAI model is exposed, so the control is OpenAI vs.\ Google).
-Compared against the identical HOM baseline over the same $100\times 12$ grid
-(36{,}000 calls), the control yields $\kappa_{\mathrm{HOM}}=0.552$ and
-$\kappa_{\mathrm{HET\text{-}SameTier}}=0.236$, a contrast of
+\label{sec:control}
+The primary ensemble configurations vary both provider identity and model
+capability tier. To reduce this confounding, we conduct a pre-registered
+capability-matched control using three OpenAI efficient-tier agents and two
+Google efficient-tier agents (Het-SameTier). An equivalent efficient-tier xAI
+model was not available, so this control varies provider across two rather than
+three model families. Across the same 100-equity and 12-date grid, the
+homogeneous baseline produces $\kappa_{\mathrm{HOM}}=0.552$, whereas the
+capability-matched heterogeneous configuration produces
+$\kappa_{\mathrm{HET\text{-}SameTier}}=0.236$. The resulting contrast is
 \[
 \Delta\kappa_{\mathrm{HOM-SameTier}}=0.315,\quad
 95\%\ \mathrm{CI}\ [0.288,\ 0.341],
 \]
-which excludes zero. This capability-matched effect recovers $\approx$94\% of
-the full flagship-mixture effect ($0.336$), demonstrating that the de-correlation
-is driven overwhelmingly by provider identity rather than capability tier. The
-capability confound is therefore not a plausible explanation for the primary
-result. (The reproduction of $\kappa_{\mathrm{HOM}}=0.552$ to four decimals
+which excludes zero. This capability-matched estimate is approximately 94\% of
+the primary HOM-to-HET contrast. The result indicates that the observed
+de-correlation is largely preserved when model tier is held approximately
+constant, supporting provider identity as a major contributor to the primary
+effect. The control substantially reduces the capability-tier concern but does
+not eliminate it completely, because matching is approximate and covers only two
+providers. (The reproduction of $\kappa_{\mathrm{HOM}}=0.552$ to four decimals
 across two independently collected datasets also re-confirms determinism of the
 homogeneous baseline.)
 
 \subsection{Robustness: temperature sensitivity}
-Agreement is mechanically a function of sampling temperature, so a natural
-concern is that our primary effect is an artifact of the single operating point
-$T=0.7$. We therefore re-ran a small stratified subgrid (8 equities $\times$ 2
-dates $\times$ 3 configs $\times$ 3 runs, written to separate files that never
-touch the frozen study) at $T\in\{0.0,0.7,1.0\}$ and recomputed $\kappa$ and
-the primary contrast at each temperature (Table~\ref{tab:temp}). Two things are
-stable and one is not. Stable: the ordering
+Agreement can vary with sampling temperature, raising the possibility that the
+primary result is specific to the main operating point of $T=0.7$. We therefore
+evaluated a separate stratified subgrid comprising eight equities, two analysis
+dates, three ensemble configurations, and three independent runs at
+$T\in\{0.0,0.7,1.0\}$. These observations were stored separately from the frozen
+confirmatory dataset and analyzed using the same seeded estimator. The ordering
 $\kappa_{\mathrm{HOM}}>\kappa_{\mathrm{HET\text{-}LITE}}>\kappa_{\mathrm{HET}}$
-holds at every temperature, and the primary contrast
-$\Delta\kappa(\mathrm{HOM}-\mathrm{HET})$ is positive with a 95\% CI excluding
-zero at every temperature ($0.299$, $0.509$, $0.385$ at $T=0.0,0.7,1.0$). Not
-stable: the absolute $\kappa$ levels vary non-monotonically with $T$ (e.g.\
-$\kappa_{\mathrm{HOM}}$ ranges $0.33$--$0.67$), because temperature shifts both
-within-cell concordance and the directional marginals (at $T=0$ the homogeneous
-marginal is near-uniform across BUY/HOLD/SELL, lowering chance-corrected
-agreement despite greedy decoding; at $T=0.7$--$1.0$ it concentrates on HOLD).
-The takeaway is that our conclusion is a statement about the contrast between
-configurations, which is temperature-robust, not about any absolute agreement
-level, which is not. This subgrid is a documented pre-registration amendment and
-is analyzed by the same seeded estimator as the main study.
+is preserved at every tested temperature. The corresponding HOM-to-HET contrasts
+are 0.299, 0.509, and 0.385 at $T=0.0$, $0.7$, and $1.0$, respectively, with
+95\% confidence intervals excluding zero in each case (Table~\ref{tab:temp}).
+Absolute agreement levels, however, vary non-monotonically with temperature; for
+example, $\kappa_{\mathrm{HOM}}$ ranges from approximately 0.33 to 0.67. This
+variation reflects changes in both within-cell concordance and the marginal
+distribution of BUY, HOLD, and SELL responses. At $T=0$, the homogeneous
+configuration produces a more nearly uniform label distribution, whereas at
+$T=0.7$ and $T=1.0$, responses are more concentrated in HOLD. The results
+therefore indicate that the relative reduction in agreement associated with
+provider heterogeneity is robust within the tested subgrid, while absolute
+agreement remains temperature-dependent. We note that the subgrid's contrast at
+the main operating point ($0.509$ at $T=0.7$) differs from the full-grid
+estimate ($0.336$) at the same temperature; this discrepancy is attributable to
+the sampling variance of the small $8\times 2$ subgrid, whose wide confidence
+interval ($[0.21,\ 0.78]$) comfortably contains the full-grid estimate. The
+subgrid is accordingly informative about the sign and ordering of the effect,
+not its magnitude. Because this analysis uses a substantially smaller grid than
+the primary experiment, it is interpreted as supporting evidence rather than an
+independent replication. The temperature
+analysis was conducted under a documented protocol amendment and does not alter
+the frozen confirmatory dataset.
 
 \begin{table}[!t]
 \centering
@@ -678,141 +889,204 @@ $\kappa_{\mathrm{HET}}$ & $\Delta\kappa$ [95\% CI] \\
 \end{table}
 
 \section{Discussion}
-Our central result gives quantitative teeth to an intuition: a homogeneous LLM
-committee is substantially an echo chamber ($\kappa=0.55$), and cross-provider
-heterogeneity is what actually makes its members think independently
-($\kappa=0.22$), for a well-characterized $\sim$4.4$\times$ cost. The
-provider-pair matrix shows this de-correlation is driven by provider identity
-rather than sampling noise. Crucially, de-correlation is a necessary but not
-sufficient condition for ensemble benefit: independence only helps if the
-independent opinions are also informative. Our honest null on average accuracy,
-read alongside the correlated-error / monoculture findings of Kim \textit{et
-al.}~\cite{kim2025correlated}, cautions that buying disagreement does not
-automatically buy correctness. Yet our exploratory analysis of consensus
-structure (Sec.~5.7) suggests the premium is not valueless in this setting:
-homogeneous committees produce confident, unanimous, wrong calls at $1.84\times$
-the heterogeneous rate, so the independence appears to buy tail-risk reduction
-even without a mean-accuracy gain---a hypothesis we flag for confirmatory
-follow-up. For practitioners, the frontier is directly actionable: teams paying
-the heterogeneity premium should verify that the additional independence
-translates into a downstream objective (calibration, robustness, or reduced
-collective-error rate) for their task rather than assuming it. Our own data
-already hint at where the value concentrates: because the confident-collective-
-error rate saturates from the first heterogeneous agent onward, HET-LITE
-captures nearly all of the tail-risk benefit at a $\sim$2.3$\times$ rather than
-$\sim$4.4$\times$ premium, making a single second-provider agent the efficient
-operating point in this setting.
+The results provide a quantitative characterization of the relationship between
+provider heterogeneity, ensemble agreement, and inference cost. Within-ensemble
+agreement decreases from $\kappa=0.552$ for the homogeneous configuration to
+$\kappa=0.215$ for the fully heterogeneous configuration, while inference cost
+increases by approximately $4.4\times$. The provider-pair analysis further shows
+that agents from the same provider agree more frequently than agents from
+different providers under identical prompt and information conditions. Together
+with the capability-matched control, these findings support provider identity as
+an important source of behavioral similarity within LLM ensembles.
 
-Methodologically, the sampling-non-determinism trap (Section~\ref{sec:protocol})
-is, we argue, of independent value: any study that measures LLM-ensemble
-agreement without controlling the sampling context risks a multiplicative
-over-statement.
+Reduced agreement is a necessary but not sufficient condition for improved
+ensemble performance. Greater behavioral diversity is useful only when the
+additional judgments provide relevant information or enable more reliable
+downstream decisions. In the present study, cross-provider heterogeneity
+substantially reduces within-ensemble agreement but does not produce a
+statistically reliable improvement in average directional accuracy. This result
+is consistent with the algorithmic-monoculture
+literature~\cite{kim2025correlated} in showing that greater behavioral diversity
+does not automatically translate into greater correctness. The exploratory
+consensus analysis nevertheless indicates that heterogeneity changes the
+structure of collective errors. Homogeneous ensembles produce unanimous
+incorrect directional decisions at approximately $1.84\times$ the rate of fully
+heterogeneous ensembles and exhibit greater concentration of agents around an
+incorrect majority decision. These findings suggest that disagreement may
+provide value through reduced error concentration and increased visibility of
+dissent, even when mean accuracy does not improve. However, this interpretation
+remains exploratory and requires confirmatory evaluation using an appropriately
+powered downstream endpoint.
+
+The agreement--cost frontier provides a practical framework for ensemble
+selection. Practitioners should not assume that the additional cost of provider
+heterogeneity is justified solely because it reduces agreement. Instead, they
+should evaluate whether the resulting diversity improves a task-relevant
+objective, such as calibration, robustness, abstention quality, or the frequency
+of concentrated collective errors. In the exploratory analysis, HET-LITE
+achieves a reduction in unanimous directional errors comparable to HET at an
+approximately $2.3\times$, rather than $4.4\times$, cost premium. A single
+second-provider agent may therefore represent a candidate cost-efficient
+operating point for this task, although this conclusion should be validated
+prospectively before being generalized to other applications.
+
+The shared-seed pilot also has a methodological implication for empirical
+studies of LLM ensembles. When repeated model instances receive the same seed or
+otherwise share elements of the sampling trajectory, their outputs may not
+represent independent draws, causing within-ensemble agreement and configuration
+contrasts to be materially distorted. Agreement studies should therefore
+document the sampling context, assign separate reproducible seeds to individual
+agents when supported, and include a diagnostic for residual within-run
+dependence.
 
 \section{Threats to Validity}
 \textbf{Heterogeneity vs.\ capability confound.}
-HOM uses five instances of a small efficient model, whereas heterogeneous
-configurations add larger, different-provider models; part of the measured
-de-correlation could in principle reflect capability differences rather than
-provider identity per se. Two pieces of evidence bound this concern. First, the
-provider-pair analysis (Fig.~\ref{fig:provider}) is a within-cell comparison: for
-a fixed cell, all agents receive the identical prompt, yet same-source agent
-pairs agree far more ($0.80$--$0.92$) than cross-source pairs ($0.43$--$0.63$),
-indicating that source identity---not merely stochasticity or prompt
-difficulty---drives disagreement. Second, the effect is monotone and significant
-at every increment of heterogeneity (Table~\ref{tab:endpoints}), including the
-HET-LITE$\to$HET step, which adds provider diversity without a systematic
-capability jump. Third and most directly, our capability-matched control
-(Section~5.8) holds tier approximately constant and still yields
-$\Delta\kappa=0.315$ (95\% CI $[0.288, 0.341]$), $\approx$94\% of the full
-effect, so the de-correlation is provider-driven rather than tier-driven. The
-residual limitation is scope: the control contrasts two providers (OpenAI vs.\
-Google), since no efficient-tier xAI model is currently exposed; a fully
-tier-matched three-provider control awaits such a model.
+The primary ensemble configurations differ in both provider composition and
+model capability tier. HOM contains five instances of an efficient-tier OpenAI
+model, whereas the heterogeneous configurations introduce models from other
+providers, including higher-tier models. Consequently, part of the observed
+reduction in agreement could reflect capability differences rather than provider
+identity alone. Two analyses reduce, but do not eliminate, this concern. First,
+the provider-pair matrix (Fig.~\ref{fig:provider}) compares agents evaluating
+the same equity-date cell under identical prompt and information conditions and
+shows substantially higher agreement for same-provider pairs ($0.80$--$0.92$)
+than for cross-provider pairs ($0.43$--$0.63$). Second, the capability-matched
+control (Section~\ref{sec:control}) holds model tier approximately constant
+across OpenAI and Google and produces a contrast of $\Delta\kappa=0.315$,
+approximately 94\% of the primary HOM-to-HET effect. The de-correlation
+therefore remains substantial after approximate tier matching. However, the
+control covers only two providers because an equivalent efficient-tier xAI model
+was unavailable, and differences in training data, architecture, alignment
+procedures, and effective capability cannot be completely separated from
+provider identity.
 
 \textbf{Single task domain.}
-All results are for one directional financial-analysis task with a single prompt
-template; richer analyst tasks may exhibit different agreement structure, and we
-make no claim about LLM ensembles in general. Two factors bound this concern.
-First, the driving mechanism---higher within-provider than cross-provider
-agreement (Fig.~\ref{fig:provider})---is a property of the models, not of the
-finance framing, so we expect the ordering (though not the magnitude) to
-transfer. Second, we pre-register an out-of-domain replication as immediate
-future work: the identical pipeline (three configs, per-agent seeding,
-per-run-averaged $\kappa$) applied to a three-class classification task (e.g.\
-sentiment) on a small grid, reported without new confidence claims, to test
-whether the HOM $>$ HET-LITE $>$ HET ordering is finance-specific. Finance is
-arguably a hard case for stability, given the regime shifts spanned by our
-dates, which makes the monotone de-correlation we observe a conservative
-demonstration.
+The experiment evaluates one directional financial-analysis task using a single
+prompt template and a three-class BUY/HOLD/SELL output space. The magnitude of
+agreement reduction may differ for other tasks, prompts, domains, label
+structures, or reasoning requirements. In particular, tasks involving factual
+retrieval, open-ended generation, numerical reasoning, or multi-turn interaction
+may exhibit different within-provider and cross-provider dependence. The present
+results should therefore be interpreted as evidence for the evaluated task
+rather than as a universal estimate of LLM ensemble de-correlation. An
+out-of-domain replication using the same ensemble configurations,
+independent-sampling protocol, and agreement estimator is required to determine
+whether the observed ordering generalizes beyond the financial setting.
 
 \textbf{Model-version pinning.}
-Providers update models; we mitigate by pinning exact strings and treating the
-hash-frozen dataset as the object of record.
+Proprietary model endpoints may be updated by their providers without preserving
+identical behavior under the same product name. We mitigate this limitation by
+recording the exact model identifiers, timestamps, seeds, prompt hashes, and raw
+responses associated with every call and by treating the frozen, hash-verified
+dataset as the empirical object of record. The findings therefore apply to the
+archived outputs generated during the reported collection period and may not
+reproduce exactly with later endpoint versions.
 
 \textbf{Single-run collection.}
-Confirmatory data are collected once; provider-side drift within the window is
-not averaged out.
+Although the design contains three independent runs per configuration, the
+confirmatory responses were collected within a single experimental period.
+Provider-side updates, transient service conditions, or undocumented inference
+changes occurring outside that period are therefore not averaged across multiple
+collection windows. Repeating the experiment at later dates would be necessary
+to evaluate temporal stability.
 
 \textbf{Accuracy underpowered.}
-The design is powered for $\kappa$, not accuracy; the accuracy proxy is
-descriptive with wide intervals and must not be read as an alpha claim.
+The experiment was designed and powered for the agreement endpoint rather than
+for differences in directional accuracy. The accuracy analysis uses a
+descriptive proxy based on the sign of the 20-trading-day forward return, treats
+HOLD as an abstention, and produces relatively wide confidence intervals. It
+therefore cannot establish that heterogeneity improves or fails to improve
+predictive performance. The reported hit rates should not be interpreted as
+evidence of investment alpha, trading profitability, or economically significant
+forecasting ability.
 
 \textbf{Generalization.}
-Findings pertain to these three ensemble recipes, five agents, and this provider
-set; other sizes, tasks, and mixes may differ.
+The findings are specific to five-agent ensembles, three provider mixtures, the
+selected models, and the tested heterogeneity levels. Different ensemble sizes,
+provider allocations, aggregation rules, model tiers, prompts, or cost
+structures may produce different agreement--cost frontiers. In addition, lower
+agreement is not inherently beneficial; its value depends on whether
+disagreement improves a relevant downstream outcome. Generalization therefore
+requires replication across alternative ensemble compositions and decision
+tasks.
 
 \section{Conclusion}
-We present a pre-registered, 54{,}000-call measurement of how cross-provider
-heterogeneity de-correlates LLM ensembles and what it costs. Heterogeneity
-reduces within-ensemble agreement monotonically---$\Delta\kappa=0.336$ (95\% CI
-$[0.304, 0.369]$)---at a $\sim$4.4$\times$ inference-cost premium, defining an
-explicit agreement--cost frontier. We contribute a measurement protocol that
-removes a $\sim$4$\times$ inflation from shared-context sampling
-non-determinism, and we release a frozen, reproducible artifact. We find no
-reliable average-accuracy benefit at this scale, situating the result within the
-algorithmic-monoculture literature: diversity buys disagreement, but disagreement
-must still be shown to buy value. An exploratory analysis nonetheless indicates
-one concrete value---homogeneous ensembles commit confident, unanimous,
-directional errors at $1.84\times$ the heterogeneous rate---suggesting tail-risk
-reduction that a confirmatory study should test. A pre-registered,
-capability-matched control establishes that the effect is provider-driven rather
-than a capability-tier artifact ($\Delta\kappa=0.315$, 95\% CI $[0.288, 0.341]$);
-the remaining methodological gap is a fully tier-matched three-provider control,
-which awaits an efficient-tier model from a third provider. Two further steps
-follow: an out-of-domain replication to test whether the de-correlation ordering
-is task-general, and connecting the priced independence to downstream objectives
-(calibration, robustness, collective-error rate) so that it can be shown to buy
-value in this and other settings.
+This study presents a pre-registered empirical evaluation of how cross-provider
+heterogeneity affects agreement and inference cost in LLM ensembles. Across a
+54{,}000-call primary experiment, within-ensemble agreement decreases
+monotonically as provider diversity increases, with a primary HOM-to-HET
+contrast of $\Delta\kappa=0.336$ (95\% CI: $[0.304, 0.369]$). This reduction is
+accompanied by an approximately $4.4\times$ increase in inference cost,
+producing an explicit agreement--cost frontier for the evaluated
+configurations. A capability-matched control preserves approximately 94\% of the
+primary effect, supporting provider identity as a major contributor to ensemble
+de-correlation while not fully eliminating capability-related confounding. We
+also introduce an independent-draw measurement protocol that controls dependence
+caused by shared sampling seeds. In a controlled pilot, shared per-run seeding
+inflated the estimated de-correlation effect by approximately fourfold,
+demonstrating the importance of verifying sampling independence in
+ensemble-agreement studies.
+
+Cross-provider heterogeneity does not produce a statistically reliable
+improvement in average directional accuracy at the scale of this experiment.
+However, exploratory results indicate that homogeneous ensembles generate
+unanimous incorrect directional decisions at approximately $1.84\times$ the rate
+of fully heterogeneous ensembles and concentrate more agents around incorrect
+majority decisions. These findings suggest that heterogeneity may provide value
+by reducing concentrated collective errors and preserving disagreement signals,
+although this interpretation requires confirmatory evaluation. Overall, the
+results show that model diversity can reduce output agreement and yield
+less-correlated judgments, but the practical value of that reduced agreement
+must be established against a downstream objective such as calibration,
+robustness, abstention quality, or collective-error reduction. Future work
+should evaluate the observed agreement ordering across additional tasks,
+ensemble compositions, and fully tier-matched provider configurations.
 
 \section*{Data and Code Availability}
 To support reproduction, we release: (i)~the immutable, read-only,
-SHA-256-stamped raw dataset (\texttt{runs.csv}; 54{,}000 logged calls with
-per-call model, seed, prompt hash, timestamp, tokens, cost, and raw response);
-(ii)~the pre-registration and the cryptographic freeze receipt; (iii)~the
-deterministic, seeded analysis pipeline that regenerates every figure and table
-in this paper byte-for-byte, together with a replication check; and (iv)~the
-orchestration harness including the Het-SameTier control configuration. Artifacts
-are archived at [Zenodo / Code Ocean DOI, to be minted on acceptance] and
-mirrored at
-\url{https://github.com/samirrc2/price-of-decorrelation}.
-The dataset SHA-256 and commit hash are recorded in the manuscript's
-supplementary manifest.
+SHA-256-stamped raw dataset (\texttt{runs.csv}), containing 54{,}000 logged
+calls with the per-call model, seed, prompt hash, timestamp, token usage, cost,
+and raw response; (ii)~the pre-registration materials and the cryptographic
+freeze receipt; (iii)~the deterministic, seeded analysis pipeline that
+regenerates every table and figure in this paper, together with a replication
+check; and (iv)~the orchestration harness, including the Het-SameTier control
+configuration. Artifacts are archived at [Zenodo / Code Ocean DOI, to be minted
+on acceptance] and mirrored at
+\url{https://github.com/samirrc2/price-of-decorrelation}. The dataset SHA-256
+hash and analysis commit hash are recorded in the supplementary manifest.
 
 \section*{Acknowledgment}
 The authors thank colleagues and reviewers for feedback.
+
+\section*{Use of Generative AI}
+The authors acknowledge the use of artificial intelligence (AI) tools for the
+preparation of this manuscript. Specifically, OpenAI's ChatGPT (GPT-5, 2025)
+and Anthropic's Claude were employed to support tasks such as text drafting,
+language polishing, formatting guidance, and code review. All outputs from
+these tools were critically examined, verified, and edited by the authors to
+ensure accuracy and originality.
 
 \bibliographystyle{IEEEtran}
 \bibliography{references}
 
 \begin{IEEEbiographynophoto}{Samir Chincholikar}
-Independent researcher. Research interests include large language models,
-multi-agent systems, machine learning evaluation, and reproducible empirical
-methods.
+received the B.E. degree from the University of Mumbai, India, in 2013, the
+M.B.A. degree in finance from the Jamnalal Bajaj Institute of Management
+Studies, University of Mumbai, in 2016, and the M.S. degree in financial
+engineering from the University of Illinois Urbana-Champaign, Urbana, IL, USA,
+in 2019. He has over a decade of professional experience in quantitative risk
+analytics and machine learning in the financial services industry. His research
+interests include large language models, multi-agent systems, machine learning
+evaluation, and reproducible empirical methods in computational finance.
 \end{IEEEbiographynophoto}
 
 \begin{IEEEbiographynophoto}{Robin Chawla}
-Independent researcher. Research interests include large language models,
-systems, and reproducible computational science.
+received the B.Tech. degree in computer science and engineering from the Indian
+Institute of Technology (BHU), Varanasi, India. His research interests include
+large language models, distributed systems, and reproducible computational
+science.
 \end{IEEEbiographynophoto}
+
+\EOD
 
 \end{document}

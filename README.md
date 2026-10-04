@@ -30,6 +30,7 @@ This repository is the frozen dataset and analysis pipeline that regenerates tho
 | **Code repository** | https://github.com/samirrc2/price-of-decorrelation |
 | **Persistent DOI** | Pending Code Ocean / Zenodo / IEEE DataPort deposit (to be inserted here when minted) |
 | **Contact** | Samir Chincholikar: samir.chincholikar@gmail.com; Robin Chawla: robin.chawla.cse14@iitbhu.ac.in |
+| **ORCID** | Samir Chincholikar: https://orcid.org/0009-0007-2779-3492; Robin Chawla: https://orcid.org/0009-0007-2807-3948 |
 
 ### Abstract and role of the artifact
 
