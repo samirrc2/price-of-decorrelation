@@ -392,6 +392,20 @@ _run_gates() {
   _gate figures "$PY" "$CODE_ROOT/src/check_figures.py" || return 1
   echo "[gate] claim values vs the reviewed lock"
   _gate claims-lock "$PY" "$CODE_ROOT/src/check_claims_bound.py" || return 1
+  # The response letter quotes most of the paper's numbers back to the reviewers, and for this
+  # whole revision nothing bound them: substituting 0.455 for the error-correlation contrast
+  # 0.454 passed every gate, because 0.455 is the true value of a different claim. These four
+  # gates bind the letter the way check_binding binds the manuscript, and check its factual
+  # claims about the paper: numbers, section and table pointers, what was added or revised
+  # against the as-submitted tag, and the reference numbers it quotes.
+  echo "[gate] response-letter numbers bound to claims"
+  _gate letter-binding "$PY" "$CODE_ROOT/src/check_letter_binding.py" || return 1
+  echo "[gate] response-letter section, table and figure pointers"
+  _gate letter-sections "$PY" "$CODE_ROOT/src/check_letter_sections.py" || return 1
+  echo "[gate] response-letter claims about what changed"
+  _gate letter-actions "$PY" "$CODE_ROOT/src/check_letter_actions.py" || return 1
+  echo "[gate] freeze timestamps quoted in prose vs the receipts"
+  _gate freeze-timestamps "$PY" "$CODE_ROOT/src/check_freeze_timestamps.py" || return 1
   echo "[gate] unit tests"
   if [[ -d "$CODE_ROOT/tests" ]]; then
     if "$PY" -c "import pytest" >/dev/null 2>&1; then

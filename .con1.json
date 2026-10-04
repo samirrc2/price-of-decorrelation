@@ -40,6 +40,9 @@
     "python3 code/src/check_claims_bound.py",
     "python3 code/src/check_ieee_style.py",
     "python3 code/src/check_letter_refs.py",
+    "python3 code/src/check_letter_actions.py",
+    "python3 code/src/check_letter_sections.py",
+    "python3 code/src/check_letter_binding.py",
     "python3 code/src/check_freeze_timestamps.py",
     "python3 code/src/check_figures.py"
   ],

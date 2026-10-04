@@ -93,8 +93,8 @@ Author response:
 
 Author action:
 
-  - Section V-J, "Cross-Domain Replication: Clinical Knowledge," was revised to add the
-    approximate capability-matched same-provider versus cross-provider comparison.
+  - Section V-J, "Cross-Domain Replication: Clinical Knowledge," is new in this revision and
+    includes the approximate capability-matched same-provider versus cross-provider comparison.
   - Section V-K, "Robustness: Capability-Matched Control," retains the pre-registered financial
     capability control, which preserves approximately 94% of the primary agreement contrast
     while holding model tier approximately constant.
@@ -305,8 +305,8 @@ Author action:
   - Section V-F, "Provider-Pair Agreement," was rewritten as a configuration-specific
     observational analysis and now states explicitly that provider is bundled with other model
     characteristics.
-  - Section V-J, "Cross-Domain Replication: Clinical Knowledge," was revised to include the
-    approximate capability-matched same-provider versus cross-provider comparison.
+  - Section V-J, "Cross-Domain Replication: Clinical Knowledge," is new in this revision and
+    includes the approximate capability-matched same-provider versus cross-provider comparison.
   - Section V-K, "Robustness: Capability-Matched Control," retains the pre-registered financial
     capability control.
   - Section VII, "Threats to Validity," subsection "Heterogeneity vs. capability confound," was
@@ -492,8 +492,8 @@ Author action:
     and paired clustered AURC inference.
   - Section V-H, "Exploratory Analysis of Consensus Errors," was revised to report
     equity-clustered and two-way uncertainty for unanimous incorrect decisions and pile-on.
-  - Section V-C, "Agreement, Error Correlation, and Decorrelation," was revised to report the
-    common-subset error-correlation analysis with HOLD counted as an error.
+  - Section V-C, "Agreement, Error Correlation, and Decorrelation," is new in this revision and
+    reports the common-subset error-correlation analysis with HOLD counted as an error.
   - Section V-G, "Secondary Directional-Accuracy Analysis," retains the directional hit-rate
     analysis as secondary and does not use overlapping marginal Wilson intervals as the
     principal inferential evidence.

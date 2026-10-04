@@ -53,6 +53,9 @@ cp paper/main.pdf submission/main_manuscript.pdf
 python3 code/src/check_ieee_style.py | sed 's/^/   /'
 # Same reason: the letter quotes reference numbers, which exist only in main.bbl.
 python3 code/src/check_letter_refs.py | sed 's/^/   /'
+python3 code/src/check_letter_binding.py | sed 's/^/   /'
+python3 code/src/check_letter_sections.py | sed 's/^/   /'
+python3 code/src/check_letter_actions.py | sed 's/^/   /'
 python3 code/src/check_freeze_timestamps.py | sed 's/^/   /'
 
 echo "== 2/4 Word version =="
