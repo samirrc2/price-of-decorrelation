@@ -162,12 +162,18 @@ def _rewrite_runs(s, macro):
         # whatever follows. In the five-concepts list of Section V-C it opened a visible gap
         # between items 4 and 5 that the clean manuscript does not have. Stripping it closes
         # the gap and changes nothing else, since the space was never part of the text.
+        # The trailing whitespace is moved OUT of the highlight, not deleted. Deleting it closed
+        # the blank-line gap but also welded the run to the next word -- "sectors.Manuscript" in
+        # the title footnote -- and the character-parity check could not see it, because that
+        # check compares alphanumerics only. Emitted after the closing brace, the space is still
+        # in the text and is no longer highlighted, so neither defect occurs.
+        tail = body[len(body.rstrip()):]
         body = body.rstrip()
         if any(tok in body for tok in UNSAFE_IN_RUN) or len(body) > 1200:
-            out.append(r"\DIFplain{" + body + "}")     # keep the text, skip the highlight
+            out.append(r"\DIFplain{" + body + "}" + tail)   # keep the text, skip the highlight
             plain += 1
         else:
-            out.append(macro + box_for_soul(body) + "}")
+            out.append(macro + box_for_soul(body) + "}" + tail)
             hl += 1
         i = e + 1
     return "".join(out), hl, plain
