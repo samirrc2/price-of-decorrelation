@@ -60,11 +60,11 @@ Robin Chawla
 
 \item We agree that reduced agreement alone does not establish a downstream benefit.
 
-\item We added a selective-prediction analysis using mean agent conviction to rank ensemble decisions. AURC is 0.553 for HOM, 0.568 for HET-LITE, and 0.554 for HET. The HOM-HET difference is -0.001 with a 95\% confidence interval of [-0.059, 0.060]. The corresponding two- way interval is [-0.113, 0.115]. Both intervals contain zero.
+\item We added a selective-prediction analysis using mean agent conviction to rank ensemble decisions. AURC is 0.553 for HOM, 0.568 for HET-LITE, and 0.554 for HET. The HOM-HET difference is -0.001 with a 95\% confidence interval of [-0.059, 0.060]. Under two-way equity and date resampling, the interval is [-0.113, 0.115]. Both intervals contain zero.
 
-\item Restricting evaluation to the most confident half of decisions does not materially reduce selective risk in any configuration. We therefore claim no improvement in calibration or abstention quality.
+\item Restricting evaluation to the most confident half of decisions does not materially reduce selective risk in any configuration. We therefore do not claim an improvement in calibration or abstention quality.
 
-\item The exploratory consensus analysis separately evaluates unanimous incorrect decisions and is addressed under Reviewer \#1, Concern \#4.
+\item We also evaluate a separate decision-relevant outcome, unanimous incorrect decisions. HOM produces unanimous incorrect directional decisions at 1.84 times the rate of HET. The equity- clustered 95\% confidence interval is [1.42, 2.52], and the two-way interval is [1.13, 3.06]. Because this analysis is post hoc and no multiplicity adjustment is applied, we treat it as exploratory rather than confirmatory.
 
 \end{itemize}
 
@@ -72,9 +72,11 @@ Robin Chawla
 
 \begin{itemize}
 
-\item Section V-I, ``Cross-Domain Replication: Clinical Knowledge,'' subsection ``Selective Prediction,'' was added to report the risk-coverage analysis and clustered AURC contrast.
+\item Section V-I, ``Cross-Domain Replication: Clinical Knowledge,'' subsection ``Selective Prediction,'' was added to report the risk-coverage analysis and uncertainty for the HOM-HET AURC contrast.
 
-\item Section V-D, ``The Agreement-Cost Frontier,'' was revised to state explicitly that the frontier describes the cost of greater behavioral diversity and does not establish improved downstream decision quality.
+\item Section V-H, ``Exploratory Analysis of Consensus Errors,'' was revised to report the unanimous- incorrect ratio with equity-clustered and two-way confidence intervals and to state explicitly that the analysis is exploratory.
+
+\item Section V-D, ``The Agreement-Cost Frontier,'' was revised to state that the frontier quantifies the cost associated with greater behavioral diversity and does not by itself establish improved downstream decision quality.
 
 \end{itemize}
 
@@ -91,11 +93,11 @@ Robin Chawla
 
 \item A fully three-provider tier-matched design remains unavailable because an equivalent efficient-tier xAI model was not available.
 
-\item We therefore added an additional capability comparison in the clinical replication. Within the fully heterogeneous configuration, one same-provider pair and one cross-provider pair have nearly identical mean member accuracy, 0.951 and 0.955 respectively.
+\item We added an additional capability comparison in the clinical replication. Within the fully heterogeneous configuration, one same-provider pair and one cross-provider pair have nearly identical mean member accuracy, 0.951 and 0.955 respectively.
 
 \item Their error correlations are 0.954 and 0.607, a difference of 0.347 with a 95\% confidence interval of [0.207, 0.507].
 
-\item We describe this as approximate capability matching. Provider remains confounded with other model-specific characteristics and is not identified as an independent causal factor.
+\item We describe this as approximate capability matching. It reduces the capability confound but does not eliminate the broader confounding between provider and other model-specific characteristics. We therefore do not identify provider as an independent causal factor.
 
 \end{itemize}
 
@@ -103,11 +105,11 @@ Robin Chawla
 
 \begin{itemize}
 
-\item Section V-I, ``Cross-Domain Replication: Clinical Knowledge,'' was revised to add the approximate capability-matched provider comparison.
+\item Section V-I, ``Cross-Domain Replication: Clinical Knowledge,'' was revised to add the approximate capability-matched same-provider versus cross-provider comparison.
 
-\item Section V-J, ``Robustness: Capability-Matched Control,'' retains the pre-registered financial tier-matched analysis and states explicitly that matching is approximate and covers only two providers.
+\item Section V-J, ``Robustness: Capability-Matched Control,'' retains the pre-registered financial capability control, which preserves approximately 94\% of the primary agreement contrast while holding model tier approximately constant.
 
-\item Section VII, ``Threats to Validity,'' subsection ``Heterogeneity vs. capability confound,'' was revised to retain the unresolved provider and capability limitations.
+\item Section VII, ``Threats to Validity,'' subsection ``Heterogeneity vs. capability confound,'' was revised to state explicitly that provider remains confounded with model identity, training data, architecture, alignment, and effective capability.
 
 \end{itemize}
 
@@ -124,11 +126,13 @@ Robin Chawla
 
 \item We added a pre-registered replication on a substantially different clinical-knowledge task using 537 questions from the MMLU professional-medicine and clinical-knowledge subsets.
 
-\item The response structure changes from three financial labels to four answer options with one correct answer. The five-agent structure, three configurations, seeding procedure, temperature, number of runs, and estimators remain unchanged.
+\item The response structure changes from the three BUY, HOLD, and SELL labels used in finance to four answer options with one correct answer. The five-agent structure, three configurations, seeding procedure, temperature, number of runs, and estimators remain unchanged.
 
-\item The directional ordering reproduces. Agreement decreases by delta-kappa = 0.072 with a 95\% confidence interval of [0.040, 0.104], compared with 0.336 in finance. Error correlation decreases by delta-phi = 0.393 with a 95\% confidence interval of [0.325, 0.459], compared with 0.454 in finance.
+\item The ordering reproduces. Agreement decreases by delta-kappa = 0.072 with a 95\% confidence interval of [0.040, 0.104], compared with 0.336 in finance. Error correlation decreases by delta-phi = 0.393 with a 95\% confidence interval of [0.325, 0.459], compared with 0.454 in finance.
 
-\item We have not varied ensemble size or aggregation rule and now identify those remaining dimensions explicitly as limitations.
+\item The agreement contrast therefore changes substantially more across the two tasks than the error-correlation contrast. We do not claim that the magnitude is invariant across domains.
+
+\item Ensemble size, aggregation rule, prompt format, and the particular model mixtures remain fixed and are stated explicitly as limitations.
 
 \end{itemize}
 
@@ -136,11 +140,11 @@ Robin Chawla
 
 \begin{itemize}
 
-\item Section V-I, ``Cross-Domain Replication: Clinical Knowledge,'' was added to report the pre- registered clinical replication.
+\item Section V-I, ``Cross-Domain Replication: Clinical Knowledge,'' was added to report the pre- registered 537-item clinical replication.
 
-\item Section VII, ``Threats to Validity,'' subsection ``Scope and generalizability,'' was revised to state which dimensions were replicated and which remain fixed.
+\item Section VII, ``Threats to Validity,'' subsection ``Scope and generalizability,'' was revised to distinguish the dimensions tested across domains from those that remain fixed.
 
-\item The replication pre-registration and freeze receipt were added to the released reproducibility materials.
+\item The clinical replication pre-registration and freeze receipt were added to the released reproducibility materials.
 
 \end{itemize}
 
@@ -155,13 +159,13 @@ Robin Chawla
 
 \begin{itemize}
 
-\item We now treat this analysis explicitly as exploratory.
+\item We now treat the consensus analysis explicitly as exploratory.
 
-\item The HOM-to-HET unanimous-incorrect ratio is 1.84. The equity-clustered 95\% confidence interval is [1.42, 2.52]. Under the two-way equity and date resampling scheme, the interval is [1.13, 3.06]. Both exclude unity.
+\item The HOM-to-HET unanimous-incorrect ratio is 1.84. The equity-clustered 95\% confidence interval is [1.42, 2.52]. Under two-way equity and date resampling, the interval is [1.13, 3.06]. Both exclude unity.
 
-\item The comparison and statistic were selected after inspection of the data, multiple related comparisons were available, and no multiplicity adjustment is applied. The manuscript therefore does not treat these intervals as confirmatory evidence.
+\item The statistic and configuration comparison were selected after inspection of the data, multiple related comparisons were available, and no multiplicity adjustment is applied. The intervals are therefore not interpreted as confirmatory evidence.
 
-\item HET-LITE is no longer presented as a recommended design. Its observed cost efficiency is treated only as a hypothesis for prospective evaluation.
+\item HET-LITE is no longer presented as a recommended ensemble design. Its observed cost efficiency is treated only as a hypothesis for prospective confirmatory evaluation.
 
 \end{itemize}
 
@@ -169,9 +173,9 @@ Robin Chawla
 
 \begin{itemize}
 
-\item Section V-H, ``Exploratory Analysis of Consensus Errors,'' was revised to add equity-clustered and two-way uncertainty for the unanimous-incorrect ratio.
+\item Section V-H, ``Exploratory Analysis of Consensus Errors,'' was revised to report equity- clustered and two-way uncertainty for the unanimous-incorrect ratio.
 
-\item Section V-H was also revised to add the post hoc and multiplicity caveats and to remove the HET-LITE deployment recommendation.
+\item Section V-H was also revised to state the post hoc status of the analysis, note the absence of multiplicity adjustment, and remove the HET-LITE design recommendation.
 
 \item Section VI, ``Discussion,'' was revised so that the HET-LITE result is described as hypothesis- generating rather than deployment guidance.
 
@@ -188,13 +192,13 @@ Robin Chawla
 
 \begin{itemize}
 
-\item We added a sensitivity analysis that separates pairwise agreement according to whether two agents use the same model.
+\item We added a sensitivity analysis separating pairwise agreement according to whether the two agents use the same model.
 
 \item Same-model agreement is 0.800 in HOM, 0.794 in HET-LITE, and 0.862 in HET. Different-model agreement is 0.455 in HET-LITE and 0.490 in HET.
 
-\item Same-model agreement remains high across configurations, while different-model pairs exhibit substantially lower agreement.
+\item Same-model agreement remains high across configurations, while different-model pairs exhibit substantially lower agreement. The reduction in ensemble agreement is therefore associated with the introduction of different-model pairs rather than a systematic decline in agreement among repeated instances of the same model.
 
-\item We also clarify that distinct per-agent seeds remove the demonstrated shared-seed artifact but do not establish statistical independence of model responses.
+\item We also clarify that assigning distinct seeds removes the specific shared-seed artifact observed in the pilot but does not establish statistical independence of model responses.
 
 \end{itemize}
 
@@ -202,11 +206,13 @@ Robin Chawla
 
 \begin{itemize}
 
-\item Section V-E, ``Shared-Seed Dependence and Measurement Validation,'' subsection ``Sensitivity: agreement by pair type,'' was added.
+\item Section V-E, ``Shared-Seed Dependence and Measurement Validation,'' subsection ``Sensitivity: agreement by pair type,'' was added to report the same-model and different-model pairwise agreement results.
 
-\item Section V-E, subsection ``What unique seeds do and do not establish,'' was added to state explicitly that distinct seeds do not prove independence.
+\item Section V-E, subsection ``What unique seeds do and do not establish,'' was added to state explicitly that distinct per-agent seeds do not prove statistical independence.
 
-\item Figure 2 was revised to describe the change as assignment of a distinct reproducible seed to each agent rather than restoration of statistical independence.
+\item Figure 2 was revised to describe the change as assignment of a distinct reproducible seed to each agent and explicitly states that this does not establish statistical independence.
+
+\item Table 6 retains the within-run versus cross-run diagnostic and identifies the heterogeneous results as secondary consistency checks rather than direct independence tests.
 
 \end{itemize}
 
@@ -221,9 +227,11 @@ Robin Chawla
 
 \begin{itemize}
 
-\item We clarified the cost calculation. For each call, metered prompt and completion tokens are priced using the rates in the model registry. Costs are summed across the five agents in an ensemble decision and averaged across cells.
+\item We clarified the cost calculation. For each model call, metered prompt and completion tokens are priced using the per-million-token rates reported in the model registry.
 
-\item The resulting costs are \$6.48 x 10\textasciicircum{}-4 for HOM, \$1.52 x 10\textasciicircum{}-3 for HET-LITE, and \$2.84 x 10\textasciicircum{}-3 for HET. The HOM-to-HET cost ratio is approximately 4.4x.
+\item Costs are summed across the five agents within each ensemble decision and then averaged across cells within each configuration.
+
+\item The resulting costs are \$6.48 x 10\textasciicircum{}-4 for HOM, \$1.52 x 10\textasciicircum{}-3 for HET-LITE, and \$2.84 x 10\textasciicircum{}-3 for HET. Moving from HOM to HET therefore increases inference cost by approximately 4.4x.
 
 \item Prices are fixed at those applicable during data collection. No discount, batching, or caching adjustment is applied. Failed requests returning no billable completion are excluded.
 
@@ -235,7 +243,7 @@ Robin Chawla
 
 \item Section V-D, ``The Agreement-Cost Frontier,'' was revised to state the token accounting, aggregation, and pricing assumptions explicitly.
 
-\item Table 4 reports the corresponding per-ensemble-decision costs for all three configurations.
+\item Table 4 reports the corresponding per-ensemble-decision cost for each of the three configurations.
 
 \end{itemize}
 
@@ -258,7 +266,7 @@ Robin Chawla
 
 \begin{itemize}
 
-\item The manuscript Index Terms were revised to: algorithmic monoculture, inter-rater agreement, large language models, model heterogeneity, and multi-agent systems. They are given in alphabetical order, as the IEEE Editorial Style Manual requires.
+\item The manuscript Index Terms were revised to: algorithmic monoculture, inter-rater agreement, large language models, model heterogeneity, and multi-agent systems. They are listed in alphabetical order, which the IEEE Editorial Style Manual requires of Index Terms.
 
 \end{itemize}
 
@@ -277,7 +285,7 @@ Robin Chawla
 
 \item Existing methods such as mixture-of-agents, multi-agent debate, and diversity-based ensemble selection are generally evaluated through downstream performance. The present study instead measures how ensemble composition changes output agreement, error dependence, and inference cost under fixed task conditions.
 
-\item The contribution is therefore a measurement framework that separates output agreement from error correlation, controls the shared-seed artifact, quantifies uncertainty, and incorporates inference cost.
+\item The relevant comparison is therefore methodological. The study separates output agreement from error correlation, controls the shared-seed artifact observed in repeated model sampling, quantifies statistical uncertainty, and incorporates inference cost.
 
 \end{itemize}
 
@@ -285,9 +293,9 @@ Robin Chawla
 
 \begin{itemize}
 
-\item Section V-L, ``Relation to Existing Ensemble Methods,'' was added to explain the appropriate basis of comparison with existing ensemble approaches.
+\item Section V-L, ``Relation to Existing Ensemble Methods,'' was added to explain the basis of comparison with existing ensemble approaches.
 
-\item Section II-A, ``LLM Ensembles and Mixture-of-Agents,'' provides the corresponding literature context for diversity-based and heterogeneous ensemble approaches.
+\item Section II-A, ``LLM Ensembles and Mixture-of-Agents,'' provides the corresponding literature context for mixture-of-agents, diversity-based selection, and heterogeneous ensemble approaches.
 
 \end{itemize}
 
@@ -302,11 +310,13 @@ Robin Chawla
 
 \begin{itemize}
 
-\item We agree that provider is not experimentally separable from model identity, training data, architecture, alignment procedure, and other model-specific characteristics in the primary design.
+\item We agree that provider is not experimentally separable from model identity, capability, training data, architecture, alignment procedure, and other model-specific characteristics in the primary design.
 
 \item We therefore interpret the provider comparisons as configuration-specific observational findings rather than isolated causal provider effects.
 
-\item The pre-registered capability-matched financial control preserves approximately 94\% of the primary agreement contrast. The clinical replication additionally provides an approximate capability-matched provider comparison with nearly identical member accuracy.
+\item The pre-registered financial capability control preserves approximately 94\% of the primary agreement contrast when model tier is held approximately constant across OpenAI and Google.
+
+\item The clinical replication provides an additional approximate capability-matched comparison. One same-provider pair and one cross-provider pair have mean member accuracy of 0.951 and 0.955 respectively, while their error correlations are 0.954 and 0.607.
 
 \item These analyses narrow the capability confound but do not identify provider as an independent causal factor.
 
@@ -322,7 +332,7 @@ Robin Chawla
 
 \item Section V-J, ``Robustness: Capability-Matched Control,'' retains the pre-registered financial capability control.
 
-\item Section VII, ``Threats to Validity,'' subsection ``Heterogeneity vs. capability confound,'' was revised to state that provider cannot be isolated causally in the present design.
+\item Section VII, ``Threats to Validity,'' subsection ``Heterogeneity vs. capability confound,'' was revised to state explicitly that provider cannot be isolated causally in the present design.
 
 \end{itemize}
 
@@ -337,13 +347,15 @@ Robin Chawla
 
 \begin{itemize}
 
-\item Equity remains the pre-registered primary resampling unit because repeated dates are nested within securities. Analysis date is treated as a second crossed source of dependence.
+\item Equity remains the pre-registered primary resampling unit because repeated observations are nested within securities. Analysis date is treated as a second crossed source of dependence because all securities evaluated on a date share common market conditions.
 
-\item For the primary contrast, the point estimate is 0.3363 under all resampling schemes. The 95\% intervals are [0.3035, 0.3689] under equity clustering, [0.2989, 0.3656] under date clustering, and [0.2786, 0.3877] under two-way resampling. All exclude zero.
+\item For the primary HOM-HET agreement contrast, the point estimate is 0.3363 under all three resampling schemes. The 95\% confidence intervals are [0.3035, 0.3689] under equity clustering, [0.2989, 0.3656] under date clustering, and [0.2786, 0.3877] under two-way resampling. All exclude zero.
 
-\item Two-way sensitivity analysis is also reported for the inferential exploratory contrasts. The unanimous-incorrect ratio has an interval of [1.13, 3.06], the pile-on contrast has [0.140, 0.232], and the AURC contrast has [-0.113, 0.115].
+\item We also applied two-way sensitivity analysis to the exploratory contrasts carrying inferential claims. The unanimous-incorrect ratio has a two-way interval of [1.13, 3.06]. The pile-on contrast has an interval of [0.140, 0.232]. The AURC contrast has an interval of [-0.113, 0.115].
 
-\item The error-correlation contrasts also retain their conclusions under two-way resampling, as reported under Reviewer \#3, Concern \#3.
+\item The error-correlation results also remain resolved under two-way resampling. The main phi contrast has a two-way interval of [0.328, 0.586], and the common-subset specification that counts HOLD as an error has an interval of [0.227, 0.387].
+
+\item The bootstrap implementation was also corrected so that repeated sampled equities retain their multiplicity. The equity-clustered result now reproduces the pre-registered primary interval exactly.
 
 \end{itemize}
 
@@ -351,13 +363,13 @@ Robin Chawla
 
 \begin{itemize}
 
-\item Section III-D, ``Uncertainty Quantification,'' was revised to justify equity clustering formally and to define the date-clustered and two-way resampling procedures.
+\item Section III-D, ``Uncertainty Quantification,'' was revised to justify equity clustering and define the date-clustered and two-way resampling procedures.
 
 \item Table 5 was added to report the primary HOM-HET contrast under equity, date, and two-way resampling.
 
 \item Section V-C, ``Agreement, Error Correlation, and Decorrelation,'' was revised to report two-way sensitivity intervals for both error-correlation specifications.
 
-\item Section V-H, ``Exploratory Analysis of Consensus Errors,'' was revised to report two-way intervals for the unanimous-incorrect ratio and pile-on contrast.
+\item Section V-H, ``Exploratory Analysis of Consensus Errors,'' was revised to report two-way uncertainty for the unanimous-incorrect ratio and pile-on contrast.
 
 \item Section V-I, subsection ``Selective Prediction,'' was revised to report the two-way AURC interval.
 
@@ -376,11 +388,13 @@ Robin Chawla
 
 \item We took the second option and now measure error dependence directly.
 
-\item For every pair of agents within a cell, we compute phi between binary error indicators. Error correlation decreases from 0.984 for HOM to 0.742 for HET-LITE and 0.530 for HET. The HOM-HET contrast is 0.454 with a 95\% confidence interval of [0.376, 0.534]. The two-way interval is [0.328, 0.586].
+\item For every pair of agents within an ensemble cell, we compute phi between binary error indicators. Error correlation decreases from 0.984 for HOM to 0.742 for HET-LITE and 0.530 for HET. The HOM-HET contrast is 0.454 with a 95\% confidence interval of [0.376, 0.534]. Under two-way resampling, the interval is [0.328, 0.586].
 
-\item We repeat the analysis with HOLD counted as an error so that all configurations use the same evaluated subset. The corresponding contrast is 0.309 with a 95\% confidence interval of [0.262, 0.354]. The two-way interval is [0.227, 0.387].
+\item Because treating HOLD as an abstention changes the evaluated subset, we repeat the analysis with HOLD counted as an error. The corresponding HOM-HET contrast is 0.309 with a 95\% confidence interval of [0.262, 0.354]. The two-way interval is [0.227, 0.387].
 
-\item The manuscript now distinguishes output agreement, error correlation, sampling independence, model diversity, and provider diversity. Decorrelation is defined specifically as a reduction in error correlation measured by phi, while kappa is retained as the agreement measure.
+\item Mean per-agent error rates remain similar across configurations, so the decline in phi reflects lower error dependence rather than differences in average correctness.
+
+\item The manuscript now distinguishes output agreement, error correlation, sampling independence, model diversity, and provider diversity. Decorrelation is defined specifically as a reduction in error correlation measured by phi, while kappa measures categorical agreement.
 
 \end{itemize}
 
@@ -390,11 +404,11 @@ Robin Chawla
 
 \item Section V-C, ``Agreement, Error Correlation, and Decorrelation,'' was added to define the five concepts and report the phi analysis under both treatments of HOLD.
 
-\item Section V-A was retitled ``Heterogeneity Reduces Ensemble Agreement (Primary)'' so that the kappa result is no longer described as decorrelation.
+\item Section V-A was retitled ``Heterogeneity Reduces Ensemble Agreement (Primary)'' so that the kappa result is described explicitly as an agreement result.
 
-\item The Abstract was revised to report the phi contrast alongside the kappa contrast.
+\item The Abstract was revised to report the phi contrast alongside the kappa contrast and to distinguish reduced error dependence from reduced agreement.
 
-\item Section VI, ``Discussion,'' and Section VIII, ``Conclusion,'' were revised so that claims about decorrelation refer to error dependence rather than categorical agreement.
+\item Section VI, ``Discussion,'' and Section VIII, ``Conclusion,'' were revised so that decorrelation claims refer to error dependence rather than categorical agreement. The Conclusion now states that model diversity can reduce both output agreement and error correlation.
 
 \end{itemize}
 
@@ -409,15 +423,15 @@ Robin Chawla
 
 \begin{itemize}
 
-\item The selective-prediction analysis reports a HOM-HET AURC difference of -0.001 with a 95\% equity-clustered confidence interval of [-0.059, 0.060] and a two-way interval of [-0.113, 0.115].
+\item We added a selective-prediction analysis using mean agent conviction to rank decisions. The HOM-HET AURC difference is -0.001 with a 95\% equity-clustered confidence interval of [-0.059, 0.060]. The corresponding two-way interval is [-0.113, 0.115]. Both contain zero.
 
 \item The unanimous-incorrect ratio is 1.84 with an equity-clustered interval of [1.42, 2.52] and a two-way interval of [1.13, 3.06].
 
 \item For pile-on, the HOM-HET difference is 0.189 with an equity-clustered interval of [0.160, 0.216] and a two-way interval of [0.140, 0.232].
 
-\item The error-correlation analysis is also reported with HOLD counted as an error, which fixes the evaluated subset across configurations.
+\item We also report error correlation with HOLD counted as an error, which fixes the evaluated subset across configurations. The resulting HOM-HET phi contrast is 0.309 with a 95\% confidence interval of [0.262, 0.354] and a two-way interval of [0.227, 0.387].
 
-\item Wilson intervals are retained only for the descriptive secondary accuracy analysis and are no longer the primary inferential evidence.
+\item Wilson intervals are retained only in the descriptive secondary accuracy analysis and are no longer the principal inferential evidence.
 
 \end{itemize}
 
@@ -427,11 +441,11 @@ Robin Chawla
 
 \item Section V-I, subsection ``Selective Prediction,'' was added to report risk-coverage analysis and paired clustered AURC inference.
 
-\item Section V-H, ``Exploratory Analysis of Consensus Errors,'' was revised to report clustered and two-way uncertainty for unanimous-incorrect decisions and pile-on.
+\item Section V-H, ``Exploratory Analysis of Consensus Errors,'' was revised to report equity- clustered and two-way uncertainty for unanimous incorrect decisions and pile-on.
 
 \item Section V-C, ``Agreement, Error Correlation, and Decorrelation,'' was revised to report the common-subset error-correlation analysis with HOLD counted as an error.
 
-\item Section V-G, ``Secondary Directional-Accuracy Analysis,'' now treats the accuracy results as secondary and does not rely on marginal Wilson intervals as the principal inferential evidence.
+\item Section V-G, ``Secondary Directional-Accuracy Analysis,'' retains the directional hit-rate analysis as secondary and does not use overlapping marginal Wilson intervals as the principal inferential evidence.
 
 \end{itemize}
 
@@ -446,15 +460,15 @@ Robin Chawla
 
 \begin{itemize}
 
-\item The manuscript now states explicitly that distinct per-agent seeds remove the demonstrated shared-seed artifact but do not prove statistical independence.
+\item The manuscript now states explicitly that assigning distinct per-agent seeds removes the demonstrated shared-seed artifact but does not establish statistical independence.
 
-\item The confirmatory grid contains 54,000 valid planned responses. Completing it required 94,566 API requests. Of the 40,566 unsuccessful requests, 40,544 were rate-limit or quota responses and 22 were transport or schema failures.
+\item The confirmatory grid contains 54,000 planned responses, all of which ultimately returned valid outputs. Completing the grid required 94,566 API requests. Of the 40,566 unsuccessful requests, 40,544 were rate-limit or quota responses and 22 were transport or schema failures.
 
-\item Every request attempt is retained in the released log. The reproducibility materials contain the request settings, prompts, prompt hashes, model identifiers, prices, experimental configuration, pre-registration records, and archived model responses.
+\item Every request attempt is retained in the released log. The reproducibility materials contain request settings, complete prompts, prompt hashes, model identifiers, seeds, prices, experimental configuration, pre-registration records, archived responses, and the frozen analysis materials.
 
-\item Figure 3 now contains only the two like-for-like pilot HOM-HET agreement contrasts. The contrast is 0.485 under a shared seed and 0.113 under distinct per-agent seeds.
+\item Figure 3 now contains only two like-for-like pilot quantities. Both measure the HOM-HET agreement contrast on the same pilot grid and model set. The contrast is 0.485 under a shared seed and 0.113 under distinct per-agent seeds.
 
-\item The full-study within-minus-cross-run diagnostic is reported separately in Table 6 and is no longer mixed with the Figure 3 estimand.
+\item The full-study within-minus-cross-run diagnostic is reported separately in Table 6 and is no longer combined with the Figure 3 estimand.
 
 \end{itemize}
 
@@ -462,21 +476,21 @@ Robin Chawla
 
 \begin{itemize}
 
-\item Section III-C, ``Independent-Draw Estimand,'' was revised to state the seeding construction and the limits of seed-based reproducibility.
+\item Section III-C, ``Independent-Draw Estimand,'' was revised to document the per-agent seed construction and the limits of seed-based reproducibility.
 
-\item Section IV-C, ``Models,'' records the provider and model identifiers and fixed inference settings.
+\item Section IV-C, ``Models,'' records the model identifiers, provider assignments, inference settings, timestamps, seeds, prompt hashes, token usage, costs, and archived responses.
 
-\item Section IV-D, ``Pre-Registration, Freezing, and Reproducibility,'' documents the frozen design, hashes, archived dataset, and deterministic analysis pipeline.
+\item Section IV-D, ``Pre-Registration, Freezing, and Reproducibility,'' documents the frozen design, pre-registration hash, immutable dataset, and deterministic analysis pipeline.
 
-\item Section IV-E, ``Collection Provenance and Retry Accounting,'' was added to report the 94,566 attempted requests, 54,000 valid outputs, failure breakdown, and retained attempt logs.
+\item Section IV-E, ``Collection Provenance and Retry Accounting,'' was added to report the 94,566 attempted requests, 54,000 valid outputs, failure breakdown, and retained attempt history.
 
-\item Section V-E, ``Shared-Seed Dependence and Measurement Validation,'' was revised to distinguish the shared-seed artifact from statistical independence.
+\item Section V-E, ``Shared-Seed Dependence and Measurement Validation,'' was revised to distinguish removal of the shared-seed artifact from proof of statistical independence.
 
-\item Figure 2 was revised to describe the distinct per-agent seed construction without claiming independence.
+\item Figure 2 was revised to show the distinct per-agent seed construction and explicitly state that this does not establish statistical independence.
 
 \item Figure 3 was reduced to the two directly comparable pilot HOM-HET agreement contrasts.
 
-\item Table 6 reports the full-study within versus cross-run residual dependence diagnostic separately.
+\item Table 6 reports the full-study within-run versus cross-run diagnostic separately.
 
 \end{itemize}
 
@@ -491,15 +505,17 @@ Robin Chawla
 
 \begin{itemize}
 
-\item We added a pre-registered replication using 537 MMLU professional-medicine and clinical- knowledge questions. Chance performance is 25\%, and the evaluated models perform substantially above that level.
+\item We added a pre-registered replication using 537 questions from the MMLU professional-medicine and clinical-knowledge subsets.
 
-\item The response structure contains four options rather than the three BUY, HOLD, and SELL labels. Choice order is shuffled deterministically to remove positional imbalance in the published answer key.
+\item The task has four response options with one correct answer rather than the three BUY, HOLD, and SELL labels used in the financial experiment. Chance performance is 25\%, and the evaluated models perform substantially above that level.
+
+\item Choice order is shuffled deterministically within each item to remove positional imbalance in the published answer key.
 
 \item The main ordering reproduces. Agreement decreases by delta-kappa = 0.072 with a 95\% confidence interval of [0.040, 0.104], while error correlation decreases by delta-phi = 0.393 with a 95\% confidence interval of [0.325, 0.459].
 
-\item Agreement changes substantially more across the two domains than error correlation. We therefore do not claim that the magnitude is invariant across domains.
+\item The agreement contrast is substantially smaller than in finance, while the error-correlation contrast attenuates much less. We therefore report the cross-domain replication without claiming that the magnitude is invariant across tasks.
 
-\item Prompt format, five-agent ensemble size, majority-vote aggregation, and the tested model mixtures remain fixed and are identified explicitly as limitations.
+\item Prompt format, five-agent ensemble size, majority-vote aggregation, and the tested model mixtures remain fixed and are stated explicitly as limitations.
 
 \end{itemize}
 
@@ -509,7 +525,7 @@ Robin Chawla
 
 \item Section V-I, ``Cross-Domain Replication: Clinical Knowledge,'' was added to report the pre- registered 537-item clinical replication.
 
-\item Section VII, ``Threats to Validity,'' subsection ``Scope and generalizability,'' was revised to state explicitly that the result has been evaluated across two substantially different tasks while prompt format, ensemble size, aggregation rule, and model mixtures remain fixed.
+\item Section VII, ``Threats to Validity,'' subsection ``Scope and generalizability,'' was revised to state that the ordering has been evaluated across two substantially different tasks while prompt format, ensemble size, aggregation rule, and model mixtures remain fixed.
 
 \item The clinical replication pre-registration and freeze receipt were added to the released reproducibility materials.
 
