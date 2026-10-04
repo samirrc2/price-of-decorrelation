@@ -1,6 +1,6 @@
 # Archive manifest — confirmatory dataset
 
-- file: `runs.csv`
+- file: `data/confirmatory/runs.csv`
 - SHA-256: `8a1f5fc78482e87cb7ef5825c6a9425eb377bc80a7a60eb0febf61e70e5c0ee1`
 - rows (incl. retries): 94566   usable (ok): 54000
 - frozen read-only (0444): yes

@@ -1,0 +1,10 @@
+{
+  "kind": "minipilot",
+  "data_date": "20260703",
+  "note": "Pilot / gate.",
+  "files": {
+    "runs.csv": "96cdf3f318d1ca35f76bc31aa5c7c99aa09983a135047b5fd7e7475951f35e57",
+    "spend_ledger.json": "de3b8fc4afc87d315e423d5afa45ea9e2fc7fda31354c53b9ee27241d9a2c9e8"
+  },
+  "written_utc": "2026-07-23T20:35:26.727306+00:00"
+}

@@ -1,0 +1,15 @@
+{
+  "kind": "temperature_robustness_small",
+  "data_date": "20260704",
+  "note": "Small T-check subgrid; not a full temperature study.",
+  "files": {
+    "run_manifest.json": "3d5d7a8af2694a3b5407295ce7ca29d27ca0b878c5dfadde6234f55e059dbcfe",
+    "runs_T00.csv": "d75ea6684ba3c0590934954fa2cc9ee2b8a9f09ec462fe3699c8a0dd14015629",
+    "runs_T00_ledger.json": "c19c6e7419d3c0a8620a47d34e6aa7ef45e279587d6bf21915142cf1fd7ed543",
+    "runs_T07.csv": "4bbe826aa79720b7484f8e17263df46b75790399f026bc3524eaff6982272785",
+    "runs_T07_ledger.json": "2903efea3efa417129f8807a4630369604bf41a9b83848c04b00d577f1164aff",
+    "runs_T10.csv": "8dbfff594d2f1761c7f1e529700b8948ed085ff1b15ddeecb8340146ec62ea83",
+    "runs_T10_ledger.json": "e5528cb1b2d3cddf005d7a8652b73ae5c28fb5ab647e3c78eadc20595ced624c"
+  },
+  "written_utc": "2026-07-23T20:35:26.729733+00:00"
+}

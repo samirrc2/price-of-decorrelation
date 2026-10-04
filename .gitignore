@@ -5,12 +5,29 @@ keys.env.txt
 *.pem
 **/API Keys/
 
-# python virtualenv + caches (installed deps, not source)
+# python virtualenv + caches
 .venv/
 venv/
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
+.pytest_cache/
 
 # OS / editor cruft
 .DS_Store
+
+# Transient / bulky — not required to reproduce from frozen CSVs
+cache/
+data/raw/
+results/
+
+# LaTeX build products (source stays under paper/)
+paper/*.pdf
+paper/*.aux
+paper/*.bbl
+paper/*.blg
+paper/*.log
+paper/*.out
+paper/*.toc
+paper/generated_tables/
+paper/pdf_extract.txt

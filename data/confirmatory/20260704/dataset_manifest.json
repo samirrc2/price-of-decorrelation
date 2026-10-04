@@ -1,0 +1,10 @@
+{
+  "kind": "confirmatory",
+  "data_date": "20260704",
+  "note": "Main study; call timestamps span 2026-07-03..2026-07-04 (folder = completion day).",
+  "files": {
+    "runs.csv": "8a1f5fc78482e87cb7ef5825c6a9425eb377bc80a7a60eb0febf61e70e5c0ee1",
+    "spend_ledger.json": "c858b0baa4ed8e43d205c92c404fb1a1aeebb78d89747918a6c846e2fe8e7252"
+  },
+  "written_utc": "2026-07-23T20:35:26.708616+00:00"
+}

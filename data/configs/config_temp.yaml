@@ -1,0 +1,106 @@
+# =============================================================================
+# TEMPERATURE-SENSITIVITY ROBUSTNESS CHECK  (reviewer point #3)
+# A small STRATIFIED subgrid, run at T in {0.0, 0.7, 1.0} to show that the
+# de-correlation ordering (HOM > HET-LITE > HET) is stable in direction across
+# temperature. This is a documented pre-registration AMENDMENT and is written to
+# its OWN files (data/temperature_robustness_small/<YYYYMMDD>/...) — it NEVER
+# touches the frozen study runs.csv. Not a full temperature study — qualitative
+# robustness only.
+#
+# Run once per temperature, each to a separate output file:
+#   python code/src/orchestrator.py --config configs/config_temp.yaml --phase full \
+#          --temperature 0.0 --runs-csv data/temperature_robustness_small/latest/runs_T00.csv
+#   ...
+# then:  python code/src/temp_analyze.py
+# (or just run:  bash code/scripts/run_temp_sweep.sh)
+# =============================================================================
+
+seed_master: 20260703        # same master as the main study (independent-draw seeds)
+bootstrap_seed: 42
+seed_mode: per_agent
+temperature: 0.7             # default; overridden per run via --temperature
+runs: 3
+seeds: [101, 202, 303]
+
+forward_return_days: 20
+
+# 8-ticker stratified subgrid (1 per sector, matches the Phase-1.5 mini-pilot cells)
+tickers: [AAPL, MSFT, JPM, XOM, UNH, CAT, GOOGL, PG]
+
+# 2 dates spanning distinct regimes (AI-capex peak; energy supply-shock phase)
+dates: ["2026-04-17", "2026-05-15"]
+
+date_regimes:
+  "2026-04-17": "Q1 2026 earnings / AI-capex peak."
+  "2026-05-15": "Energy supply-shock phase; defensive rotation."
+
+# Same 3 configs as the main study (5 agents each).
+configs:
+  HOM:
+    - {model: gpt-5.4-nano}
+    - {model: gpt-5.4-nano}
+    - {model: gpt-5.4-nano}
+    - {model: gpt-5.4-nano}
+    - {model: gpt-5.4-nano}
+  HET-LITE:
+    - {model: gpt-5.4-nano}
+    - {model: gpt-5.4-nano}
+    - {model: gpt-5.4-nano}
+    - {model: gpt-5.4-nano}
+    - {model: gemini-3.5-flash}
+  HET:
+    - {model: gpt-5.4-nano}
+    - {model: gpt-5.4-nano}
+    - {model: gemini-3.5-flash}
+    - {model: gemini-3.5-flash}
+    - {model: grok-4.3}
+
+heterogeneity_level: {HOM: 0, HET-LITE: 1, HET: 3}
+
+# Model registry (identical strings/pricing to the frozen study).
+models:
+  gpt-5.4-nano:
+    provider: openai
+    api_model: "gpt-5.4-nano"
+    knowledge_cutoff: "2025-08-01"
+    price_in: 0.20
+    price_out: 1.25
+    max_tokens: 256
+  gemini-3.5-flash:
+    provider: google
+    api_model: "gemini-3.5-flash"
+    knowledge_cutoff: "2025-01-01"
+    price_in: 1.5
+    price_out: 9.0
+    max_tokens: 256
+  grok-4.3:
+    provider: xai
+    api_model: "grok-4.3"
+    knowledge_cutoff: "2025-06-01"
+    price_in: 1.25
+    price_out: 2.50
+    max_tokens: 256
+    reasoning_effort: "low"
+
+# Grid size per temperature: 8 tickers x 2 dates x 3 configs x 3 runs x 5 agents
+#   = 720 calls per T; x3 temperatures = 2,160 calls total (~$2-4).
+spend_cap_usd: 15.0
+stop_margin_usd: 0.5
+max_retries: 5
+concurrency: 16
+
+rpm_limits:
+  openai: 450
+  google: 250
+  xai: 300
+
+# gemini calls per T = 8*2*3runs*(1 HET-LITE + 2 HET) = 144; x3 T = 432/day << 10000.
+daily_limits:
+  gemini-3.5-flash: 10000
+
+paths:
+  inputs_dir: "inputs"                 # reuse the frozen, pre-built no-lookahead snippets
+  runs_csv: "data/temperature_robustness_small/latest/runs.csv"      # default; overridden per-T via --runs-csv
+  spend_ledger: "data/temperature_robustness_small/latest/spend_ledger.json"
+
+bootstrap_draws: 2000

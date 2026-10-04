@@ -1,0 +1,11 @@
+{
+  "kind": "control",
+  "data_date": "20260704",
+  "note": "Het-SameTier control.",
+  "files": {
+    "run_manifest.json": "b055799a14fefb7fc0204889338a2facb8267955d0e4decabff58f98de3b5eec",
+    "runs.csv": "62e1a3ace12568e684f4d351b6c4360fe0f6ab2df5d4edf6fb29df0aa8789eaa",
+    "spend_ledger.json": "02cac5b05586dfd4dd99de66109d41c09ad6597da4418618eed7b89922f61f39"
+  },
+  "written_utc": "2026-07-23T20:35:26.725920+00:00"
+}
