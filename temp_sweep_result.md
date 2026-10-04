@@ -1,4 +1,4 @@
-# Temperature-sensitivity sweep (robustness; reviewer point #3)
+# Temperature-robustness check (small subgrid; not a full temp study)
 
 Subgrid: 8 tickers x 2 dates x 3 configs x 3 runs per temperature (same estimator and seeds as the main study; separate files).
 
