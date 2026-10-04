@@ -36,7 +36,10 @@
   "gates": [
     "python3 code/src/check_binding.py",
     "python3 code/src/check_coverage.py",
-    "python3 code/src/check_claims.py"
+    "python3 code/src/check_claims.py",
+    "python3 code/src/check_claims_bound.py",
+    "python3 code/src/check_ieee_style.py",
+    "python3 code/src/check_figures.py"
   ],
   "inputs": [
     "data/confirmatory/latest/runs.csv"
