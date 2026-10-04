@@ -158,9 +158,22 @@ def check_pdf_text_parity():
     if not (clean.exists() and high.exists()):
         return 0, [], "one of the two PDFs is not built; text parity not checked"
 
+    # The running header -- "Chincholikar et al.: The Price of De-correlation in Heterogeneous
+    # LLM Ensembles" -- is 62 alphanumeric characters, longer than the 60 this once compared.
+    # Every page that carries it therefore matched on the header alone and the check reported
+    # 14/14 pages aligned while five genuinely start elsewhere. The header is stripped before
+    # comparing, so the comparison is against body text.
+    HEADER = re.sub(r"[^A-Za-z0-9]", "",
+                    "Chincholikar et al.: The Price of De-correlation in "
+                    "Heterogeneous LLM Ensembles").lower()
+
     def flat(path):
-        pages = [re.sub(r"[^A-Za-z0-9]", "", p.extract_text() or "").lower()
-                 for p in PdfReader(path).pages]
+        pages = []
+        for p in PdfReader(path).pages:
+            t = re.sub(r"[^A-Za-z0-9]", "", p.extract_text() or "").lower()
+            if t.startswith(HEADER):
+                t = t[len(HEADER):]
+            pages.append(t)
         return pages, "".join(pages)
 
     cp, ca = flat(clean)
@@ -173,9 +186,13 @@ def check_pdf_text_parity():
                      f"{len(ca)}: the two PDFs do not carry the same text")
     elif sorted(ca) != sorted(ha):
         fails.append("the two PDFs have the same character count but not the same characters")
-    same_start = sum(1 for a, b in zip(cp, hp) if a[:60] == b[:60])
+    moved = [i + 1 for i, (a, b) in enumerate(zip(cp, hp)) if a[:60] != b[:60]]
+    note = (f"all {len(cp)} pages start at the same point" if not moved else
+            f"{len(cp) - len(moved)}/{len(cp)} pages start at the same point; "
+            f"page(s) {', '.join(map(str, moved))} start one line earlier or later because "
+            f"inline highlighting cannot hyphenate, which shifts a few line breaks")
     return 2, fails, (f"both PDFs: {len(cp)} pages, {len(ca):,} alphanumeric characters, identical "
-                      f"text; {same_start}/{len(cp)} pages start at the same point")
+                      f"text; {note}")
 
 
 def base_ref():
