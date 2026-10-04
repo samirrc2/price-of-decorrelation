@@ -50,7 +50,12 @@ SPECIAL = {"\\": r"\textbackslash{}", "&": r"\&", "%": r"\%", "$": r"\$", "#": r
            "\u2192": r"$\rightarrow$", "\u2190": r"$\leftarrow$", "\u2212": r"$-$",
            "\u2033": r"$^{\prime\prime}$", "\u2032": r"$^{\prime}$", "\u2248": r"$\approx$",
            "\u2264": r"$\leq$", "\u2265": r"$\geq$", "\u00d7": r"$\times$",
-           "\u2013": "--", "\u2014": "---", "\u2019": "'", "\u2018": "`", "\u2026": r"\ldots{}"}
+           "\u2013": "--", "\u2014": "---", "\u2019": "'", "\u2018": "`", "\u2026": r"\ldots{}",
+           # The letter quotes the manuscript's own statistics, so it uses the manuscript's
+           # symbols rather than spelled-out names: a reviewer comparing the two documents
+           # should see the same notation in both.
+           "\u0394": r"$\Delta$", "\u03ba": r"$\kappa$", "\u03c6": r"$\phi$",
+           "\u03b1": r"$\alpha$", "\u03c3": r"$\sigma$"}
 
 PRE = r"""\documentclass[11pt]{article}
 \usepackage[T1]{fontenc}
