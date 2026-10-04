@@ -53,14 +53,43 @@ A [Code Ocean](https://codeocean.com/) compute capsule for this artifact is avai
 [https://doi.org/10.24433/CO.9524962.v1](https://doi.org/10.24433/CO.9524962.v1)
 (DOI `10.24433/CO.9524962.v1`).
 
-| Status | Detail |
+| Field | Detail |
 |--------|--------|
-| Capsule | Keys-free Reproducible Run via `/code/run` |
-| Environment | `environment/Dockerfile` |
-| Public link / DOI | https://doi.org/10.24433/CO.9524962.v1 |
-| Local reproduce | `bash reproduce.sh` |
+| Reproducible Run entry point | `/code/run` → `bash code/scripts/reproduce.sh --data data/confirmatory/20260704` |
+| Environment | `environment/Dockerfile` (Code Ocean `py-r` base, pinned pip packages) |
+| API keys | **none required**; the default path is keys-free and costs nothing |
+| Runtime | ~5–8 minutes |
+| Local equivalent | `bash reproduce.sh` |
 
-The capsule layout matches this repository: `/code` (including `run`, `src/`, `scripts/`), `/data` (frozen confirmatory CSV and configs), `/results` (analysis outputs), and `environment/Dockerfile`. The default Reproducible Run regenerates Phase-3 metrics and figures from the frozen dataset with **no API keys** and **no inference cost**.
+### Capsule mounts
+
+| Mount | Contents |
+|-------|----------|
+| `/code` | `run`, `src/`, `scripts/`, `tests/`, `requirements.txt` |
+| `/data` | the frozen captures, `configs/`, `inputs/`, `inputs_mmlu/`, `datacache/`, `MANIFEST.sha256`, ground truth |
+| `/results` | written by the run: `claims.json`, metrics, tables, figures, the supporting-arm reports |
+
+`/data/datacache/` is **not optional**. The analyses prefer its offline forward-return cache
+and fall back to a live `yfinance` call without it — which would turn a keys-free offline
+capsule into a network-dependent one. `make_manifest.py --capsule` asserts its presence, and
+the run fails if it is missing.
+
+### What a capsule can and cannot verify
+
+A capsule mounts `/code` and `/data` only, so `paper/` is absent. The two gates that read the
+manuscript report **not checkable here** and are skipped; everything that regenerates and
+verifies the numbers runs in full. A capsule run therefore exits **0** on success.
+
+| Gate | In a capsule |
+|------|---|
+| Determinism, input integrity, capsule completeness | runs |
+| Revision arms, supporting analyses, claims extraction | runs |
+| Manuscript agreement (`check_claims.py`) | skipped — needs `paper/main.tex` |
+| Manuscript provenance (`check_coverage.py`) | skipped — needs `paper/main.tex` |
+| Unit tests | runs |
+
+The capsule has been verified to produce **all 365 claims identically** to a full checkout,
+with 10/10 shared artifacts byte-identical.
 
 ---
 
@@ -115,7 +144,7 @@ Phase-3 analysis primarily requires PyYAML, NumPy, and Matplotlib. Pandas and yf
 | `data/datacache/forward_returns.json` | Forward-return signs for the accuracy proxy | &lt; 1 MB |
 | `data/inputs/*.json` | Price-derived context snippets (1,200 cells) | included |
 | `data/appendix/grid.csv` | Frozen experimental grid | included |
-| `data/control/runs.csv` | Capability-matched control dataset | included |
+| `data/control/latest/runs.csv` | Capability-matched control dataset | 20 MB |
 | `data/temperature_robustness_small/latest/runs_T*.csv` | Temperature-robustness check (small subgrid) | included |
 
 **Integrity (frozen confirmatory dataset):**
@@ -219,49 +248,49 @@ Stable path for readers: `results/latest/` (symlink to the newest timestamped fo
 
 ### Gates
 
-`reproduce.sh` does not merely regenerate the outputs; it refuses to report success unless
-every applicable gate passes. Each prints its own coverage count, so a gate that silently
-checked nothing is visible rather than reassuring.
+`reproduce.sh` does not merely regenerate outputs — it refuses to report success unless every
+applicable gate passes. Each prints its own coverage count, so a gate that silently checked
+nothing is visible rather than reassuring, and each was **fault-injected**: a defect was
+planted and the gate confirmed to fail on it before being trusted to pass.
 
-| Gate | What it asserts | Would catch |
+| Gate | Asserts | Would catch |
 |---|---|---|
 | Determinism | two analysis passes, 13 outputs hash-compared | order- or seed-dependence |
-| `make_manifest.py --verify` | all 1,749 frozen inputs match their pinned SHA-256 | an input that changed, was regenerated, or vanished |
-| `make_manifest.py --capsule` | the inputs a `/code`+`/data` mount cannot run without are present | a capsule that passes its hashes while missing the offline price cache, which would silently fall back to a network call |
+| `make_manifest.py --verify` | all 1,752 frozen inputs match their pinned SHA-256 | an input that changed, was regenerated, or vanished |
+| `make_manifest.py --capsule` | the inputs a `/code`+`/data` mount cannot run without are present | a capsule that passes its hashes while missing the offline price cache — hashing proves what you have is unchanged, not that you have everything |
 | `reviewer_revision.py`, `analyze_mmlu.py` | the revision arms regenerate from frozen captures | a stale reviewer or cross-domain number |
-| `make_claims.py` | 65 named claims extract from the regenerated outputs | an analysis that stopped emitting a number the paper cites |
-| `check_claims.py` | `paper/main.tex` agrees with the analysis | a drifted figure, including a plausible near-miss |
+| `control_kappa.py`, `temp_analyze.py`, `reviewer_analysis.py` | the control arm, temperature sweep and agreement-robustness tables regenerate | a supporting-arm number left behind by an older run |
+| `make_claims.py` | 365 named claims extract from the regenerated outputs | an analysis that stopped emitting a number the paper cites |
+| `check_claims.py` | `paper/main.tex` agrees with the analysis | a drifted figure, including a plausible near-miss; a machine-specific path in a committed output; a stale hash or path in `archive_manifest.md` |
+| `check_coverage.py` | **every** numeric literal in `main.tex` traces to a claim, a documented transform, or a declared non-result | a manuscript number that no analysis produces — this is the gate that found five published figures with no generating code |
 | `pytest code/tests` | metric and bootstrap primitives | a regression in κ, φ or the cluster bootstrap |
 
-Exit codes are a contract: **0** every applicable gate passed; **1** a gate failed; **2** the
-analysis reproduced but a gate that should apply here could not run. A `/code`+`/data`
-capsule has no `paper/`, so the manuscript gate is correctly skipped and the run still
-exits 0 — see `environment/README.md`.
+The last two run in opposite directions, and both are needed. `check_claims.py` asks whether
+our claims appear in the manuscript; `check_coverage.py` asks whether every manuscript number
+has provenance. Only the second can notice an assertion the artifact never computed.
 
-Verify the inputs alone, without running the analysis:
+Exit codes are a contract:
+
+| Code | Meaning |
+|------|---------|
+| **0** | every gate that applies to this copy passed |
+| **1** | a gate failed: an input is corrupt, or a reported number disagrees with the analysis |
+| **2** | the analysis reproduced, but a gate that *should* apply here could not run. Never a pass. |
+
+A `/code`+`/data` capsule has no `paper/`, so the two manuscript gates are correctly skipped
+and the run still exits 0. A **full checkout** that cannot run them exits 2.
+
+Verify the inputs or the provenance on their own, without a full run:
 
 ```bash
-python code/src/make_manifest.py --verify     # 0 = intact, 1 = corrupt or missing
+python code/src/make_manifest.py --verify     # 0 = all inputs intact, 1 = corrupt or missing
 python code/src/make_manifest.py --capsule    # 0 = a capsule has everything it needs
+python code/src/check_coverage.py             # 0 = every manuscript number has provenance
 ```
 
-`DATA_MANIFEST.md` lists every pinned file with its size and SHA-256.
+`DATA_MANIFEST.md` lists every pinned input with its size and SHA-256.
 `results/latest/claims.json` is the machine-readable record of every number the paper may
-assert; `SUBMISSION_ARTIFACT.md` summarises the locked values.
-
-Faster single-pass regeneration (no hash compare):
-
-```bash
-bash reproduce.sh --analyze-only
-```
-
-Additional offline analyses on frozen data:
-
-```bash
-python code/src/reviewer_analysis.py    # Fig. 5 + reviewer_metrics.md → results/latest/
-python code/src/control_kappa.py        # Section 5.8 → results/latest/control_result.md
-python code/src/temp_analyze.py         # Section 5.9 → results/latest/temp_sweep_*.{md,tex}
-```
+assert. `SUBMISSION_ARTIFACT.md` summarises the locked values.
 
 ### Execution time
 
@@ -269,27 +298,46 @@ See Section 3. The default `bash reproduce.sh` path is the recommended verificat
 
 ### Expected results
 
-After `bash reproduce.sh`, `results/latest/metrics_summary.md` must report:
+`bash reproduce.sh` exits **0** only if every gate passes, so the run itself is the
+verification — there is nothing to compare by eye.
+
+**Primary endpoint** — `results/latest/metrics_summary.md`:
 
 | Quantity | Expected value |
 |----------|----------------|
 | Verdict | CONFIRMED |
 | Primary endpoint Δκ(HOM−HET) | 0.3363 |
-| 95% CI (cluster bootstrap, 2,000 draws, seed 42) | [0.3035, 0.3689] |
-| κ_HOM | 0.5517 |
-| κ_HET-LITE | 0.3023 |
-| κ_HET | 0.2154 |
-| Inference-cost ratio (HOM → HET) | approximately 4.4× |
+| 95% CI (ticker-clustered bootstrap, 2,000 draws, seed 42) | [0.3035, 0.3689] |
+| κ_HOM / κ_HET-LITE / κ_HET | 0.5517 / 0.3023 / 0.2154 |
+| Secondary Δκ (HOM−HET-LITE) | 0.2494 [0.2184, 0.2801] |
+| Secondary Δκ (HET-LITE−HET) | 0.087 [0.0672, 0.105] |
+| Inference-cost ratio (HOM → HET) | ≈ 4.4× (4.375 from the frontier costs) |
+| Usable calls / grid cells | 54,000 / 54,000 of 54,000 |
 
-Generated figures under `results/latest/figures/` correspond to Article Figures 1, 3, and 4 as mapped above. Generated tables under `results/latest/tables/` correspond to the primary Δκ and frontier tables in the article.
+**Supporting arms** — regenerated by the same command, under `results/latest/`:
 
-After `bash reproduce.sh`, the console and `results/latest/replication_check.md` must report:
+| Arm | File | Expected value |
+|---|---|---|
+| HET-SameTier capability control | `control_result.md` | Δκ = 0.3153 [0.2883, 0.3414] |
+| Temperature robustness (T = 0.0 / 0.7 / 1.0) | `temp_sweep_result.md` | Δκ = 0.299 / 0.509 / 0.385 |
+| Agreement robustness, HOM (Fleiss / Krippendorff / Gwet) | `reviewer_metrics.md` | 0.5517 / 0.5518 / 0.7428 |
+| Cross-domain replication (MMLU, 537 items) | `../mmlu_replication.json` | Δκ = 0.0719, Δφ = 0.3927 |
+| Capability-matched pair contrast | `../mmlu_replication.json` | Δφ = 0.3471 [0.2070, 0.5073] |
+| Reviewer analyses (clustering, selective prediction, pair types) | `../revision_metrics.json` | over 54,000 calls |
+| Request accounting | `claims.json` | 94,566 requests; 40,566 unsuccessful = 40,544 rate-limit/quota + 22 transport/schema |
+
+**Determinism** — the console and `results/latest/replication_check.md` must report:
 
 ```text
 ✔ Deterministic: YES (13/13 identical)
 ```
 
-These outputs are the same quantities reported in the article’s results section for the confirmatory study.
+Figures under `results/latest/figures/` correspond to Article Figures 1, 3 and 4; tables under
+`results/latest/tables/` to the primary Δκ and frontier tables.
+
+Verified across **four consecutive runs of the same commit, plus a `/code` + `/data` capsule
+run**: 15/15 result artifacts byte-identical between iterations, and 10/10 byte-identical
+between capsule and full checkout.
 
 ### Out of scope for the default workflow
 
@@ -316,55 +364,103 @@ price-of-decorrelation/
 ├── README.md
 ├── LICENSE
 ├── reproduce.sh                 # → code/scripts/reproduce.sh
-├── archive_manifest.md
-├── docs/
-├── archive/
-├── paper/                       # reconstructed manuscript (optional)
+├── DATA_MANIFEST.md             # every pinned input: path, size, SHA-256
+├── SUBMISSION_ARTIFACT.md       # the locked values, and what each gate would catch
+├── archive_manifest.md          # the confirmatory dataset's pin, with a changelog
+├── docs/                        # pre-registration, freeze receipts, model manifest
+├── archive/                     # pilot archives (the independent-draw protocol)
+├── paper/                       # manuscript source (absent from the capsule)
 │
 ├── environment/                 # Code Ocean compute environment
-│   ├── Dockerfile               # pinned pip pkgs (matches working capsule)
-│   └── README.md
+│   ├── Dockerfile               # pinned pip packages (matches the working capsule)
+│   └── README.md                # mounts, gates, exit-code contract
 │
-├── metadata/
-│   └── metadata.yml             # capsule title, description, authors
+├── metadata/metadata.yml        # capsule title, description, authors
 │
-├── code/                        # capsule "code" (/code)
+├── code/                        # capsule /code
 │   ├── run                      # Code Ocean Reproducible Run entry point
-│   ├── src/                     # analyze.py, replication_check.py, …
-│   ├── scripts/
-│   │   └── reproduce.sh         # keys-free replication / analyze / scratch-run
-│   ├── tests/
-│   ├── requirements.txt
-│   └── pytest.ini
+│   ├── src/
+│   │   ├── analyze.py           # primary endpoint, figures, tables
+│   │   ├── replication_check.py # two passes + hash compare
+│   │   ├── control_kappa.py     # HET-SameTier capability control
+│   │   ├── temp_analyze.py      # temperature robustness
+│   │   ├── reviewer_analysis.py # agreement robustness, unanimity, hit rates
+│   │   ├── reviewer_revision.py # clustering, selective prediction, pair types
+│   │   ├── analyze_mmlu.py      # cross-domain + capability-matched contrast
+│   │   ├── make_manifest.py     # pin and verify inputs; --capsule completeness
+│   │   ├── make_claims.py       # extract every claim the paper may assert
+│   │   ├── check_claims.py      # manuscript agreement, portability, document hashes
+│   │   └── check_coverage.py    # every manuscript number must have provenance
+│   ├── scripts/reproduce.sh     # keys-free replication / analyze / scratch-run
+│   ├── tests/                   # metric and bootstrap unit tests
+│   └── requirements.txt
 │
-├── data/                        # capsule "data" (/data)
+├── data/                        # capsule /data
+│   ├── MANIFEST.sha256          # machine-readable pins, verified on every run
 │   ├── confirmatory/<YYYYMMDD>/runs.csv (+ latest →)
-│   ├── control/
+│   ├── control/                 # capability-matched control capture
 │   ├── temperature_robustness_small/<YYYYMMDD>/
-│   ├── minipilot/
-│   ├── raw/                     # gitignored
-│   ├── configs/
-│   ├── inputs/
-│   ├── datacache/
-│   └── appendix/
+│   ├── mmlu/, inputs_mmlu/, mmlu_ground_truth.json
+│   ├── minipilot/, appendix/
+│   ├── configs/                 # frozen protocol: grid, models, estimands
+│   ├── inputs/                  # serialized model inputs
+│   ├── datacache/               # OFFLINE price cache — required, see Code Ocean above
+│   └── raw/                     # gitignored, not needed to reproduce
 │
-└── results/                     # capsule "results" (/results); gitignored
+└── results/                     # capsule /results; gitignored
     ├── data-<dataDate>_run-<YYYYMMDD_HHMMSS>/
+    │   ├── claims.json          # every number the paper may assert
+    │   ├── metrics_summary.md, replication_check.md, headline_check.md
+    │   ├── control_result.md, temp_sweep_result.md, reviewer_metrics.md
+    │   ├── figures/, tables/
+    ├── revision_metrics.json    # reviewer analyses
+    ├── mmlu_replication.json    # cross-domain + capability-matched
     └── latest -> <that folder>
 ```
 
-**Code Ocean flow:** `/code/run` calls `reproduce.sh` on the frozen confirmatory CSV → writes under `/results/data-…_run-…/` (one folder per Reproducible Run; the replication check runs analyze twice *into that same folder* and hash-compares).
+**Code Ocean flow:** `/code/run` calls `reproduce.sh` on the frozen confirmatory CSV, writes
+under `/results/data-…_run-…/` (one folder per Reproducible Run; the replication check runs
+analyze twice *into that same folder* and hash-compares), then runs the gates.
 
-**Generated at run time** (safe to overwrite): everything under `results/`.  
-**Default review dataset:** `data/confirmatory/latest` (currently `20260704`). New collections write a new dated folder.
+**Generated at run time** (safe to overwrite): everything under `results/`. These files are
+gitignored because they are rebuilt, not archived — and a fresh clone has been verified to
+regenerate them byte-identically. `SUBMISSION_ARTIFACT.md` carries the same values in prose
+for a reader who does not want to run the pipeline.
+
+**Default review dataset:** `data/confirmatory/latest` (currently `20260704`). New collections
+write a new dated folder and never overwrite an existing one.
 
 ### Reviewer quick start
 
 ```bash
 git clone https://github.com/samirrc2/price-of-decorrelation.git
 cd price-of-decorrelation
-source code/scripts/activate_env.sh    # required once per shell: create/activate .venv + deps
+source code/scripts/activate_env.sh    # once per shell: create/activate .venv + install deps
 bash reproduce.sh
 ```
 
-Confirm that `results/latest/replication_check.md` reports Deterministic: YES, that `results/latest/metrics_summary.md` matches the expected values in Section 4, and that `results/latest/figures/` matches the corresponding article figures.
+The last line of a successful run is:
+
+```text
+[reproduce] all gates passed
+```
+
+and `echo $?` is **0**. If it prints `INCOMPLETE` and exits 2, a gate that should apply here
+could not run — that is not a pass. If any gate fails, the run exits 1 and names the
+disagreement.
+
+`reproduce.sh` selects an interpreter by **import capability**, not by name: an explicit `PY`,
+then `./.venv/bin/python`, then `python3`, then `python` — the first that can import `yaml`,
+`numpy` and `matplotlib`. To point it somewhere specific:
+
+```bash
+PY=/path/to/python bash reproduce.sh
+```
+
+Then confirm, in `results/latest/`:
+
+- `replication_check.md` reports `Deterministic: YES (13/13 identical)`
+- `metrics_summary.md` matches the primary endpoint table in Section 4
+- `control_result.md`, `temp_sweep_result.md` and `reviewer_metrics.md` match the supporting-arm table
+- `claims.json` holds 365 claims, and `check_coverage.py` reported 161/161 literals traced
+- `figures/` matches the corresponding article figures
