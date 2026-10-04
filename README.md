@@ -427,10 +427,10 @@ gitignored because they are rebuilt, not archived — and a fresh clone has been
 regenerate them byte-identically. `SUBMISSION_ARTIFACT.md` carries the same values in prose
 for a reader who does not want to run the pipeline.
 
-**Default review dataset:** `data/confirmatory/latest` (currently `20260704`). New collections
+**Default dataset:** `data/confirmatory/latest` (currently `20260704`). New collections
 write a new dated folder and never overwrite an existing one.
 
-### Reviewer quick start
+### Reproducing from a clean checkout
 
 ```bash
 git clone https://github.com/samirrc2/price-of-decorrelation.git
@@ -462,5 +462,6 @@ Then confirm, in `results/latest/`:
 - `replication_check.md` reports `Deterministic: YES (13/13 identical)`
 - `metrics_summary.md` matches the primary endpoint table in Section 4
 - `control_result.md`, `temp_sweep_result.md` and `reviewer_metrics.md` match the supporting-arm table
-- `claims.json` holds 365 claims, and `check_coverage.py` reported 161/161 literals traced
+- `claims.json` holds 378 claims; `check_coverage.py` reported 161/161 literals traced and
+  `check_binding.py` 291/291 numbers bound
 - `figures/` matches the corresponding article figures

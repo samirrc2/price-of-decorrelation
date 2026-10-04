@@ -1,19 +1,44 @@
 {
   "run": "bash code/scripts/reproduce.sh",
   "manuscript": "paper/main.tex",
-  "claims": "results/latest/claims.json",
-  "artifacts": ["results/latest/*.md", "results/latest/*.json",
-                "results/latest/tables/*", "results/*.json"],
+  "claims": "results/latest/claims*.json",
+  "artifacts": [
+    "results/latest/*.md",
+    "results/latest/*.json",
+    "results/latest/tables/*",
+    "results/*.json"
+  ],
   "capsule": {
-    "code": ["code/src", "code/tests", "code/scripts", "code/run", "code/requirements.txt"],
-    "data": ["data"],
+    "code": [
+      "code/src",
+      "code/tests",
+      "code/scripts",
+      "code/run",
+      "code/requirements.txt"
+    ],
+    "data": [
+      "data"
+    ],
     "run": "bash code/run"
   },
   "clone_extras": [],
   "normalize": [
-    {"file": "replication_check.md",
-     "pattern": "results/data-\\d{8}_run-\\d{8}_\\d{6}",
-     "replacement": "results/<run stamp>",
-     "why": "records the run-stamped output directory, i.e. when the run happened, not what it produced"}
+    {
+      "file": "replication_check.md",
+      "pattern": "results/data-\\d{8}_run-\\d{8}_\\d{6}",
+      "replacement": "results/<run stamp>",
+      "why": "records the run-stamped output directory, i.e. when the run happened, not what it produced"
+    }
+  ],
+  "env": {
+    "PY": "/Users/samirchincholikar/Desktop/NIW/Paper 1/.venv/bin/python"
+  },
+  "gates": [
+    "python3 code/src/check_binding.py",
+    "python3 code/src/check_coverage.py",
+    "python3 code/src/check_claims.py"
+  ],
+  "inputs": [
+    "data/confirmatory/latest/runs.csv"
   ]
 }

@@ -376,6 +376,12 @@ _run_gates() {
   # single claim it must equal, and to the phrase it must follow.
   echo "[gate] manuscript binding (every number equals the one claim it is bound to)"
   _gate binding "$PY" "$CODE_ROOT/src/check_binding.py" || return 1
+  # Binding is total over the manuscript, so no printed number lacks a tie -- but 219 of the 376
+  # claims are named by no rule, and fault injection showed one of those could be bent to 0.4242
+  # with no gate noticing. claims.lock.json pins every value as reviewed, so a code change that
+  # moves a number nobody is watching shows up here and in the commit diff.
+  echo "[gate] claim values vs the reviewed lock"
+  _gate claims-lock "$PY" "$CODE_ROOT/src/check_claims_bound.py" || return 1
   echo "[gate] unit tests"
   if [[ -d "$CODE_ROOT/tests" ]]; then
     if "$PY" -c "import pytest" >/dev/null 2>&1; then
