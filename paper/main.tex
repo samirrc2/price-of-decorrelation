@@ -45,9 +45,9 @@ robin.chawla.cse14@iitbhu.ac.in}
 \maketitle
 
 \begin{abstract}
-Ensembles of large language model (LLM) ``agents'' are increasingly deployed as
-committees that vote on decisions, on the premise that aggregating multiple
-opinions reduces error. This premise implicitly assumes the agents are
+Ensembles of large language model (LLM) ``agents'' are increasingly deployed in
+multi-agent systems as committees that vote on decisions, on the premise that
+aggregating multiple opinions reduces error. This premise implicitly assumes the agents are
 independent; yet a homogeneous ensemble---several instances of one model---may
 behave as a near-echo-chamber whose members merely restate a shared prior. We
 ask, and quantify, a concrete question: how much does introducing
@@ -71,7 +71,7 @@ Third, and as a methodological contribution, we show that a common measurement
 artifact---sampling non-determinism under a shared sampling context---inflates
 the apparent effect by roughly $4\times$ ($\Delta\kappa$ drops from $0.485$ to
 $0.113$ in a controlled pilot once each agent is given an independent draw); we
-provide a protocol that removes it. We find no reliable improvement in
+provide an \emph{independent-draw protocol} that removes it. We find no reliable improvement in
 directional accuracy from heterogeneity at this scale, consistent with recent
 ``algorithmic monoculture'' cautions: diversity reduces surface agreement
 without, in our setting, purchasing average correctness. An exploratory analysis
