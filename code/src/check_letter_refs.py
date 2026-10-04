@@ -56,7 +56,10 @@ ANCHORS = {
     "elyaniv2010selective":  ("El-Yaniv",),
     "hendrycks2021mmlu":     ("Hendrycks", "MMLU professional-medicine"),
 }
-ANCHOR_BEFORE, ANCHOR_AFTER = 40, 95
+# 40 characters before the anchor was too generous: with two El-Yaniv mentions on adjacent
+# lines, a correct [19] on the first excused a wrong [18] on the second. 14 is enough for the
+# "Reference [nn], " form and no more, so each mention must carry its own number.
+ANCHOR_BEFORE, ANCHOR_AFTER = 14, 95
 # references added in this revision; each must be named in the letter
 NEW = set(ATTRIB)
 
