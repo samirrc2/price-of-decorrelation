@@ -532,7 +532,7 @@ R = [
     (r"runs.csv containing all 94566 logged attempts---the$", "54000", "calls_usable", 0),
     (r"keys-free reproduction is available at doi$", "10.24433",
      "!Code Ocean DOI prefix", 5),
-    (r"10\.24433 co\.9524962\.v1 \. the dataset sha-$", "256",
+    (r"10\.24433 co\.9524962\.v2 \. the dataset sha-$", "256",
      "!algorithm name SHA-256", 0),
     # ----------------------------------------------------------- generative-AI note, biography
     (r"specifically openai s chatgpt gpt-5$", "2025", "!model release year", 0),

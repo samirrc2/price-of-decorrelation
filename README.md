@@ -29,7 +29,7 @@ This repository is the frozen dataset and analysis pipeline that regenerates tho
 | **Authors** | Samir Chincholikar, Robin Chawla |
 | **Affiliations** | Independent researchers |
 | **Code repository** | https://github.com/samirrc2/price-of-decorrelation |
-| **Persistent DOI** | https://doi.org/10.24433/CO.9524962.v1 (`10.24433/CO.9524962.v1`) |
+| **Persistent DOI** | https://doi.org/10.24433/CO.9524962.v2 (`10.24433/CO.9524962.v2`) |
 | **Contact** | Samir Chincholikar: samir.chincholikar@gmail.com; Robin Chawla: robin.chawla.cse14@iitbhu.ac.in |
 | **ORCID** | Samir Chincholikar: https://orcid.org/0009-0007-2779-3492; Robin Chawla: https://orcid.org/0009-0007-2807-3948 |
 
@@ -51,8 +51,8 @@ The artifact enables independent reproduction of the article’s computational r
 ## Code Ocean
 
 A [Code Ocean](https://codeocean.com/) compute capsule for this artifact is available at
-[https://doi.org/10.24433/CO.9524962.v1](https://doi.org/10.24433/CO.9524962.v1)
-(DOI `10.24433/CO.9524962.v1`).
+[https://doi.org/10.24433/CO.9524962.v2](https://doi.org/10.24433/CO.9524962.v2)
+(DOI `10.24433/CO.9524962.v2`).
 
 | Field | Detail |
 |--------|--------|

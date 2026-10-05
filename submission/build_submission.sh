@@ -74,7 +74,6 @@ cp paper/main.pdf submission/main_manuscript.pdf
 "$PY" code/src/check_response_consistency.py | sed 's/^/   /'
 "$PY" code/src/check_freeze_timestamps.py | sed 's/^/   /'
 "$PY" code/src/check_freeze_receipt.py | sed 's/^/   /'
-"$PY" code/src/check_highlight_coverage.py | sed 's/^/   /'
 
 echo "== 2/4 Word version =="
 # --citeproc is required: this manuscript builds its reference list from references.bib, and
@@ -86,6 +85,11 @@ echo "== 2/4 Word version =="
 
 echo "== 3/4 highlighted PDF =="
 bash submission/build_highlighted.sh
+# This gate judges the highlighted PDF against the manuscript, so it has to run AFTER the
+# overlay is rebuilt. Wired into step 1/4 it compared the NEW manuscript with the PREVIOUS
+# highlighted PDF and failed on every run that changed the manuscript -- the DOI bump to
+# .v2 was reported as unhighlighted when the overlay simply had not been regenerated yet.
+"$PY" code/src/check_highlight_coverage.py | sed 's/^/   /'
 
 echo "== 4/4 response to reviewers =="
 ( cd submission && "$PY" build_response.py )
