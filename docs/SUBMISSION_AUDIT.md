@@ -30,9 +30,9 @@ Current state, audited 2026-10-04 at the commit that carries this file:
   analysis is a function of the frozen `runs.csv` files, and every one of them is verified
   against `data/MANIFEST.sha256` before anything is computed.
 
-The published capsule at DOI `10.24433/CO.9524962.v1` is the audited August state. It must be
-replaced with a new version built from the current commit before the revision is resubmitted, and
-the DOI in `paper/main.tex` updated to match.
+DOI `10.24433/CO.9524962.v1` is the audited August capsule and is superseded. The revision is
+published as `10.24433/CO.9524962.v2`, built from the current commit by
+`code/scripts/build_capsule.sh`, and that is the DOI `paper/main.tex` and `README.md` now cite.
 
 ---
 

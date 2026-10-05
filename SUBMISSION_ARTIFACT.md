@@ -12,7 +12,7 @@ every number the paper is allowed to assert.
 | SHA-256 of every input (1747 files) | `DATA_MANIFEST.md` + `data/MANIFEST.sha256` |
 | Keys-free reproduction | `bash reproduce.sh` or `./code/run` |
 | Determinism check | built into the default path (two passes, hash-compared) |
-| Code Ocean capsule | https://doi.org/10.24433/CO.9524962.v1 (`environment/Dockerfile`, `/code/run`) |
+| Code Ocean capsule | https://doi.org/10.24433/CO.9524962.v2 (`environment/Dockerfile`, `/code/run`) |
 
 No API keys are needed to verify any reported number. Live re-collection is optional,
 costs provider budget, and is never required.
