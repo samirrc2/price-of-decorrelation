@@ -32,8 +32,18 @@ true: this number was reviewed and has not changed.
 from __future__ import annotations
 import importlib.util
 import json
+import math
 import sys
 from pathlib import Path
+
+# Exact == fails across OS/CPU: Code Ocean Linux and a Mac lock file disagree at ~1e-14
+# on the same analysis. Paper figures are 3–4 decimals; this still flags a real move.
+_LOCK_REL = 1e-12
+_LOCK_ABS = 1e-15
+
+
+def _same(a: float, b: float) -> bool:
+    return math.isclose(a, b, rel_tol=_LOCK_REL, abs_tol=_LOCK_ABS)
 
 ROOT = Path(__file__).resolve().parents[2]
 CLAIMS = ROOT / "results" / "latest" / "claims.json"
@@ -65,7 +75,7 @@ def main() -> int:
         LOCK.write_text(json.dumps({"values": {k: nums[k] for k in sorted(nums)}},
                                    indent=2, sort_keys=True) + "\n")
         moved = [(k, old[k], nums[k]) for k in sorted(nums)
-                 if k in old and old[k] != nums[k]]
+                 if k in old and not _same(old[k], nums[k])]
         added = sorted(set(nums) - set(old))
         gone = sorted(set(old) - set(nums))
         print(f"[claims-lock] wrote {LOCK.relative_to(ROOT)}: {len(nums)} values")
@@ -92,7 +102,7 @@ def main() -> int:
             fails.append(f"{k} is pinned at {locked[k]} but the analysis no longer produces it")
         elif k not in locked:
             fails.append(f"{k} = {nums[k]} is new and unpinned -- run --update and review it")
-        elif locked[k] != nums[k]:
+        elif not _same(locked[k], nums[k]):
             tag = "" if bound is None else (" [bound to the manuscript]" if k in bound
                                            else " [not bound to the manuscript]")
             fails.append(f"{k} moved: pinned {locked[k]}, analysis now gives {nums[k]}{tag}")
