@@ -9,6 +9,8 @@ from check_claims_bound import _same
 
 def test_ulp_noise_is_same():
     assert _same(0.6066061397888656, 0.6066061397888426)
+    # Largest rel-diff from the 2026-10-04 Code Ocean Linux run vs the Mac lock.
+    assert _same(0.3542234451760303, 0.3542234451765465)
 
 
 def test_real_move_is_not_same():

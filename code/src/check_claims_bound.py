@@ -36,10 +36,11 @@ import math
 import sys
 from pathlib import Path
 
-# Exact == fails across OS/CPU: Code Ocean Linux and a Mac lock file disagree at ~1e-14
-# on the same analysis. Paper figures are 3–4 decimals; this still flags a real move.
-_LOCK_REL = 1e-12
-_LOCK_ABS = 1e-15
+# Exact == fails across OS/CPU: Code Ocean Linux and a Mac lock file disagree at ~1e-12
+# to 1e-14 on the same analysis. The paper prints 3–4 decimals (~1e-4); 1e-8 absorbs
+# platform noise and still flags a real fourth-decimal move.
+_LOCK_REL = 1e-8
+_LOCK_ABS = 1e-12
 
 
 def _same(a: float, b: float) -> bool:
