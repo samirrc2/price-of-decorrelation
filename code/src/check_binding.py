@@ -57,6 +57,8 @@ LIT = re.compile(r"(?<![\w.])(\d+\.\d+|\d{3,})(?![\w])")
 #                          6.48 \times 10^{-4}
 R = [
     # ---------------------------------------------------------------- front matter / abstract
+    (r"independent researcher new york ny$", "10007",
+     "!author postal code -- an address, not a quantity", 0),
     (r"date of publication xxxx 00$", "0000", "!IEEE template placeholder in \\history", 0),
     (r"date of current version xxxx 00$", "0000", "!IEEE template placeholder in \\history", 0),
     (r"manuscript submitted october 5$", "2026", "!submission date", 0),
@@ -395,6 +397,18 @@ R = [
      "revision_r1_1_r3_4_selective_prediction_het_lite_aurc", 3),
     (r"for hom 0\.568 for het-lite and$", "0.554",
      "revision_r1_1_r3_4_selective_prediction_het_aurc", 3),
+    # The Discussion restates the selective-prediction null (reviewer point 1). Same claims as
+    # the Results subsection above, bound separately because the preceding phrase differs.
+    (r"holds for selective prediction\. aurc is$", "0.553",
+     "revision_r1_1_r3_4_selective_prediction_hom_aurc", 3),
+    (r"prediction\. aurc is 0\.553 for hom$", "0.568",
+     "revision_r1_1_r3_4_selective_prediction_het_lite_aurc", 3),
+    (r"hom \- het difference of \-$", "0.001",
+     "revision_r3_4_paired_cluster_contrasts_aurc_delta_hom_het", 3),
+    (r"difference of \-0\.001 95 ci \-$", "0.059",
+     "revision_r3_4_paired_cluster_contrasts_aurc_ci_low", 3),
+    (r"difference of \-0\.001 95 ci \-0\.059$", "0.060",
+     "revision_r3_4_paired_cluster_contrasts_aurc_ci_high", 3),
     # ------------------------------------------------------- capability-matched control (finance)
     (r"three model families\. across the same$", "100",
      "revision_r3_2_clustering_ticker_n_clusters", 0),

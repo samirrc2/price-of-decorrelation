@@ -12,5 +12,11 @@ numpy==2.2.6           # pinned: numpy 2.4.x / pandas 3.0.x combo is broken ("ra
 yfinance>=0.2.40
 pandas==2.2.3          # pinned to a known-good pair with numpy 2.2.6
 
+# Highlight overlay + its gate (check_highlight_coverage.py). Undeclared until con1's clone
+# track failed on it: the gate imports pymupdf, build_highlighted.sh silently searched for
+# whatever interpreter happened to have it, and a reviewer installing from this file could not
+# run the gate at all -- reproduce.sh exited 2, "a gate could not run", in a full checkout.
+pymupdf>=1.24
+
 # Tests (local)
 pytest>=8.0

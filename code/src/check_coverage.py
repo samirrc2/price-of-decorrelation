@@ -27,6 +27,7 @@ TEX = ROOT / "paper" / "main.tex"
 # traceable to a claim fails the gate, so this list is the explicit, reviewable boundary of
 # what the artifact does and does not generate.
 NON_RESULTS = {
+    "10007": "author postal code in the affiliation -- an address, not a quantity",
     "5.4": "model name gpt-5.4-nano",
     "3.5": "model name gemini-3.5-flash",
     "4.3": "model name grok-4.3",

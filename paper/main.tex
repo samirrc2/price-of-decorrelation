@@ -39,14 +39,14 @@ in Heterogeneous Large Language Model Ensembles}
 \author{\uppercase{Samir Chincholikar}\authorrefmark{1},
 \uppercase{Robin Chawla}\authorrefmark{1}}
 
-\address[1]{Independent Researcher (e-mail: samir.chincholikar@gmail.com, ORCID: 0009-0007-2779-3492; robin.chawla.cse14@iitbhu.ac.in, ORCID: 0009-0007-2807-3948)}
+\address[1]{Independent Researcher, New York, NY 10007, USA (e-mail: samir.chincholikar@gmail.com, ORCID: 0009-0007-2779-3492; robin.chawla.cse14@iitbhu.ac.in, ORCID: 0009-0007-2807-3948)}
 \tfootnote{This work received no specific grant from any funding agency in the public, commercial, or not-for-profit sectors. Manuscript submitted October 5, 2026.}
 
 \markboth
 {Chincholikar \headeretal: The Price of De-correlation in Heterogeneous LLM Ensembles}
 {Chincholikar \headeretal: The Price of De-correlation in Heterogeneous LLM Ensembles}
 
-\corresp{Corresponding author: Samir Chincholikar (e-mail: samir.chincholikar@gmail.com).}
+\corresp{Corresponding author: Robin Chawla (e-mail: robin.chawla.cse14@iitbhu.ac.in).}
 
 \begin{abstract}
 Large language model (LLM) ensembles are increasingly used as decision-making
@@ -1241,7 +1241,11 @@ incorrect majority decision. These findings suggest that disagreement may
 provide value through reduced error concentration and increased visibility of
 dissent, even when mean accuracy does not improve. However, this interpretation
 remains exploratory and requires confirmatory evaluation using an appropriately
-powered downstream endpoint.
+powered downstream endpoint. The same holds for selective prediction. AURC is
+$0.553$ for HOM, $0.568$ for HET-LITE, and $0.554$ for HET, and the HOM$-$HET
+difference of $-0.001$ (95\% CI $[-0.059,\,0.060]$) contains zero. Reduced
+agreement did not improve error ranking, and HET-LITE, the highest AURC of the
+three, gains no selective-prediction advantage.
 
 The agreement--cost frontier provides a practical framework for ensemble
 selection. Practitioners should not assume that the additional cost of provider
@@ -1284,7 +1288,10 @@ therefore remains substantial after approximate tier matching. However, the
 control covers only two providers because an equivalent efficient-tier xAI model
 was unavailable, and differences in training data, architecture, alignment
 procedures, and effective capability cannot be completely separated from
-provider identity.
+provider identity. No model-level random-effects analysis and no fully
+tier-matched three-provider design were performed. The capability-matched
+control therefore narrows this confound rather than resolving it, and the
+provider-associated ordering should be read with that limitation in view.
 
 \textbf{Scope and generalizability.}
 The primary experiment evaluates a directional financial-analysis task with a
@@ -1412,14 +1419,17 @@ empirical methods in computational finance.
 \end{IEEEbiography}
 
 \begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{figures/bio_chawla.jpg}}]{Robin Chawla}
-received the B.Tech. degree in computer science and engineering from the Indian
-Institute of Technology (BHU), Varanasi, India. He has about eight years of
-professional experience as a software engineer at a proprietary trading firm,
-focused on low-latency systems, performance-oriented software, and the use of
-AI to automate engineering workflows. His research interests include large
-language models, multi-agent systems, machine learning for engineering
-workflows and automation, and reproducible evaluation of generative AI
-for decision-making.
+received the B.Tech. degree in Computer Science and Engineering from the
+Indian Institute of Technology (BHU), Varanasi, India. He has approximately eight
+years of professional experience in software engineering, specializing in low-latency
+trading infrastructure, high-performance computing, concurrent systems, and
+engineering automation. His professional expertise encompasses the development of
+high-performance software systems and the application of artificial intelligence to
+complex engineering challenges. His research focuses on applied artificial
+intelligence, with particular emphasis on large language models, multi-agent systems,
+AI reliability and governance, and their applications in financial risk assessment and
+decision-making. His work also explores reproducible evaluation methodologies for
+assessing the performance and real-world implications of generative AI systems.
 \end{IEEEbiography}
 
 \EOD
