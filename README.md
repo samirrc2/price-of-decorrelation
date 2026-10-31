@@ -6,6 +6,9 @@
 
 **Reproducibility:** [Code Ocean capsule DOI 10.24433/CO.9524962.v2](https://doi.org/10.24433/CO.9524962.v2) is the separate executable artifact, not the journal-article DOI.
 
+**Website activation (one-time GitHub setting):** Open [Settings → Pages](https://github.com/samirrc2/price-of-decorrelation/settings/pages), set **Build and deployment → Source → GitHub Actions**, and save. The website's deployment workflow is in [`.github/workflows/publish-research-website.yml`](.github/workflows/publish-research-website.yml); after activating Pages, rerun it from [Actions](https://github.com/samirrc2/price-of-decorrelation/actions/workflows/publish-research-website.yml). Until that setting is enabled, the website files are committed but the Pages URL may not load.
+
+
 
 Computational artifact for the IEEE Access article:
 
