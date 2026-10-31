@@ -1,33 +1,31 @@
 # The Price of De-correlation
+### Quantifying the Agreement–Cost Trade-off in Heterogeneous Large Language Model Ensembles
 
-**IEEE Access publication:** *The Price of De-Correlation: Quantifying the Agreement–Cost Trade-Off in Heterogeneous Large Language Model Ensembles*, by Samir Chincholikar and Robin Chawla. **Accepted 27 October 2026** (manuscript ACCESS-2026-50920). **Journal DOI:** [10.1109/ACCESS.2026.3749218](https://doi.org/10.1109/ACCESS.2026.3749218). The accepted author proof does not specify an online publication date; check the DOI record for the final bibliographic details.
+**Samir Chincholikar and Robin Chawla**  
+*IEEE Access* (2026)
 
-**Research companion website (re1):** [100 research questions and answers](https://samirrc2.github.io/price-of-decorrelation/) — **50 Research Questions + 50 Generic Questions** on model heterogeneity, agent agreement, correlated errors, false consensus, inference cost, shared-seed artifacts and financial decision systems. The website links to the IEEE Access article as the publication of record; it does not host a submitted-manuscript PDF.
+[**Journal article**](https://doi.org/10.1109/ACCESS.2026.3749218) · [**Reproducibility capsule**](https://doi.org/10.24433/CO.9524962.v2) · [**Research guide**](https://samirrc2.github.io/price-of-decorrelation/)
 
-**Reproducibility:** [Code Ocean capsule DOI 10.24433/CO.9524962.v2](https://doi.org/10.24433/CO.9524962.v2) is the separate executable artifact, not the journal-article DOI.
+## Overview
 
-**Website activation (one-time GitHub setting):** Open [Settings → Pages](https://github.com/samirrc2/price-of-decorrelation/settings/pages), set **Build and deployment → Source → GitHub Actions**, and save. The website's deployment workflow is in [`.github/workflows/publish-research-website.yml`](.github/workflows/publish-research-website.yml); after activating Pages, rerun it from [Actions](https://github.com/samirrc2/price-of-decorrelation/actions/workflows/publish-research-website.yml). Until that setting is enabled, the website files are committed but the Pages URL may not load.
+This study examines whether using models from different providers reduces agreement and shared errors in large language model (LLM) ensembles—and the inference cost of doing so. The preregistered financial experiment comprises **54,000 independent model calls** across three five-agent configurations, 100 equities, and 12 analysis dates. A separately preregistered evaluation on **537 clinical-knowledge items** examines whether the pattern extends beyond finance.
 
+The analysis distinguishes agreement between agents (Fleiss’ κ), correlation between their errors (φ), and predictive accuracy. These quantities measure different properties of ensemble behavior.
 
+### Key findings
 
-Computational artifact for the IEEE Access article:
+- **Agreement decreases with heterogeneity.** Fleiss’ κ declines from **0.552** in the homogeneous ensemble to **0.302** with one alternative-provider agent and **0.215** with three. The preregistered HOM–HET contrast is **0.336** (95% CI: 0.304–0.369).
+- **Shared-error dependence also decreases.** Binary-error correlation falls from **0.984** to **0.530**, a difference of **0.454** (95% CI: 0.376–0.534). Lower agreement and lower error correlation are related but distinct findings.
+- **Heterogeneity carries a measurable cost.** The fully heterogeneous configuration costs approximately **4.4×** as much per ensemble decision in metered inference charges.
+- **The result is not explained by capability tier alone.** An approximately capability-matched comparison retains about **94%** of the primary agreement contrast. Provider identity remains confounded with model-specific characteristics, so a provider-only causal effect is not identified.
+- **Independent generation matters.** A shared-seed pilot inflated the measured agreement contrast by roughly **4×** relative to an independent-draw protocol.
+- **Better average accuracy is not established.** Directional prediction shows no statistically reliable improvement at the study's power. An exploratory analysis finds approximately **1.8×** as many unanimous incorrect decisions in homogeneous ensembles, but that analysis is post hoc and hypothesis-generating.
 
-**The Price of De-correlation: Quantifying the Agreement–Cost Trade-off in Heterogeneous Large Language Model Ensembles**
+## Reproducibility
 
-### Paper summary
+This repository contains the frozen datasets, study configurations, preregistration records, analysis code, and validation procedures used to reproduce the paper's numerical findings and figures. The default reproduction workflow uses archived model responses: **no LLM API keys or new inference calls are required**.
 
-Ensembles of LLM agents are often assumed to benefit from diversity, yet neither the reduction in within-ensemble agreement bought by cross-provider heterogeneity, nor the reduction in error dependence, nor the inference cost of either is routinely measured under a statistically powered, pre-registered design. This article runs **54,000 independent LLM calls** across three five-agent configurations (heterogeneity levels {0, 1, 3}) on a directional financial-analysis task (100 equities × 12 dates), and replicates the ordering on 537 clinical-knowledge items. Output agreement is measured by Fleiss’ κ and error dependence by a φ correlation over paired binary error indicators, both with cluster-bootstrap confidence intervals over equities, over dates, and over the two margins jointly.
-
-**Main findings:**
-
-- Within-ensemble **agreement** falls monotonically as heterogeneity increases: κ = **0.552** (homogeneous), **0.302** (one heterogeneous agent), **0.215** (three), with the pre-registered primary contrast **Δκ(HOM−HET) = 0.336** (95% CI [0.304, 0.369]; two-way [0.279, 0.388]) — *Confirmed*.
-- **Error correlation** falls separately, from φ = **0.984** to **0.530**, a contrast of **0.454** (95% CI [0.376, 0.534]; two-way [0.328, 0.586]). κ measures agreement and φ measures error dependence; "de-correlation" in the title refers to the latter.
-- That reduction costs a **~4.4×** inference premium per ensemble decision (explicit agreement–cost frontier).
-- A capability-matched control preserves **~94%** of the contrast (**Δκ = 0.315**), so it is not explained by capability tier alone. Provider nevertheless remains bundled with model identity, training data, architecture and alignment, and is **not** identified as an independent causal factor.
-- A shared-seed measurement artifact can inflate the effect by ~**4×**; the article contributes an independent-draw protocol that removes it.
-- Average directional accuracy shows no reliable gain at this scale, and a selective-prediction analysis finds no AURC difference (**−0.001**, 95% CI [−0.059, 0.060]). An **exploratory** analysis finds homogeneous ensembles produce confident, unanimous, wrong calls at ~**1.8×** the heterogeneous rate; it is post hoc, unadjusted for multiplicity, and hypothesis-generating rather than confirmatory.
-
-This repository is the frozen dataset and analysis pipeline that regenerates those numerical results and figures.
+For an executable archival environment, use the [Code Ocean capsule](https://doi.org/10.24433/CO.9524962.v2). The [research guide](https://samirrc2.github.io/price-of-decorrelation/) provides a topic-organized discussion of the findings and limitations. The published IEEE Access article is the authoritative source for the research.
 
 ---
 
@@ -35,11 +33,14 @@ This repository is the frozen dataset and analysis pipeline that regenerates tho
 
 | Field | Value |
 |-------|--------|
-| **Article title** | The Price of De-correlation: Quantifying the Agreement–Cost Trade-off in Heterogeneous Large Language Model Ensembles |
-| **Authors** | Samir Chincholikar, Robin Chawla |
-| **Affiliations** | Independent researchers |
-| **Code repository** | https://github.com/samirrc2/price-of-decorrelation |
-| **Persistent DOI** | https://doi.org/10.24433/CO.9524962.v2 (`10.24433/CO.9524962.v2`) |
+| **Article** | *The Price of De-correlation: Quantifying the Agreement–Cost Trade-off in Heterogeneous Large Language Model Ensembles* |
+| **Authors** | Samir Chincholikar; Robin Chawla |
+| **Affiliation** | Independent researchers |
+| **Journal** | IEEE Access (2026) |
+| **Article DOI** | [10.1109/ACCESS.2026.3749218](https://doi.org/10.1109/ACCESS.2026.3749218) |
+| **Manuscript** | ACCESS-2026-50920 |
+| **Research repository** | https://github.com/samirrc2/price-of-decorrelation |
+| **Code Ocean capsule DOI** | [10.24433/CO.9524962.v2](https://doi.org/10.24433/CO.9524962.v2) |
 | **Contact** | Samir Chincholikar: samir.chincholikar@gmail.com; Robin Chawla: robin.chawla.cse14@iitbhu.ac.in |
 | **ORCID** | Samir Chincholikar: https://orcid.org/0009-0007-2779-3492; Robin Chawla: https://orcid.org/0009-0007-2807-3948 |
 
