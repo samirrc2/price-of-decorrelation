@@ -1,5 +1,12 @@
 # The Price of De-correlation
 
+**IEEE Access publication:** *The Price of De-Correlation: Quantifying the Agreement–Cost Trade-Off in Heterogeneous Large Language Model Ensembles*, by Samir Chincholikar and Robin Chawla. **Accepted 27 October 2026** (manuscript ACCESS-2026-50920). **Journal DOI:** [10.1109/ACCESS.2026.3749218](https://doi.org/10.1109/ACCESS.2026.3749218). The accepted author proof does not specify an online publication date; check the DOI record for the final bibliographic details.
+
+**Research companion website (re1):** [100 research questions and answers](https://samirrc2.github.io/price-of-decorrelation/) — **50 Research Questions + 50 Generic Questions** on model heterogeneity, agent agreement, correlated errors, false consensus, inference cost, shared-seed artifacts and financial decision systems. The website links to the IEEE Access article as the publication of record; it does not host a submitted-manuscript PDF.
+
+**Reproducibility:** [Code Ocean capsule DOI 10.24433/CO.9524962.v2](https://doi.org/10.24433/CO.9524962.v2) is the separate executable artifact, not the journal-article DOI.
+
+
 Computational artifact for the IEEE Access article:
 
 **The Price of De-correlation: Quantifying the Agreement–Cost Trade-off in Heterogeneous Large Language Model Ensembles**
