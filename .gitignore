@@ -40,3 +40,28 @@ submission/missfont.log
 submission/final_submission/Final Files Checklist Completed.docx
 submission/final_submission/Final Files Checklist Completed.pdf
 submission/_ Final-Files-Checklist.docx
+
+# Peer-review correspondence and the machinery built to answer it.
+# Kept on disk — journals ask for these again at proof stage — but not published
+# in the archival record, which is the accepted article and the artifact that
+# reproduces it. Removed after acceptance (IEEE Access, 27 October 2026).
+submission/IEEE-Access-Response-to-Reviewers.docx
+submission/IEEE-Access-Response-to-Reviewers.pdf
+submission/IEEE-Access-Response-to-Reviewers.tex
+submission/response_to_reviewers.txt
+submission/highlighted_pdf.pdf
+submission/build_response.py
+submission/build_highlighted.sh
+submission/check_highlighting.py
+submission/highlight_overlay.py
+# Gates whose only input was the response letter or the highlighted copy.
+code/src/check_response_consistency.py
+code/src/check_letter_binding.py
+code/src/check_letter_refs.py
+code/src/check_letter_actions.py
+code/src/check_letter_sections.py
+code/src/check_freeze_timestamps.py
+code/src/check_highlight_coverage.py
+# Proof-stage correspondence with the publisher (author query responses).
+submission/AQ_response.pdf
+submission/AQ_response.tex

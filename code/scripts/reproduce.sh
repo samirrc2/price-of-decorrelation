@@ -329,7 +329,7 @@ _run_gates() {
 
   # Hashes verifying is not the same as the inputs being COMPLETE. The capsule passed its
   # hash check while data/datacache/forward_returns.json was missing, which silently turned
-  # an offline run into a network-dependent one and then crashed the reviewer analyses.
+  # an offline run into a network-dependent one and then crashed the robustness analyses.
   echo "[gate] capsule completeness (inputs a /code + /data mount must carry)"
   _gate capsule "$PY" "$CODE_ROOT/src/make_manifest.py" --capsule || return 1
 
@@ -337,9 +337,9 @@ _run_gates() {
   # is what LOCKS them -- previously reproduce.sh rebuilt the primary endpoint and left
   # results/revision_metrics.json and results/mmlu_replication.json as whatever was last
   # committed, so a stale revision number could not be detected by any run.
-  echo "[gate] revision arms (reviewer analyses + cross-domain replication)"
+  echo "[gate] robustness arms (clustering, selective prediction + cross-domain replication)"
   if [[ -f "$DATA_ROOT/confirmatory/latest/runs.csv" || -d "$DATA_ROOT/confirmatory" ]]; then
-    _gate revision "$PY" "$CODE_ROOT/src/reviewer_revision.py" || return 1
+    _gate revision "$PY" "$CODE_ROOT/src/robustness_analysis.py" || return 1
   else
     echo "     [revision] NOT CHECKABLE: confirmatory capture absent"; GATES_INCOMPLETE=1
   fi
@@ -350,11 +350,11 @@ _run_gates() {
   fi
 
   # Three further analyses feed the manuscript and were NEVER run by reproduce.sh, so the
-  # HET-SameTier control, the temperature sweep and the reviewer-hardening tables were
+  # HET-SameTier control, the temperature sweep and the agreement-robustness tables were
   # whatever a past run happened to leave behind. All three are keys-free functions of
   # frozen inputs; regenerating them is what locks those manuscript values.
-  echo "[gate] supporting analyses (control arm, temperature sweep, reviewer hardening)"
-  for _s in analyze_pilot control_kappa temp_analyze reviewer_analysis; do
+  echo "[gate] supporting analyses (control arm, temperature sweep, agreement robustness)"
+  for _s in analyze_pilot control_kappa temp_analyze agreement_analysis; do
     if [[ -f "$CODE_ROOT/src/$_s.py" ]]; then
       _gate "$_s" "$PY" "$CODE_ROOT/src/$_s.py" || return 1
     fi
@@ -392,30 +392,8 @@ _run_gates() {
   _gate figures "$PY" "$CODE_ROOT/src/check_figures.py" || return 1
   echo "[gate] claim values vs the reviewed lock"
   _gate claims-lock "$PY" "$CODE_ROOT/src/check_claims_bound.py" || return 1
-  # The response letter quotes most of the paper's numbers back to the reviewers, and for this
-  # whole revision nothing bound them: substituting 0.455 for the error-correlation contrast
-  # 0.454 passed every gate, because 0.455 is the true value of a different claim. These four
-  # gates bind the letter the way check_binding binds the manuscript, and check its factual
-  # claims about the paper: numbers, section and table pointers, what was added or revised
-  # against the as-submitted tag, and the reference numbers it quotes.
-  echo "[gate] response-letter numbers bound to claims"
-  _gate letter-binding "$PY" "$CODE_ROOT/src/check_letter_binding.py" || return 1
-  echo "[gate] response-letter section, table and figure pointers"
-  _gate letter-sections "$PY" "$CODE_ROOT/src/check_letter_sections.py" || return 1
-  echo "[gate] response-letter claims about what changed"
-  _gate letter-actions "$PY" "$CODE_ROOT/src/check_letter_actions.py" || return 1
-  echo "[gate] letter and manuscript tell the reviewers the same story"
-  _gate response-consistency "$PY" "$CODE_ROOT/src/check_response_consistency.py" || return 1
   echo "[gate] freeze receipts vs the commits and artifacts they attest"
   _gate freeze-receipt "$PY" "$CODE_ROOT/src/check_freeze_receipt.py" || return 1
-  # Does the yellow on the page match what actually changed? Nothing else asks this: the other
-  # highlighting checks verify that the two PDFs share a layout and that the build located every
-  # change it was told about, which is not the same question. Four defects reached the author
-  # before this gate existed.
-  echo "[gate] highlighting vs the real diff against as-submitted"
-  _gate highlight-coverage "$PY" "$CODE_ROOT/src/check_highlight_coverage.py" || return 1
-  echo "[gate] freeze timestamps quoted in prose vs the receipts"
-  _gate freeze-timestamps "$PY" "$CODE_ROOT/src/check_freeze_timestamps.py" || return 1
   echo "[gate] unit tests"
   if [[ -d "$CODE_ROOT/tests" ]]; then
     if "$PY" -c "import pytest" >/dev/null 2>&1; then

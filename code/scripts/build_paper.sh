@@ -107,7 +107,7 @@ sync_figures() {
     echo "  synced $f  ←  $src/$f"
   done
 
-  # fig5: from results/latest/figures (reviewer_analysis), else keep paper copy
+  # fig5: from results/latest/figures (agreement_analysis), else keep paper copy
   if [[ -f "$src/fig5_calibration.png" ]]; then
     cp -f "$src/fig5_calibration.png" "$FIG_DST/fig5_calibration.png"
     echo "  synced fig5_calibration.png  ←  $src/fig5_calibration.png"

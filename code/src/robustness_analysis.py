@@ -1,13 +1,12 @@
-"""Reviewer-requested analyses for the revision. Reads only frozen data; $0.
+"""Robustness analyses on the frozen data; no API calls, $0.
 
-Each block is keyed to the comment it answers. Writes results/revision_metrics.json
-and prints a summary. Nothing here changes analyze.py, which remains the frozen
-confirmatory pipeline.
+Writes results/revision_metrics.json and prints a summary. Nothing here changes
+analyze.py, which remains the frozen confirmatory pipeline.
 
-  R3.2  bootstrap unit: ticker (primary), date, and two-way equity/date clustering
-  R1.4  cluster-bootstrap CIs on the post-hoc unanimous-incorrect statistic
-  R1.5  independence diagnostic restricted to different-model agent pairs
-  R1.1 / R3.4  selective prediction: risk-coverage curve and AURC
+  - bootstrap unit: ticker (primary), date, and two-way equity/date clustering
+  - cluster-bootstrap CIs on the post-hoc unanimous-incorrect statistic
+  - independence diagnostic restricted to different-model agent pairs
+  - selective prediction: risk-coverage curve and AURC
 """
 from __future__ import annotations
 import csv, itertools, json, math, os, random, sys, collections
@@ -439,11 +438,11 @@ def paired_cluster_contrasts(rows, signs, tick):
     table in the paper rests on one resampling scheme.
     """
     # pile-on: per (config, ticker) the wrong-majority decisions and the agreeing fraction
-    # Reuse reviewer_analysis's own grouping and tie-break rather than re-deriving them. A
+    # Reuse agreement_analysis's own grouping and tie-break rather than re-deriving them. A
     # first version filtered on ok=="True" and used Counter.most_common, which differs from
     # M.usable() and from the DIRS-ordered tie-break, and produced HET = 0.6761 against the
     # published 0.636 -- a second version of exactly the contradiction R3.2 is about.
-    import reviewer_analysis as RA
+    import agreement_analysis as RA
     pile = {c: collections.defaultdict(lambda: [0.0, 0]) for c in ("HOM", "HET")}
     for cfg in ("HOM", "HET"):
         for (t, d, _run), agents in RA.decision_groups(rows, cfg).items():
@@ -482,7 +481,7 @@ def paired_cluster_contrasts(rows, signs, tick):
                 pts.extend([(c, e)] * int(k))
         return _aurc_from(pts)[0]
 
-    # The point estimates must equal the ones already published by reviewer_analysis.downstream
+    # The point estimates must equal the ones already published by agreement_analysis.downstream
     # and selective(); a bootstrap around a different number is a different statistic.
     ref_sel = selective(rows, signs)
     ref = {"pile_on": {c: RA.downstream(rows, signs, c)["cond_agree_given_wrong"]

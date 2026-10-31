@@ -69,7 +69,7 @@ A [Code Ocean](https://codeocean.com/) compute capsule for this artifact is avai
 | `/code` | `run`, `src/`, `scripts/`, `tests/`, `requirements.txt` |
 | `/data` | the frozen captures (confirmatory, clinical, control, temperature, pilot), `configs/`, `inputs/`, `inputs_mmlu/`, `datacache/`, `MANIFEST.sha256`, clinical ground truth |
 | `/results` | written by the run: `claims.json`, metrics, tables, figures, the supporting-arm reports |
-| `docs/` + root | the two freeze receipts, both frozen pre-registrations, `PREREGISTRATION_AMENDMENTS.md`, `DATA_MANIFEST.md` — the evidence the response to reviewers points at |
+| `docs/` + root | the two freeze receipts, both frozen pre-registrations, `PREREGISTRATION_AMENDMENTS.md`, `DATA_MANIFEST.md` — the evidence the article points the reader at |
 
 The capsule is assembled and self-verified by `bash code/scripts/build_capsule.sh`, which builds
 from `git archive HEAD` rather than the working tree, runs the capsule's own entry point inside
@@ -91,7 +91,7 @@ verifies the numbers runs in full. A capsule run therefore exits **0** on succes
 | Gate | In a capsule |
 |------|---|
 | Determinism, input integrity, capsule completeness | runs |
-| Revision arms, supporting analyses, claims extraction | runs |
+| Robustness arms, supporting analyses, claims extraction | runs |
 | Manuscript agreement (`check_claims.py`) | skipped — needs `paper/main.tex` |
 | Manuscript provenance (`check_coverage.py`) | skipped — needs `paper/main.tex` |
 | Unit tests | runs |
@@ -266,8 +266,8 @@ planted and the gate confirmed to fail on it before being trusted to pass.
 | Determinism | two analysis passes, 13 outputs hash-compared | order- or seed-dependence |
 | `make_manifest.py --verify` | all 1,752 frozen inputs match their pinned SHA-256 | an input that changed, was regenerated, or vanished |
 | `make_manifest.py --capsule` | the inputs a `/code`+`/data` mount cannot run without are present | a capsule that passes its hashes while missing the offline price cache — hashing proves what you have is unchanged, not that you have everything |
-| `reviewer_revision.py`, `analyze_mmlu.py` | the revision arms regenerate from frozen captures | a stale reviewer or cross-domain number |
-| `control_kappa.py`, `temp_analyze.py`, `reviewer_analysis.py` | the control arm, temperature sweep and agreement-robustness tables regenerate | a supporting-arm number left behind by an older run |
+| `robustness_analysis.py`, `analyze_mmlu.py` | the robustness arms regenerate from frozen captures | a stale robustness or cross-domain number |
+| `control_kappa.py`, `temp_analyze.py`, `agreement_analysis.py` | the control arm, temperature sweep and agreement-robustness tables regenerate | a supporting-arm number left behind by an older run |
 | `make_claims.py` | 365 named claims extract from the regenerated outputs | an analysis that stopped emitting a number the paper cites |
 | `check_claims.py` | `paper/main.tex` agrees with the analysis | a drifted figure, including a plausible near-miss; a machine-specific path in a committed output; a stale hash or path in `archive_manifest.md` |
 | `check_coverage.py` | **every** numeric literal in `main.tex` traces to a claim, a documented transform, or a declared non-result | a manuscript number that no analysis produces — this is the gate that found five published figures with no generating code |
@@ -331,7 +331,7 @@ verification — there is nothing to compare by eye.
 | Agreement robustness, HOM (Fleiss / Krippendorff / Gwet) | `reviewer_metrics.md` | 0.5517 / 0.5518 / 0.7428 |
 | Cross-domain replication (MMLU, 537 items) | `../mmlu_replication.json` | Δκ = 0.0719, Δφ = 0.3927 |
 | Capability-matched pair contrast | `../mmlu_replication.json` | Δφ = 0.3471 [0.2070, 0.5073] |
-| Reviewer analyses (clustering, selective prediction, pair types) | `../revision_metrics.json` | over 54,000 calls |
+| Robustness analyses (clustering, selective prediction, pair types) | `../revision_metrics.json` | over 54,000 calls |
 | Request accounting | `claims.json` | 94,566 requests; 40,566 unsuccessful = 40,544 rate-limit/quota + 22 transport/schema |
 
 **Determinism** — the console and `results/latest/replication_check.md` must report:
@@ -392,8 +392,8 @@ price-of-decorrelation/
 │   │   ├── replication_check.py # two passes + hash compare
 │   │   ├── control_kappa.py     # HET-SameTier capability control
 │   │   ├── temp_analyze.py      # temperature robustness
-│   │   ├── reviewer_analysis.py # agreement robustness, unanimity, hit rates
-│   │   ├── reviewer_revision.py # clustering, selective prediction, pair types
+│   │   ├── agreement_analysis.py # agreement robustness, unanimity, hit rates
+│   │   ├── robustness_analysis.py # clustering, selective prediction, pair types
 │   │   ├── analyze_mmlu.py      # cross-domain + capability-matched contrast
 │   │   ├── make_manifest.py     # pin and verify inputs; --capsule completeness
 │   │   ├── make_claims.py       # extract every claim the paper may assert

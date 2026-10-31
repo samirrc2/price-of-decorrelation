@@ -8,7 +8,7 @@
 #
 #   * it is assembled from `git archive HEAD`, never from the working tree, so an uncommitted
 #     file cannot end up in a capsule that a reader can never reproduce;
-#   * the document gates (manuscript binding, letter checks, IEEE ordering, freeze receipts)
+#   * the document gates (manuscript binding, IEEE ordering, freeze receipts)
 #     cannot run there and must exit 2, "not checkable", rather than 0. reproduce.sh already
 #     distinguishes those cases; this script asserts the distinction held;
 #   * the capsule must carry every input the analysis arms read. make_manifest.py --capsule
@@ -50,11 +50,11 @@ git archive HEAD | tar -x -C "$TMP"
 for p in code data environment metadata docs; do
   [[ -e "$TMP/$p" ]] && cp -R "$TMP/$p" "$DEST/$p"
 done
-# docs/ carries the evidence the response letter promises the reader: the two freeze receipts and
-# the frozen pre-registrations. R3.5 says "the released package also contains timestamped
+# docs/ carries the evidence the article points the reader at: the two freeze receipts and the
+# frozen pre-registrations. The article states that the released package contains timestamped
 # cryptographic freeze receipts for both the confirmatory study and the cross-domain
-# replication", and the first capsule this script built did not contain them -- the promise was
-# kept by the GitHub release and broken by the capsule, which is the artifact a reviewer runs.
+# replication, and the first capsule this script built did not contain them -- the promise was
+# kept by the GitHub release and broken by the capsule, which is the artifact a reader runs.
 for f in LICENSE PREREGISTRATION_AMENDMENTS.md DATA_MANIFEST.md archive_manifest.md; do
   cp "$TMP/$f" "$DEST/" 2>/dev/null || true
 done
@@ -86,7 +86,7 @@ TXT
 echo "  size: $(du -sh "$DEST" | cut -f1)"
 echo "  mounts: $(cd "$DEST" && ls -d */ | tr '\n' ' ')"
 
-echo "== evidence the response letter promises the reader =="
+echo "== evidence the article promises the reader =="
 MISSING_EVIDENCE=0
 for f in docs/freeze_receipt.md docs/freeze_receipt_mmlu.md docs/preregistration.md \
          docs/preregistration_mmlu.md PREREGISTRATION_AMENDMENTS.md; do
@@ -97,7 +97,7 @@ for f in docs/freeze_receipt.md docs/freeze_receipt_mmlu.md docs/preregistration
   fi
 done
 if [[ "$MISSING_EVIDENCE" != "0" ]]; then
-  echo "!! the capsule is missing evidence the response letter tells reviewers it contains" >&2
+  echo "!! the capsule is missing evidence the article tells the reader it contains" >&2
   exit 1
 fi
 
@@ -112,7 +112,7 @@ echo "== running the capsule's own entry point =="
 }
 grep -E "NOT CHECKABLE|capsule layout|all gates passed" "$DEST/_run.log" | sed 's/^/   /'
 # A document gate inside a capsule must say "not checkable" (exit 2), never "failed" (exit 1).
-# The first build of this script caught check_letter_actions doing exactly that.
+# The first build of this script caught a document gate doing exactly that.
 if grep -q "FAILED (exit 1)" "$DEST/_run.log"; then
   echo "!! a gate reported a FAILURE inside the capsule; a gate that cannot run here must" >&2
   echo "!! exit 2, not 1. Offending lines:" >&2

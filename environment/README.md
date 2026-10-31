@@ -28,7 +28,7 @@ numbers themselves runs in full:
 |------|---|---|
 | Determinism (two analysis passes, hash-compared) | yes | every output byte-identical across re-runs |
 | Input integrity (`make_manifest.py --verify`) | yes | all 1,747 frozen inputs match their pinned SHA-256 |
-| Revision arms (`reviewer_revision.py`, `analyze_mmlu.py`) | yes | the reviewer analyses and the cross-domain replication regenerate |
+| Robustness arms (`robustness_analysis.py`, `analyze_mmlu.py`) | yes | the robustness analyses and the cross-domain replication regenerate |
 | Claims extraction (`make_claims.py`) | yes | the named numbers come out of the regenerated outputs |
 | Manuscript agreement (`check_claims.py`) | **no** — needs `paper/main.tex` | no reported number has drifted from the analysis |
 | Unit tests | yes | metric and bootstrap primitives |

@@ -39,17 +39,22 @@
     "python3 code/src/check_claims.py",
     "python3 code/src/check_claims_bound.py",
     "python3 code/src/check_ieee_style.py",
-    "python3 code/src/check_letter_refs.py",
-    "python3 code/src/check_letter_actions.py",
-    "python3 code/src/check_response_consistency.py",
-    "python3 code/src/check_letter_sections.py",
-    "python3 code/src/check_letter_binding.py",
-    "python3 code/src/check_freeze_timestamps.py",
     "python3 code/src/check_freeze_receipt.py",
-    "python3 code/src/check_highlight_coverage.py",
     "python3 code/src/check_figures.py"
   ],
   "inputs": [
     "data/confirmatory/latest/runs.csv"
-  ]
+  ],
+  "gates_removed_after_acceptance": {
+    "why": "These gates read the response letter or the highlighted copy, both of which were untracked after acceptance. In a fresh clone their input does not exist, so they would exit 2 and make every con1 fault-injection run uninterpretable.",
+    "gates": [
+      "python3 code/src/check_letter_refs.py",
+      "python3 code/src/check_letter_actions.py",
+      "python3 code/src/check_response_consistency.py",
+      "python3 code/src/check_letter_sections.py",
+      "python3 code/src/check_letter_binding.py",
+      "python3 code/src/check_freeze_timestamps.py",
+      "python3 code/src/check_highlight_coverage.py"
+    ]
+  }
 }

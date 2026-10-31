@@ -1,14 +1,14 @@
-"""Post-hoc, frozen-data re-analysis for the reviewer-hardening pass.
+"""Post-hoc, frozen-data re-analysis of ensemble agreement and its downstream value.
 
 Reads ONLY runs.csv + config.yaml + datacache/forward_returns.json (no API calls,
 no new data). Produces, per config:
 
-  #2 Downstream benefit (exploratory)
+  Downstream benefit (exploratory)
      - unanimous directional-wrong rate  (manufactured consensus / tail risk)
      - agent-agreement conditional on the ensemble being wrong (Kim-style)
      - conviction calibration: hit-rate by conviction bucket (per-agent, directional)
 
-  #4 Agreement robustness (prevalence-paradox rebuttal)
+  Agreement robustness under chance-correction choice
      - Krippendorff's alpha (nominal) and Gwet's AC1, per-run-averaged like kappa
      - BUY/HOLD/SELL marginals per config
 

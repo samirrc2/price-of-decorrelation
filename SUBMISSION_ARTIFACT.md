@@ -4,7 +4,7 @@ Canonical manuscript: **`paper/main.tex`** (IEEE Access template). Analysis outp
 under **`results/latest/`**; `results/latest/claims.json` is the machine-readable record of
 every number the paper is allowed to assert.
 
-## What reviewers / editors get
+## What the reader gets
 
 | Artifact | Location |
 |---|---|
@@ -38,7 +38,7 @@ run if `paper/main.tex` disagrees with the regenerated analysis.
 |---|---|
 | Determinism (two passes, 13 outputs hash-compared) | any order- or seed-dependence in the analysis |
 | `make_manifest.py --verify` | a frozen input that changed, was regenerated, or went missing |
-| `reviewer_revision.py`, `analyze_mmlu.py` | a stale revision number: these are regenerated, not trusted |
+| `robustness_analysis.py`, `analyze_mmlu.py` | a stale robustness number: these are regenerated, not trusted |
 | `make_claims.py` | an analysis that no longer emits a number the paper cites |
 | `check_claims.py` | a manuscript figure that drifted from the analysis, including a near-miss |
 | `pytest code/tests` | a regression in the metric or bootstrap primitives |
