@@ -2,3 +2,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://samirrc2.github.io/price-of-decorrelation/sitemap.xml
+Sitemap: https://samirrc2.github.io/price-of-decorrelation/research-sitemap.xml
